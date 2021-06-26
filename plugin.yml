@@ -1,0 +1,6 @@
+name: RyzerCore
+api: 3.0.0
+author: BauboLP
+main: baubolp\core\Ryzer
+description: RyzerCore for RyzerBE
+version: 1.0
