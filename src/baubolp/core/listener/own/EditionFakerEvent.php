@@ -77,7 +77,7 @@ class EditionFakerEvent extends Event
             return [];
         }
 
-        $c = new Config("/root/RyzerCloud/data/editionfaker.json", 2);
+        $c = new Config("/root/RyzerCloud/data/editionfaker.json", Config::JSON);
         return $c->get("whitelist");
     }
 
