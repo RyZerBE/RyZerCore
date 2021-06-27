@@ -34,6 +34,7 @@ use baubolp\core\listener\BowHitEntityListener;
 use baubolp\core\listener\CommandListener;
 use baubolp\core\listener\DamageListener;
 use baubolp\core\listener\DataPacketReceiveListener;
+use baubolp\core\listener\EditionFakerListener;
 use baubolp\core\listener\ExplosionPrimeListener;
 use baubolp\core\listener\PlayerChatListener;
 use baubolp\core\listener\PlayerCreationListener;
@@ -74,7 +75,8 @@ class Loader
             new BowHitEntityListener(),
             new ExplosionPrimeListener(),
             new PlayerJoinNetworkListener(),
-            new PlayerQuitNetworkListener()
+            new PlayerQuitNetworkListener(),
+            new EditionFakerListener()
         ];
 
 
