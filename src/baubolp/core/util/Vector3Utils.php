@@ -27,9 +27,9 @@ class Vector3Utils {
     public static function fromString(string $vector3): Vector3 {
         $vector3 = explode(":", $vector3);
         return new Vector3(
-            (float)(isset($vector3[0]) ? $vector3[0] : 0),
-            (float)(isset($vector3[1]) ? $vector3[1] : 0),
-            (float)(isset($vector3[2]) ? $vector3[2] : 0)
+            (float)($vector3[0] ?? 0),
+            (float)($vector3[1] ?? 0),
+            (float)($vector3[2] ?? 0),
         );
     }
 
