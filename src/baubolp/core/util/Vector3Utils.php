@@ -3,6 +3,8 @@
 namespace baubolp\core\util;
 
 use pocketmine\math\Vector3;
+use function max;
+use function min;
 
 class Vector3Utils {
 
@@ -38,11 +40,9 @@ class Vector3Utils {
      * @return bool
      */
     public static function inArea(Vector3 $pos1, Vector3 $pos2, Vector3 $vector3): bool {
-        return (
-            $vector3->x >= min($pos1->x, $pos2->x) && $vector3->x <= max($pos1->x, $pos2->x) &&
-            $vector3->y >= min($pos1->y, $pos2->y) && $vector3->y <= max($pos1->y, $pos2->y) &&
-            $vector3->z >= min($pos1->z, $pos2->z) && $vector3->z <= max($pos1->z, $pos2->z)
-        );
+        if($vector3->x <= min($pos1->x, $pos2->x) or $vector3->x >= max($pos1->x, $pos2->x)) return false;
+        if($vector3->y <= min($pos1->y, $pos2->y) or $vector3->y >= max($pos1->y, $pos2->y)) return false;
+        return $vector3->z > min($pos1->z, $pos2->z) and $vector3->z < max($pos1->z, $pos2->z);
     }
 
     /**
