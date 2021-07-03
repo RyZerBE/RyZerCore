@@ -43,7 +43,7 @@ class Emotes
     public const BORED = "7a314ecf-f94c-42c0-945f-76903c923808";
     public const BIG_CHUCKLES = "819f2f36-2a16-440c-8e46-94c6b003a2e0";
     public const AHH_CHOO = "f9345ebb-4ba3-40e6-ad9b-6bfb10c92890";
-    public const DAnCING_LIKE_TOOTHLESS = "a12252fa-4ec8-42e0-a7d0-d44fbc90d753";
+    public const DANCING_LIKE_TOOTHLESS = "a12252fa-4ec8-42e0-a7d0-d44fbc90d753";
     public const VICTORY_CHEER = "d0c60245-538e-4ea2-bdd4-33477db5aa89";
     public const ACTING_LIKE_A_DRAGON = "c2a47805-c792-4882-a56d-17c80b6c57a8";
     public const CHATTING = "59d9e78c-f0bb-4f14-9e9b-7ab4f58ffbf5";
