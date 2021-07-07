@@ -4,3 +4,5 @@ author: BauboLP
 main: baubolp\core\Ryzer
 description: RyzerCore for RyzerBE
 version: 1.0
+loadbefore:
+  - ChestOpening
