@@ -16,8 +16,6 @@ class EditionFakerEvent extends Event
     private $input;
     /** @var int */
     private $os;
-    /** @var bool  */
-    private $faker = false;
     /** @var string  */
     private $name;
 
