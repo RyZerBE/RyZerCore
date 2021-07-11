@@ -6,6 +6,7 @@ namespace baubolp\core\task;
 use BauboLP\BW\BW;
 use BauboLP\Cloud\Bungee\BungeeAPI;
 use BauboLP\Cloud\Provider\CloudProvider;
+use baubolp\core\listener\own\RyZerPlayerAuthEvent;
 use baubolp\core\player\RyzerPlayer;
 use baubolp\core\player\RyzerPlayerProvider;
 use baubolp\core\provider\DiscordProvider;
@@ -410,6 +411,9 @@ class LoadAsyncDataTask extends AsyncTask
                 }
             }
 
+            $ev = new RyZerPlayerAuthEvent($obj, $obj->getLoginData());
+            $ev->call();
+            
             if(VIPJoinProvider::isVipJoin())
                 VIPJoinProvider::check($player);
         }
