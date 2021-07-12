@@ -26,7 +26,7 @@ class CommandListener implements Listener
         if ($command[0] == "/") {
             DiscordProvider::sendMessageToDiscord("Spion", $event->getPlayer()->getName()." | ".$command, Webhooks::COMMAND_LOG);
             $data = explode(" ", $command);
-            if (Server::getInstance()->getCommandMap()->getCommand(str_replace("/", "", $data[0])) == null) {
+            if (Server::getInstance()->getCommandMap()->getCommand(str_replace(["//", "/", "#"], ["#", "", "/"], $data[0])) == null) {
                 $event->getPlayer()->sendMessage(Ryzer::PREFIX . LanguageProvider::getMessageContainer('command-not-found', $event->getPlayer()->getName()));
                 $event->setCancelled();
                 return;
