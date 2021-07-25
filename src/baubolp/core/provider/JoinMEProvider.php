@@ -117,12 +117,12 @@ class JoinMEProvider
         CloudBridge::getInstance()->getClient()->getPacketHandler()->writePacket($pk);
 
         $name = $player->getName();
-        $server = CloudProvider::getServer();
-        AsyncExecutor::submitMySQLAsyncTask("RyzerCore", function (\mysqli $mysqli) use ($name, $server){
-            $mysqli->query("INSERT INTO `JoinMe`(`playername`, `server`) VALUES ('$name', '$server')");
-        }, function (Server $server, $result) use ($name, $server){
+        $serverName = CloudProvider::getServer();
+        AsyncExecutor::submitMySQLAsyncTask("RyzerCore", function (\mysqli $mysqli) use ($name, $serverName){
+            $mysqli->query("INSERT INTO `JoinMe`(`playername`, `server`) VALUES ('$name', '$serverName')");
+        }, function (Server $server, $result) use ($name, $serverName){
             if(($player = $server->getPlayerExact($name)) != null)
-                $player->sendMessage(Ryzer::PREFIX.LanguageProvider::getMessageContainer('joinme-created', $player->getName(), ['#server' => $server]));
+                $player->sendMessage(Ryzer::PREFIX.LanguageProvider::getMessageContainer('joinme-created', $player->getName(), ['#server' => $serverName]));
             JoinMEProvider::$joinMe[$name] = time() + 40;
         });
     }
