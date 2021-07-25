@@ -123,10 +123,9 @@ class RankProvider
                     }
                 }
                 $mysqli->query("UPDATE Ranks SET permissions='$newPermissions' WHERE rankname='$rank'");
-                $this->setResult(true);
-                return;
+                return true;
             }
-            $this->setResult(false);
+            return false;
         }, function (Server $server, bool $success) use ($permission, $senderName, $rank){
             if(($player = Server::getInstance()->getPlayerExact($senderName)) != null) {
                 if($success)
@@ -160,10 +159,10 @@ class RankProvider
                     }
                 }
                 $mysqli->query("UPDATE Ranks SET permissions='$newPermissions' WHERE rankname='$rank'");
-                $this->setResult(true);
+                return true;
                 return;
             }
-            $this->setResult(false);
+            return false;
         }, function (Server $server, bool $success) use ($senderName, $permission, $rank){
             if(($player = Server::getInstance()->getPlayerExact($senderName)) != null) {
                 if ($success)
@@ -183,7 +182,7 @@ class RankProvider
     {
         AsyncExecutor::submitMySQLAsyncTask("RyzerCore", function (\mysqli $mysqli) use ($playerName, $senderName, $rank) {
             $mysqli->query("UPDATE PlayerPerms SET rankname='$rank' WHERE playername='$playerName'");
-            $this->setResult(true);
+            return true;
         }, function (Server $server, bool $success) use ($senderName, $playerName, $rank) {
             if(($player = Server::getInstance()->getPlayerExact($senderName)) != null) {
                 if($success)
@@ -202,9 +201,8 @@ class RankProvider
     public static function setJoinPower(string $rank, string $senderName, int $joinPower)
     {
         AsyncExecutor::submitMySQLAsyncTask("RyzerCore", function (\mysqli $mysqli) use ($joinPower, $senderName, $rank){
-            $mysqli = new \mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
             $mysqli->query("UPDATE `Ranks` SET joinpower='$joinPower' WHERE rankname='$rank'");
-            $this->setResult(true);
+            return true;
         }, function (Server $server, bool $success) use ($senderName, $rank, $joinPower){
             if(($player = Server::getInstance()->getPlayerExact($senderName)) != null) {
                 if($success)
@@ -238,10 +236,9 @@ class RankProvider
                     }
                 }
                 $mysqli->query("UPDATE PlayerPerms SET permissions='$newPermissions' WHERE playername='$playerName'");
-                $this->setResult(true);
-                return;
+                return true;
             }
-            $this->setResult(false);
+            return false;
         }, function (Server $server, bool $success) use ($permission, $senderName, $playerName){
             if(($player = Server::getInstance()->getPlayerExact($senderName)) != null) {
                 if($success)
@@ -271,10 +268,9 @@ class RankProvider
                     }
                 }
                 $mysqli->query("UPDATE PlayerPerms SET permissions='$newPermissions' WHERE playername='$playerName'");
-                $this->setResult(true);
-                return;
+                return true;
             }
-            $this->setResult(false);
+            return false;
         }, function (Server $server, bool $success) use ($senderName, $playerName, $permission){
             if(($player = Server::getInstance()->getPlayerExact($senderName)) != null) {
                 if($success)

@@ -51,7 +51,7 @@ class RyzerPermsCommand extends Command
             $playerName = $args[1];
             $rank = $args[2];
             if(!RankProvider::existRank($rank)) {
-                $sender->sendMessage(Ryzer::PREFIX.TextFormat::RED."Verfügbare Ränge: ".TextFormat::AQUA.implode(", ", array_keys(Ryzer::$ranks)));
+                $sender->sendMessage(Ryzer::PREFIX.TextFormat::RED."Verfügbare Ränge: ".TextFormat::AQUA.implode(", ", array_keys(RankProvider::$ranks)));
                 return;
             }
 
@@ -65,7 +65,7 @@ class RyzerPermsCommand extends Command
                 $rank = $args[1];
                 $permission = $args[2];
                 if(!RankProvider::existRank($rank)) {
-                    $sender->sendMessage(Ryzer::PREFIX.TextFormat::RED."Verfügbare Ränge: ".TextFormat::AQUA.implode(", ", array_keys(Ryzer::$ranks)));
+                    $sender->sendMessage(Ryzer::PREFIX.TextFormat::RED."Verfügbare Ränge: ".TextFormat::AQUA.implode(", ", array_keys(RankProvider::$ranks)));
                     return;
                 }
 
@@ -79,7 +79,7 @@ class RyzerPermsCommand extends Command
                 $rank = $args[1];
                 $permission = $args[2];
                 if(!RankProvider::existRank($rank)) {
-                    $sender->sendMessage(Ryzer::PREFIX.TextFormat::RED."Verfügbare Ränge: ".TextFormat::AQUA.implode(", ", array_keys(Ryzer::$ranks)));
+                    $sender->sendMessage(Ryzer::PREFIX.TextFormat::RED."Verfügbare Ränge: ".TextFormat::AQUA.implode(", ", array_keys(RankProvider::$ranks)));
                     return;
                 }
 
@@ -113,7 +113,7 @@ class RyzerPermsCommand extends Command
                 $rank = $args[1];
                 $joinPower = $args[2];
                 if(!RankProvider::existRank($rank)) {
-                    $sender->sendMessage(Ryzer::PREFIX.TextFormat::RED."Verfügbare Ränge: ".TextFormat::AQUA.implode(", ", array_keys(Ryzer::$ranks)));
+                    $sender->sendMessage(Ryzer::PREFIX.TextFormat::RED."Verfügbare Ränge: ".TextFormat::AQUA.implode(", ", array_keys(RankProvider::$ranks)));
                     return;
                 }
 

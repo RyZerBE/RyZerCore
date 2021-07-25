@@ -47,8 +47,6 @@ class Ryzer extends PluginBase
     public static $translations = [];
     /** @var array  */
     public static $banIds = [];
-    /** @var array  */
-    public static $ranks = [];
     /** @var \TobiasDev\DatabaseAPI\Connection */
     private static $async;
     /** @var \baubolp\core\Ryzer */
