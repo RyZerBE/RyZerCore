@@ -78,7 +78,7 @@ class DiscordProvider
     public static function reportAC(string $username, $firstcheck, $secondcheck, $thirdcheck, $average, $importance, $calls, $device)
     {
         if(($player = Server::getInstance()->getPlayerExact($username)) != null) {
-            $ping = $player->getPing();
+            $ping = "unknown";
             $tps = Server::getInstance()->getTicksPerSecond();
             $tps_procent = Server::getInstance()->getTickUsage();
 

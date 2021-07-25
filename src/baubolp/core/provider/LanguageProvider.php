@@ -51,7 +51,9 @@ class LanguageProvider
      */
     public static function setLanguage(string $username, string $language): void
     {
-        Ryzer::getAsyncConnection()->execute("UPDATE PlayerLanguage SET selected_language='$language' WHERE playername='$username'", 'RyzerCore', null);
+        AsyncExecutor::submitMySQLAsyncTask("RyzerCore", function (mysqli $mysqli) use ($language, $username){
+            $mysqli->query("UPDATE PlayerLanguage SET selected_language='$language' WHERE playername='$username'");
+        });
     }
 
     /**
@@ -103,7 +105,8 @@ class LanguageProvider
      */
     public static function loadKeys(string $language)
     {
-        Ryzer::getAsyncConnection()->executeQuery("SELECT * FROM ".$language, "Languages", function (mysqli_result $result) use ($language){
+        AsyncExecutor::submitMySQLAsyncTask("Languages", function (mysqli $mysqli) use ($language){
+            $result = $mysqli->query("SELECT * FROM ".$language);
             $translation = [];
             if($result->num_rows > 0) {
                 while ($data = $result->fetch_assoc()) {
@@ -111,14 +114,14 @@ class LanguageProvider
                 }
             }
             return $translation;
-        }, function ($r, $e){}, [], function (Server $server, array $translations, $extra_data) use ($language){
+        }, function (Server $server, array $translations) use ($language){
             $i = 0;
             foreach ($translations as $key => $message) {
                 Ryzer::$translations[$language][$key] = $message;
                 $i++;
             }
 
-            $server->getLogger()->info(TextFormat::YELLOW."$language were loaded! $i translations were found!");
+            $server->getLogger()->info(TextFormat::GOLD.$language.TextFormat::DARK_AQUA." were loaded!\n    ".TextFormat::DARK_GRAY."-> ".TextFormat::GOLD.$i." translations fetched!");
         });
     }
 
@@ -129,7 +132,9 @@ class LanguageProvider
      */
     public static function addKey(string $language, string $key, string $translation)
     {
-        Ryzer::getAsyncConnection()->execute("INSERT INTO `$language`(`messagekey`, `message`) VALUES ('$key', '$translation')", "Languages", null, []);
+        AsyncExecutor::submitMySQLAsyncTask("Languages", function (mysqli $mysqli) use ($translation, $key, $language){
+            $mysqli->query("INSERT INTO `$language`(`messagekey`, `message`) VALUES ('$key', '$translation')");
+        });
     }
 
     /**
@@ -138,7 +143,8 @@ class LanguageProvider
      */
     public static function removeKey(string $language, string $key)
     {
-        Ryzer::getAsyncConnection()->execute("DELETE FROM `$language` WHERE messagekey='$key'", "Languages", null, []);
+        AsyncExecutor::submitMySQLAsyncTask("Languages", function (mysqli $mysqli) use ($translation, $key, $language){
+            $mysqli->query("DELETE FROM `$language` WHERE messagekey='$key'");
+        });
     }
-
 }

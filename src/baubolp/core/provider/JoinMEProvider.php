@@ -116,40 +116,15 @@ class JoinMEProvider
         $pk->addData("message", $message);
         CloudBridge::getInstance()->getClient()->getPacketHandler()->writePacket($pk);
 
-        Ryzer::getMysqlProvider()->exec(new class($player->getName()) extends AsyncTask{
-            /** @var string */
-            private $name;
-            /** @var array */
-            private $mysqlData;
-            /** @var string */
-            private $server;
-
-            public function __construct(string $name)
-            {
-                $this->name = $name;
-                $this->mysqlData = MySQLProvider::getMySQLData();
-                $this->server = CloudProvider::getServer();
-            }
-
-            /**
-             * @inheritDoc
-             */
-            public function onRun()
-            {
-                $mysqli = new \mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
-                $name = $this->name;
-                $server = $this->server;
-                $mysqli->query("INSERT INTO `JoinMe`(`playername`, `server`) VALUES ('$name', '$server')");
-                $mysqli->close();
-            }
-
-            public function onCompletion(Server $server)
-            {
-                if(($player = $server->getPlayerExact($this->name)) != null)
-                    $player->sendMessage(Ryzer::PREFIX.LanguageProvider::getMessageContainer('joinme-created', $player->getName(), ['#server' => CloudProvider::getServer()]));
-            }
+        $name = $player->getName();
+        $server = CloudProvider::getServer();
+        AsyncExecutor::submitMySQLAsyncTask("RyzerCore", function (\mysqli $mysqli) use ($name, $server){
+            $mysqli->query("INSERT INTO `JoinMe`(`playername`, `server`) VALUES ('$name', '$server')");
+        }, function (Server $server, $result) use ($name, $server){
+            if(($player = $server->getPlayerExact($name)) != null)
+                $player->sendMessage(Ryzer::PREFIX.LanguageProvider::getMessageContainer('joinme-created', $player->getName(), ['#server' => $server]));
+            JoinMEProvider::$joinMe[$name] = time() + 40;
         });
-        JoinMEProvider::$joinMe[$player->getName()] = time() + 40;
     }
 
     /**
@@ -168,30 +143,11 @@ class JoinMEProvider
      */
     public static function removeJoinMe(string $playerName, bool $mysql = true)
     {
-        if(isset(self::$joinMe[$playerName])) {
+        if (isset(self::$joinMe[$playerName])) {
             unset(self::$joinMe[$playerName]);
-            if($mysql) {
-                Ryzer::getMysqlProvider()->exec(new class($playerName) extends AsyncTask{
-
-                    private $name;
-                    private $mysqlData;
-
-                    public function __construct(string $name)
-                    {
-                        $this->name = $name;
-                        $this->mysqlData = MySQLProvider::getMySQLData();
-                    }
-
-                    /**
-                     * @inheritDoc
-                     */
-                    public function onRun()
-                    {
-                        $mysqli = new \mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
-                        $name = $this->name;
-                        $mysqli->query("DELETE FROM JoinMe WHERE playername='$name'");
-                        $mysqli->close();
-                    }
+            if ($mysql) {
+                AsyncExecutor::submitMySQLAsyncTask("RyzerCore", function (\mysqli $mysqli) use ($playerName) {
+                    $mysqli->query("DELETE FROM JoinMe WHERE playername='$playerName'");
                 });
             }
         }
