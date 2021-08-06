@@ -406,7 +406,7 @@ class LoadAsyncDataTask extends AsyncTask
                 $obj->setOnlineTime(TextFormat::GOLD.$data['gameTime'][0].TextFormat::AQUA."H ".TextFormat::GOLD.$data['gameTime'][1].TextFormat::AQUA."M");
                 $obj->setMoreParticle($data['pm']);
                 if($data['clan'] != null && $data['clan'] != "null") {
-                    $obj->setClan(new Clan($data["clan"], $data["clanColor"].$data["clanTag"], (int)$data["clanElo"], $data["owner"] == $obj->getPlayer()->getName()));
+                    $obj->setClan(new Clan($data["clan"], $data["clanColor"].$data["clanTag"], (int)$data["clanElo"], $data["owner"]));
                 }
             }
 

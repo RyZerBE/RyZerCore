@@ -10,19 +10,20 @@ class Clan {
     private $clanTag;
     /** @var int  */
     private $elo = 100;
-    /** @var bool */
-    private $isOwner;
+    /** @var string */
+    private $owner;
+
     /**
      * @param string $clanName
      * @param string $clanTag
      * @param int $elo
-     * @param bool $isOwner
+     * @param string $owner
      */
-    public function __construct(string $clanName, string $clanTag, int $elo, bool $isOwner = false){
+    public function __construct(string $clanName, string $clanTag, int $elo, string $owner){
         $this->clanName = $clanName;
         $this->clanTag = $clanTag;
         $this->elo = $elo;
-        $this->isOwner = $isOwner;
+        $this->owner = $owner;
     }
 
     /**
@@ -47,9 +48,9 @@ class Clan {
     }
 
     /**
-     * @return bool
+     * @return string
      */
-    public function isOwner(): bool{
-        return $this->isOwner;
+    public function getOwner(): string{
+        return $this->owner;
     }
 }
