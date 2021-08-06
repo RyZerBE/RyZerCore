@@ -315,10 +315,10 @@ class RankProvider
         }
         $prefix = str_replace("&", TextFormat::ESCAPE, $prefix);
         $prefix = str_replace("{player_name}", ($player->getNick() == null) ? $player->getPlayer()->getName() : $player->getNick(), $prefix);
-        if($player->getClan() == null)
+        if($player->getClan() === null)
         return str_replace("{MSG}", $message, $prefix);
         else
-            return str_replace("&", TextFormat::ESCAPE, $player->getClanTag())." ".str_replace("{MSG}", $message, $prefix);
+            return str_replace("&", TextFormat::ESCAPE, $player->getClan()->getClanTag())." ".str_replace("{MSG}", $message, $prefix);
     }
 
     /**

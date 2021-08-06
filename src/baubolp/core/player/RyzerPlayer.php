@@ -5,6 +5,7 @@ namespace baubolp\core\player;
 
 
 use baubolp\core\Ryzer;
+use baubolp\core\util\Clan;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
@@ -37,10 +38,8 @@ class RyzerPlayer
     private $skin;
     /** @var string|null */
     private $nick;
-    /** @var null|string */
+    /** @var null|Clan */
     private $clan = null;
-    /** @var null|string */
-    private $clanTag;
     /** @var string */
     private $onlineTime;
     /** @var \DateTime */
@@ -250,7 +249,7 @@ class RyzerPlayer
     }
 
     /**
-     * @return string|null
+     * @return Clan|null
      */
     public function getClan(): ?string
     {
@@ -258,27 +257,20 @@ class RyzerPlayer
     }
 
     /**
-     * @param string|null $clan
+     * @param Clan|null $clan
      */
-    public function setClan(?string $clan): void
+    public function setClan(?Clan $clan): void
     {
         $this->clan = $clan;
     }
 
-    /**
-     * @param string|null $clanTag
-     */
-    public function setClanTag(?string $clanTag): void
-    {
-        $this->clanTag = $clanTag;
-    }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getClanTag(): ?string
+    public function getClanTag(): string
     {
-        return $this->clanTag;
+        return $this->clan->getClanTag() ?? "&g???";
     }
 
     /**

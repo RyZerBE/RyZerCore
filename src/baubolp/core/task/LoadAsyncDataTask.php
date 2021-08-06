@@ -19,6 +19,7 @@ use baubolp\core\provider\StaffProvider;
 use baubolp\core\provider\VanishProvider;
 use baubolp\core\provider\VIPJoinProvider;
 use baubolp\core\Ryzer;
+use baubolp\core\util\Clan;
 use baubolp\core\util\Webhooks;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
@@ -155,11 +156,12 @@ class LoadAsyncDataTask extends AsyncTask
 
         $clanName = $playerData['clan'];
         if($clanName != null && $clanName != "null") {
-            $result = $clanDB->query("SELECT color,clantag FROM Clans WHERE clanname='$clanName'");
+            $result = $clanDB->query("SELECT color,clantag,owner FROM Clans WHERE clanname='$clanName'");
             if($result->num_rows > 0) {
                 while($data = $result->fetch_assoc()) {
                     $playerData['clanColor'] = $data['color'];
                     $playerData['clantag'] = $data['clantag'];
+                    $playerData['owner'] = $data['owner'];
                 }
             }else {
                 $playerData['clantag'] = "";
@@ -404,10 +406,7 @@ class LoadAsyncDataTask extends AsyncTask
                 $obj->setOnlineTime(TextFormat::GOLD.$data['gameTime'][0].TextFormat::AQUA."H ".TextFormat::GOLD.$data['gameTime'][1].TextFormat::AQUA."M");
                 $obj->setMoreParticle($data['pm']);
                 if($data['clan'] != null && $data['clan'] != "null") {
-                    $obj->setClan($data['clan']);
-                    $obj->setClanTag($data['clanColor'].$data['clantag']);
-                }else {
-                    $obj->setClanTag("&g???");
+                    $obj->setClan(new Clan($data["clan"], $data["clanColor"].$data["clanTag"], (int)$data["clanElo"], $data["owner"] == $obj->getPlayer()->getName()));
                 }
             }
 
