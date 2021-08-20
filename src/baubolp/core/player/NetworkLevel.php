@@ -49,6 +49,20 @@ class NetworkLevel {
     }
 
     /**
+     * @return int
+     */
+    public function getProgressToLevelUp(): int {
+        return 100;//todo
+    }
+
+    /**
+     * @return int
+     */
+    public function getProgressPercentage(): int {
+        return (100 / $this->getProgressToLevelUp()) * $this->getProgress();
+    }
+
+    /**
      * @param int $level
      * @param Closure|null $closure
      */

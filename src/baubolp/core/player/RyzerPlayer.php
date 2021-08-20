@@ -263,7 +263,7 @@ class RyzerPlayer
     /**
      * @return Clan|null
      */
-    public function getClan(): ?string
+    public function getClan(): ?Clan
     {
         return $this->clan;
     }

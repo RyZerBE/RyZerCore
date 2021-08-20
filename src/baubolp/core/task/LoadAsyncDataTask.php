@@ -170,20 +170,23 @@ class LoadAsyncDataTask extends AsyncTask
 
         $clanName = $playerData['clan'];
         if($clanName != null && $clanName != "null") {
-            $result = $clanDB->query("SELECT color,clantag,owner FROM Clans WHERE clanname='$clanName'");
+            $result = $clanDB->query("SELECT * FROM Clans WHERE clanname='$clanName'");
             if($result->num_rows > 0) {
                 while($data = $result->fetch_assoc()) {
                     $playerData['clanColor'] = $data['color'];
-                    $playerData['clantag'] = $data['clantag'];
+                    $playerData['clanTag'] = $data['clantag'];
                     $playerData['owner'] = $data['owner'];
+                    $playerData["clanElo"] = $data["elo"];
                 }
             }else {
-                $playerData['clantag'] = "";
+                $playerData['clanTag'] = "";
                 $playerData['clanColor'] = "&e";
+                $playerData["clanElo"] = 1000;
             }
         }else {
-            $playerData['clantag'] = "";
+            $playerData['clanTag'] = "";
             $playerData['clanColor'] = "&e";
+            $playerData["clanElo"] = 1000;
         }
 
         ////ADD ACCOUNTS \\\\
@@ -397,9 +400,9 @@ class LoadAsyncDataTask extends AsyncTask
                             }
                         }else {
                             if($status == null) {
-                                $player->setNameTag(str_replace("&", TextFormat::ESCAPE, $data['clanColor']).$data['clantag']." ".$nametag);
+                                $player->setNameTag(str_replace("&", TextFormat::ESCAPE, $data['clanColor']).$data['clanTag']." ".$nametag);
                             }else {
-                                $player->setNameTag(str_replace("&", TextFormat::ESCAPE, $data['clanColor']).$data['clantag']." ".$nametag."\n".TextFormat::YELLOW."✎ ".$status);
+                                $player->setNameTag(str_replace("&", TextFormat::ESCAPE, $data['clanColor']).$data['clanTag']." ".$nametag."\n".TextFormat::YELLOW."✎ ".$status);
                             }
                         }
                         $player->setDisplayName($nametag);
