@@ -7,8 +7,6 @@ namespace baubolp\core\command;
 use BauboLP\Cloud\Provider\CloudProvider;
 use baubolp\core\player\RyzerPlayerProvider;
 use baubolp\core\provider\LanguageProvider;
-use baubolp\core\provider\MySQLProvider;
-use baubolp\core\provider\RankProvider;
 use baubolp\core\Ryzer;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;

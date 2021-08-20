@@ -9,12 +9,13 @@ use baubolp\core\form\clan\ChooseEloOrFunForm;
 use baubolp\core\form\clan\ClanColorForm;
 use baubolp\core\form\clan\ClanMainMenu;
 use baubolp\core\form\clan\ClanMemberManageForm;
-use baubolp\core\form\clan\ClanMemberOptionForm;
 use baubolp\core\form\clan\ClanTop10Form;
 use baubolp\core\form\clan\CreateClanForm;
 use baubolp\core\form\clan\InvitePlayerForm;
 use baubolp\core\provider\MySQLProvider;
 use baubolp\core\Ryzer;
+use mysqli;
+use mysqli_result;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\form\MenuOption;
@@ -40,8 +41,8 @@ class ClanUICommand extends Command
 
         Ryzer::getMysqlProvider()->exec(new class($sender->getName()) extends AsyncTask{
             /** @var string */
-            private $playerName;
-            private $mysqlData;
+            private string $playerName;
+            private array $mysqlData;
 
             public function __construct(string $playerName)
             {
@@ -55,7 +56,7 @@ class ClanUICommand extends Command
             public function onRun()
             {
                 $playerName = $this->playerName;
-                $mysqli = new \mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'Clans');
+                $mysqli = new mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'Clans');
 
                 $pData = [];
                 $result = $mysqli->query("SELECT clan,role FROM ClanPlayers WHERE playername='$playerName'");
@@ -103,7 +104,7 @@ class ClanUICommand extends Command
                         $onSubmit = function (Player $player, int $selectedOption) use ($pName): void{
                             switch ($selectedOption) {
                                 case 0:
-                                    Ryzer::getAsyncConnection()->executeQuery("SELECT clanname, elo FROM Clans ORDER BY elo DESC LIMIT 10", "Clans", function (\mysqli_result $result) use ($pName) {
+                                    Ryzer::getAsyncConnection()->executeQuery("SELECT clanname, elo FROM Clans ORDER BY elo DESC LIMIT 10", "Clans", function (mysqli_result $result) use ($pName) {
                                         $return = [];
                                         if ($result->num_rows > 0) {
                                             while ($row = $result->fetch_assoc()) {
@@ -147,7 +148,7 @@ class ClanUICommand extends Command
                                     break;
                                 case 1:
                                     $pName = $player->getName();
-                                    Ryzer::getAsyncConnection()->executeQuery("SELECT clanname, elo FROM Clans ORDER BY elo DESC LIMIT 10", "Clans", function (\mysqli_result $result) use ($pName) {
+                                    Ryzer::getAsyncConnection()->executeQuery("SELECT clanname, elo FROM Clans ORDER BY elo DESC LIMIT 10", "Clans", function (mysqli_result $result) use ($pName) {
                                         $return = [];
                                         if ($result->num_rows > 0) {
                                             while ($row = $result->fetch_assoc()) {
@@ -202,7 +203,7 @@ class ClanUICommand extends Command
                                     break;
                                 case 1:
                                     $pName = $player->getName();
-                                    Ryzer::getAsyncConnection()->executeQuery("SELECT clanname, elo FROM Clans ORDER BY elo DESC LIMIT 10", "Clans", function (\mysqli_result $result) use ($pName) {
+                                    Ryzer::getAsyncConnection()->executeQuery("SELECT clanname, elo FROM Clans ORDER BY elo DESC LIMIT 10", "Clans", function (mysqli_result $result) use ($pName) {
                                         $return = [];
                                         if ($result->num_rows > 0) {
                                             while ($row = $result->fetch_assoc()) {

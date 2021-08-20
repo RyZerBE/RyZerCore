@@ -5,15 +5,14 @@ namespace baubolp\core\provider;
 
 
 use baubolp\core\util\MySQL;
-use pocketmine\item\Item;
 use pocketmine\Server;
 use pocketmine\utils\Config;
 
 class MySQLProvider
 {
     const PATH = "/root/RyzerCloud/data/";
-    /** @var \baubolp\core\util\MySQL[] */
-    private static $mysql_connections = [];
+    /** @var MySQL[] */
+    private static array $mysql_connections = [];
 
     
     public static function createConfig(): void
@@ -52,7 +51,7 @@ class MySQLProvider
     }
 
     /**
-     * @return \baubolp\core\util\MySQL[]
+     * @return MySQL[]
      */
     public static function getMysqlConnections(): array
     {
@@ -68,7 +67,7 @@ class MySQLProvider
     }
     /**
      * @param string $index
-     * @return \baubolp\core\util\MySQL|null
+     * @return MySQL|null
      */
     public static function getSQLConnection(string $index): ?MySQL
     {
@@ -86,7 +85,7 @@ class MySQLProvider
 
     /**
      * @param string $index
-     * @param \baubolp\core\util\MySQL $mySQL
+     * @param MySQL $mySQL
      */
     public static function addMySQLConnections(string $index, MySQL $mySQL): void
     {

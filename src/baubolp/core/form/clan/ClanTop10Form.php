@@ -6,6 +6,7 @@ namespace baubolp\core\form\clan;
 
 use baubolp\core\Ryzer;
 use pocketmine\form\MenuForm;
+use pocketmine\form\MenuOption;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
@@ -14,7 +15,7 @@ class ClanTop10Form extends MenuForm
     /**
      * ClanTop10Form constructor.
      *
-     * @param \pocketmine\form\MenuOption[] $options
+     * @param MenuOption[] $options
      */
     public function __construct(array $options)
     {

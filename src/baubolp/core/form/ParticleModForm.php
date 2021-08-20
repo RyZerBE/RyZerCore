@@ -8,9 +8,9 @@ use baubolp\core\player\RyzerPlayerProvider;
 use baubolp\core\provider\LanguageProvider;
 use baubolp\core\provider\MySQLProvider;
 use baubolp\core\Ryzer;
+use mysqli;
 use pocketmine\form\CustomForm;
 use pocketmine\form\CustomFormResponse;
-use pocketmine\form\element\StepSlider;
 use pocketmine\form\element\Toggle;
 use pocketmine\Player;
 use pocketmine\scheduler\AsyncTask;
@@ -34,11 +34,11 @@ class ParticleModForm extends CustomForm
                   Server::getInstance()->getAsyncPool()->submitTask(new class($player->getName(), $pm, MySQLProvider::getMySQLData()) extends AsyncTask{
 
                       /** @var string  */
-                      private $playerName;
+                      private string $playerName;
                       /** @var bool  */
-                      private $pm;
+                      private bool $pm;
                       /** @var array  */
-                      private $mysqlData;
+                      private array $mysqlData;
 
                       public function __construct(string $playerName, bool $pm, array $data)
                       {
@@ -51,7 +51,7 @@ class ParticleModForm extends CustomForm
                       {
                           $pm = (int)$this->pm; //int because mysql
                           $playerName = $this->playerName;
-                          $mysqli = new \mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
+                          $mysqli = new mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
                           $mysqli->query("UPDATE ParticleMod SET pm='$pm' WHERE playername='$playerName'");
                           $mysqli->close();
                       }

@@ -16,7 +16,7 @@ class ExplosionPrimeListener implements Listener
         $ev->setCancelled();
 
         $tnt = $ev->getEntity();
-        $explosion = new TNTExplosion(Position::fromObject($tnt->add(0, $tnt->height / 2, 0), $tnt->level), $ev->getForce(), $tnt);
+        $explosion = new TNTExplosion(Position::fromObject($tnt->add(0, $tnt->height / 2), $tnt->level), $ev->getForce(), $tnt);
         if($ev->isBlockBreaking())
             $explosion->explodeA();
 

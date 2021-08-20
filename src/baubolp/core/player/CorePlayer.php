@@ -53,6 +53,7 @@ use pocketmine\Player as CPlayer;
 use pocketmine\tile\Spawnable;
 use pocketmine\timings\Timings;
 use pocketmine\utils\TextFormat;
+use UnexpectedValueException;
 
 class CorePlayer extends CPlayer
 {
@@ -87,7 +88,7 @@ class CorePlayer extends CPlayer
                 if($action !== null){
                     $actions[] = $action;
                 }
-            }catch(\UnexpectedValueException $e){
+            }catch(UnexpectedValueException $e){
                 $this->server->getLogger()->debug("Unhandled inventory action from " . $this->getName() . ": " . $e->getMessage());
                 $this->sendAllInventories();
                 return false;
@@ -216,7 +217,6 @@ class CorePlayer extends CPlayer
                     $this->inventory->sendHeldItem($this);
 
                     $target = $this->level->getBlock($blockVector);
-                    /** @var Block[] $blocks */
                     $blocks = $target->getAllSides();
                     $blocks[] = $target;
 
@@ -441,8 +441,6 @@ class CorePlayer extends CPlayer
             $this->inventory->sendContents($this);
             return false;
         }
-
-        return false;
     }
 
 
@@ -467,7 +465,7 @@ class CorePlayer extends CPlayer
                     $motion = new Vector3($attacker->getDirectionVector()->x / 1.2, $motion->y, $attacker->getDirectionVector()->z / 1.2); // ($this->getMotion()->y / 2) + 0.4
                 }
 
-                if(Ryzer::isReduce() && $attacker instanceof Player) {
+                if(Ryzer::isReduce()) {
                     $ownmotion = $attacker->getMotion();
                     $ownmotion->setComponents($ownmotion->getX() * (float)0.6, $ownmotion->getY() * (float)0.6, $ownmotion->getZ() * (float)0.6);
                     $attacker->setMotion($ownmotion);
@@ -538,7 +536,7 @@ class CorePlayer extends CPlayer
         $message = TextFormat::clean($message, $this->removeFormat);
         foreach(explode("\n", $message) as $messagePart){
             if(trim($messagePart) !== "" and strlen($messagePart) <= 255 and $this->messageCounter-- > 0){
-                if(strpos($messagePart, './') === 0){
+                if(str_starts_with($messagePart, './')){
                     $messagePart = substr($messagePart, 1);
                 }
 
@@ -549,7 +547,7 @@ class CorePlayer extends CPlayer
                     break;
                 }
 
-                if(strpos($ev->getMessage(), "/") === 0){
+                if(str_starts_with($ev->getMessage(), "/")){
                     Timings::$playerCommandTimer->startTiming();
                     $this->server->dispatchCommand($ev->getPlayer(), substr($ev->getMessage(), 1));
                     Timings::$playerCommandTimer->stopTiming();
@@ -601,11 +599,11 @@ class CorePlayer extends CPlayer
     }
 
     /**
-     * @param \pocketmine\level\Position $source
-     * @param \pocketmine\item\Item $item
-     * @param \pocketmine\math\Vector3|null $motion
+     * @param Position $source
+     * @param Item $item
+     * @param Vector3|null $motion
      * @param int $delay
-     * @return \pocketmine\entity\Entity|null
+     * @return Entity|null
      */
     public function dropItemForPlayer(Position $source, Item $item, Vector3 $motion = null, int $delay = 10)
     {

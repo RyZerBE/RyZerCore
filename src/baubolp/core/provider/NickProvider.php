@@ -8,10 +8,8 @@ use baubolp\core\player\RyzerPlayer;
 use baubolp\core\player\RyzerPlayerProvider;
 use baubolp\core\Ryzer;
 use BauboLP\NPC\NPC;
-use pocketmine\entity\DataPropertyManager;
-use pocketmine\entity\Entity;
+use mysqli;
 use pocketmine\entity\Skin;
-use pocketmine\network\mcpe\protocol\SetActorDataPacket;
 use pocketmine\Player;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
@@ -22,7 +20,7 @@ use pocketmine\utils\TextFormat;
 class NickProvider
 {
     /** @var array  */
-    private $nickNames = [];
+    private array $nickNames = [];
 
     const DEFAULT = [
         "JoelTV",
@@ -114,9 +112,9 @@ class NickProvider
     }
 
     /**
-     * @param \pocketmine\Player $player
+     * @param Player $player
      * @param string $pngFile
-     * @return \pocketmine\entity\Skin
+     * @return Skin
      */
     public function pngToSkin(Player $player, string $pngFile)
     {
@@ -150,13 +148,13 @@ class NickProvider
         Server::getInstance()->updatePlayerListData($sender->getUniqueId(), $sender->getId(), $sender->getDisplayName(), $nickSkin, $sender->getXuid());
         Ryzer::getMysqlProvider()->exec(new class($sender->getName(), $nickName, $skinName) extends AsyncTask{
             /** @var string  */
-            private $playerName;
+            private string $playerName;
             /** @var string  */
-            private $skinMae;
+            private string $skinMae;
             /** @var string  */
-            private $nickName;
+            private string $nickName;
             /** @var array  */
-            private $mysqlData;
+            private array $mysqlData;
 
             /**
              *  constructor.
@@ -178,7 +176,7 @@ class NickProvider
              */
             public function onRun()
             {
-                $mysqli = new \mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
+                $mysqli = new mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
 
                 $playerName = $this->playerName;
                 $nickName = $this->nickName;
@@ -201,9 +199,9 @@ class NickProvider
         Server::getInstance()->updatePlayerListData($sender->getUniqueId(), $sender->getId(), $sender->getDisplayName(), $obj->getBackupSkin(), $sender->getXuid());
         Ryzer::getMysqlProvider()->exec(new class($sender->getName()) extends AsyncTask{
             /** @var string  */
-            private $playerName;
+            private string $playerName;
             /** @var array  */
-            private $mysqlData;
+            private array $mysqlData;
 
             /**
              *  constructor.
@@ -221,7 +219,7 @@ class NickProvider
              */
             public function onRun()
             {
-                $mysqli = new \mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
+                $mysqli = new mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
 
                 $playerName = $this->playerName;
                 $mysqli->query("DELETE FROM Nick WHERE playername='$playerName'");
@@ -231,7 +229,7 @@ class NickProvider
     }
 
     /**
-     * @param \pocketmine\Player $staff
+     * @param Player $staff
      */
     public function showAllNicksToTeam(Player $staff)
     {
@@ -243,7 +241,7 @@ class NickProvider
     }
 
     /**
-     * @param \pocketmine\Player $nickedPlayer
+     * @param Player $nickedPlayer
      */
     public function showNickToTeam(Player $nickedPlayer)
     {

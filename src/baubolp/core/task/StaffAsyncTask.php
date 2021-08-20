@@ -5,14 +5,14 @@ namespace baubolp\core\task;
 
 
 use baubolp\core\provider\StaffProvider;
+use mysqli;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
-use pocketmine\utils\MainLogger;
 
 class StaffAsyncTask extends AsyncTask
 {
 
-    private $mysqlData;
+    private array $mysqlData;
 
     public function __construct(array $mysqlData)
     {
@@ -21,7 +21,7 @@ class StaffAsyncTask extends AsyncTask
 
     public function onRun()
     {
-        $mysqli = new \mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
+        $mysqli = new mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
 
         $result = $mysqli->query("SELECT * FROM Staffs");
 

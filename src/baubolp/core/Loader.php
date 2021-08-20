@@ -50,6 +50,7 @@ use baubolp\core\task\DelayTask;
 use baubolp\core\task\StaffAsyncTask;
 use baubolp\core\task\UnblockIpTask;
 use baubolp\core\util\MySQL;
+use mysqli;
 use pocketmine\permission\Permission;
 use pocketmine\permission\PermissionManager;
 use pocketmine\scheduler\AsyncTask;
@@ -139,7 +140,7 @@ class Loader
     {
         Server::getInstance()->getAsyncPool()->submitTask(new class(MySQLProvider::getMySQLData()) extends AsyncTask {
 
-            private $mysqlData;
+            private array $mysqlData;
 
             public function __construct(array $mysqlData)
             {
@@ -148,11 +149,11 @@ class Loader
 
             public function onRun()
             {
-                $mysqli = new \mysqli($this->mysqlData['host'] . ":3306", $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
-                $mysqli2 = new \mysqli($this->mysqlData['host'] . ":3306", $this->mysqlData['user'], $this->mysqlData['password'], 'ChatLog');
-                $mysqli3 = new \mysqli($this->mysqlData['host'] . ":3306", $this->mysqlData['user'], $this->mysqlData['password'], 'MLGRush');
-                $mysqli4 = new \mysqli($this->mysqlData['host'] . ":3306", $this->mysqlData['user'], $this->mysqlData['password'], 'GunGame');
-                $mysqli5 = new \mysqli($this->mysqlData['host'] . ":3306", $this->mysqlData['user'], $this->mysqlData['password'], 'Webinterface');
+                $mysqli = new mysqli($this->mysqlData['host'] . ":3306", $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
+                $mysqli2 = new mysqli($this->mysqlData['host'] . ":3306", $this->mysqlData['user'], $this->mysqlData['password'], 'ChatLog');
+                $mysqli3 = new mysqli($this->mysqlData['host'] . ":3306", $this->mysqlData['user'], $this->mysqlData['password'], 'MLGRush');
+                $mysqli4 = new mysqli($this->mysqlData['host'] . ":3306", $this->mysqlData['user'], $this->mysqlData['password'], 'GunGame');
+                $mysqli5 = new mysqli($this->mysqlData['host'] . ":3306", $this->mysqlData['user'], $this->mysqlData['password'], 'Webinterface');
                 $mysqli->query("CREATE TABLE IF NOT EXISTS BanReasons(id INTEGER NOT NULL KEY AUTO_INCREMENT, reason varchar(64) NOT NULL, type varchar(32) NOT NULL, duration varchar(64) NOT NULL)");
                 $mysqli->query("CREATE TABLE IF NOT EXISTS replayList(id INTEGER NOT NULL KEY AUTO_INCREMENT, playername varchar(16) NOT NULL, replays TEXT NOT NULL)");
                 $mysqli->query("CREATE TABLE IF NOT EXISTS vanish(id INTEGER NOT NULL KEY AUTO_INCREMENT, playername varchar(16) NOT NULL)");

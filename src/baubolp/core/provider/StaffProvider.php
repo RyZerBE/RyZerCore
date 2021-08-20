@@ -5,13 +5,14 @@ namespace baubolp\core\provider;
 
 
 use BauboLP\Cloud\Bungee\BungeeAPI;
+use mysqli;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
 
 class StaffProvider
 {
 
-    private static $loggedStaffs = [];
+    private static array $loggedStaffs = [];
 
     /**
      * @param array $loggedStaffs
@@ -34,8 +35,8 @@ class StaffProvider
     {
         Server::getInstance()->getAsyncPool()->submitTask(new class(MySQLProvider::getMySQLData(), $playerName) extends AsyncTask{
 
-            private $mysqlData;
-            private $name;
+            private array $mysqlData;
+            private string $name;
 
             public function __construct(array $mysqlData, string $name)
             {
@@ -45,7 +46,7 @@ class StaffProvider
 
             public function onRun()
             {
-                $mysqli = new \mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
+                $mysqli = new mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
                 $name = $this->name;
                 $mysqli->query("INSERT INTO `Staffs`(`playername`) VALUES ('$name')");
                 $mysqli->close();
@@ -59,8 +60,8 @@ class StaffProvider
     {
         Server::getInstance()->getAsyncPool()->submitTask(new class(MySQLProvider::getMySQLData(), $playerName) extends AsyncTask{
 
-            private $mysqlData;
-            private $name;
+            private array $mysqlData;
+            private string $name;
 
             public function __construct(array $mysqlData, string $name)
             {
@@ -70,7 +71,7 @@ class StaffProvider
 
             public function onRun()
             {
-                $mysqli = new \mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
+                $mysqli = new mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
                 $name = $this->name;
                 $mysqli->query("DELETE FROM `Staffs` WHERE playername='$name'");
                 $mysqli->close();

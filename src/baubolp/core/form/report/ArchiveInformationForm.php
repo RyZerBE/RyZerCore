@@ -29,6 +29,6 @@ class ArchiveInformationForm extends MenuForm
         TextFormat::YELLOW."Angenommen: ".$accepted;
         parent::__construct(Ryzer::PREFIX.TextFormat::DARK_GREEN."Archivedatei auslesen", $text, [], function (Player $player, int $selectedOption): void {
 
-        }, null);
+        });
     }
 }

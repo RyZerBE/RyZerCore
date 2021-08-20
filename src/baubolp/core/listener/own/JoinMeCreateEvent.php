@@ -11,9 +11,9 @@ use pocketmine\Player;
 class JoinMeCreateEvent extends Event implements Cancellable
 {
 
-    private $player;
+    private Player $player;
     /** @var string */
-    private $reason;
+    private string $reason;
 
     public function __construct(Player $player)
     {
@@ -21,9 +21,9 @@ class JoinMeCreateEvent extends Event implements Cancellable
     }
 
     /**
-     * @return \pocketmine\Player
+     * @return Player
      */
-    public function getPlayer(): \pocketmine\Player
+    public function getPlayer(): Player
     {
         return $this->player;
     }

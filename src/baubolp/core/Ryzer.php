@@ -4,7 +4,6 @@
 namespace baubolp\core;
 
 
-use BauboLP\BW\BW;
 use BauboLP\Cloud\CloudBridge;
 use BauboLP\Cloud\Provider\CloudProvider;
 use baubolp\core\command\PKickCommand;
@@ -41,23 +40,23 @@ class Ryzer extends PluginBase
 {
 
     const PREFIX = TextFormat::WHITE.TextFormat::BOLD."RyZer".TextFormat::RED.TextFormat::BOLD."BE ".TextFormat::RESET;
-    /** @var \pocketmine\entity\Skin */
-    public static $backupSkin;
+    /** @var Skin */
+    public static Skin $backupSkin;
     /** @var array */
-    public static $translations = [];
+    public static array $translations = [];
     /** @var array  */
-    public static $banIds = [];
-    /** @var \TobiasDev\DatabaseAPI\Connection */
-    private static $async;
-    /** @var \baubolp\core\Ryzer */
-    private static $plugin;
+    public static array $banIds = [];
+    /** @var Connection */
+    private static Connection $async;
+    /** @var Ryzer */
+    private static Ryzer $plugin;
     /** @var bool */
-    private static $reduce;
+    private static bool $reduce;
 
-    /** @var \baubolp\core\module\TrollSystem\TrollSystem */
-    public static $trollSystem;
+    /** @var TrollSystem */
+    public static TrollSystem $trollSystem;
 
-    public static $permissions = [
+    public static array $permissions = [
         'languages.edit',
         'languages.reload',
         'core.ban',
@@ -89,9 +88,9 @@ class Ryzer extends PluginBase
     ];
 
     /** @var MySQLProvider */
-    private static $mysqlProvider;
+    private static MySQLProvider $mysqlProvider;
     /** @var NickProvider */
-    private static $nickProvider;
+    private static NickProvider $nickProvider;
 
     public function onEnable()
     {
@@ -169,7 +168,7 @@ class Ryzer extends PluginBase
     }
 
     /**
-     * @return \baubolp\core\Ryzer
+     * @return Ryzer
      */
     public static function getPlugin(): Ryzer
     {
@@ -222,7 +221,7 @@ class Ryzer extends PluginBase
     }
 
     /**
-     * @return \baubolp\core\provider\MySQLProvider
+     * @return MySQLProvider
      */
     public static function getMysqlProvider(): MySQLProvider
     {
@@ -245,7 +244,7 @@ class Ryzer extends PluginBase
     }
 
     /**
-     * @return \baubolp\core\provider\NickProvider
+     * @return NickProvider
      */
     public static function getNickProvider(): NickProvider
     {
@@ -256,7 +255,7 @@ class Ryzer extends PluginBase
     {
         foreach ($getCoins as $playerName) {
             if(($p = Server::getInstance()->getPlayer($playerName)) != null) {
-                $p->sendMessage("\n\n".BW::PREFIX.LanguageProvider::getMessageContainer('coinboost-vip', $playerName, ['#percent' => $percent, '#booster' => $boosterName]));
+                $p->sendMessage("\n\n".Ryzer::PREFIX.LanguageProvider::getMessageContainer('coinboost-vip', $playerName, ['#percent' => $percent, '#booster' => $boosterName]));
             }
             CoinProvider::addCoins($playerName, $coins + (($coins * $percent) / 100));
         }
@@ -306,9 +305,9 @@ class Ryzer extends PluginBase
 
 
     /**
-     * @return \baubolp\core\module\TrollSystem\TrollSystem
+     * @return TrollSystem
      */
-    public static function getTrollSystem(): \baubolp\core\module\TrollSystem\TrollSystem
+    public static function getTrollSystem(): TrollSystem
     {
         return self::$trollSystem;
     }

@@ -12,7 +12,6 @@ use baubolp\core\provider\LanguageProvider;
 use baubolp\core\provider\ModerationProvider;
 use baubolp\core\provider\RankProvider;
 use baubolp\core\Ryzer;
-use baubolp\core\util\Emojis;
 use baubolp\core\util\Webhooks;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerChatEvent;

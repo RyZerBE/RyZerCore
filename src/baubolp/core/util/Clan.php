@@ -5,13 +5,13 @@ namespace baubolp\core\util;
 class Clan {
 
     /** @var string  */
-    private $clanName;
+    private string $clanName;
     /** @var string  */
-    private $clanTag;
+    private string $clanTag;
     /** @var int  */
-    private $elo = 100;
+    private int $elo = 100;
     /** @var string */
-    private $owner;
+    private string $owner;
 
     /**
      * @param string $clanName

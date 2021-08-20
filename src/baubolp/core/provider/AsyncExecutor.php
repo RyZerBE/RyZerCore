@@ -17,8 +17,8 @@ class AsyncExecutor
 
     /**
      * @param string $database
-     * @param \Closure $function
-     * @param \Closure|null $completeFunction
+     * @param Closure $function
+     * @param Closure|null $completeFunction
      */
     public static function submitMySQLAsyncTask(string $database, Closure $function, Closure $completeFunction = null)
     {
@@ -29,14 +29,14 @@ class AsyncExecutor
             new class($function, $completeFunction, $database) extends AsyncTask {
                 /** @var Closure */
                 /* function (mysqli $mysqli) */
-                private $function;
+                private Closure $function;
                 /** @var Closure */
                 /* function (Server $server, mixed $result)*/
-                private $completeFunction;
+                private ?Closure $completeFunction;
                 /** @var string */
-                private $database;
+                private string $database;
                 /** @var array */
-                private $mysqlData;
+                private array $mysqlData;
 
                 public function __construct(Closure $function, ?Closure $completeFunction, string $database)
                 {

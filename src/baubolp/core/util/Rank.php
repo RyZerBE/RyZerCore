@@ -7,15 +7,15 @@ namespace baubolp\core\util;
 class Rank
 {
     /** @var int */
-    private $rankName;
+    private int|string $rankName;
     /** @var string */
-    private $nameTag;
+    private string $nameTag;
     /** @var string */
-    private $chatPrefix;
+    private string $chatPrefix;
     /** @var array */
-    private $permissions;
+    private array $permissions;
     /** @var int */
-    private $joinPower;
+    private int $joinPower;
 
     public function __construct(string $rankName, string $nameTag, string $chatPrefix, array $permissions, int $joinPower)
     {

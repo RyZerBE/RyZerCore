@@ -8,9 +8,8 @@ use baubolp\core\player\RyzerPlayer;
 use baubolp\core\player\RyzerPlayerProvider;
 use baubolp\core\Ryzer;
 use baubolp\core\util\Rank;
+use mysqli;
 use pocketmine\permission\PermissionManager;
-use pocketmine\Player;
-use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
 use pocketmine\utils\MainLogger;
 use pocketmine\utils\TextFormat;
@@ -18,10 +17,10 @@ use pocketmine\utils\TextFormat;
 class RankProvider
 {
     /** @var Rank[]  */
-    public static $ranks = [];
+    public static array $ranks = [];
 
     /**
-     * @return \baubolp\core\util\Rank[]
+     * @return Rank[]
      */
     public static function getRanks(): array
     {
@@ -40,7 +39,7 @@ class RankProvider
 
     public static function loadRanks()
     {
-        AsyncExecutor::submitMySQLAsyncTask("RyzerCore", function (\mysqli $mysqli){
+        AsyncExecutor::submitMySQLAsyncTask("RyzerCore", function (mysqli $mysqli){
             $result = $mysqli->query("SELECT * FROM Ranks");
             $ranks = [];
             if($result->num_rows > 0) {
@@ -111,7 +110,7 @@ class RankProvider
      */
     public static function addPermToRank(string $rank, string $senderName, string $permission)
     {
-        AsyncExecutor::submitMySQLAsyncTask("RyzerCore", function (\mysqli $mysqli) use ($senderName, $rank, $permission){
+        AsyncExecutor::submitMySQLAsyncTask("RyzerCore", function (mysqli $mysqli) use ($senderName, $rank, $permission){
             $result = $mysqli->query("SELECT permissions From Ranks WHERE rankname='$rank'");
             $newPermissions = "";
             if($result->num_rows > 0) {
@@ -143,7 +142,7 @@ class RankProvider
      */
     public static function removePermFromRank(string $rank, string $senderName, string $permission)
     {
-        AsyncExecutor::submitMySQLAsyncTask("RyzerCore", function (\mysqli $mysqli) use ($rank, $senderName, $permission){
+        AsyncExecutor::submitMySQLAsyncTask("RyzerCore", function (mysqli $mysqli) use ($rank, $senderName, $permission){
             $result = $mysqli->query("SELECT permissions From Ranks WHERE rankname='$rank'");
             $newPermissions = "";
             if($result->num_rows > 0) {
@@ -160,7 +159,6 @@ class RankProvider
                 }
                 $mysqli->query("UPDATE Ranks SET permissions='$newPermissions' WHERE rankname='$rank'");
                 return true;
-                return;
             }
             return false;
         }, function (Server $server, bool $success) use ($senderName, $permission, $rank){
@@ -180,7 +178,7 @@ class RankProvider
      */
     public static function setRank(string $playerName, string $senderName, string $rank)
     {
-        AsyncExecutor::submitMySQLAsyncTask("RyzerCore", function (\mysqli $mysqli) use ($playerName, $senderName, $rank) {
+        AsyncExecutor::submitMySQLAsyncTask("RyzerCore", function (mysqli $mysqli) use ($playerName, $senderName, $rank) {
             $mysqli->query("UPDATE PlayerPerms SET rankname='$rank' WHERE playername='$playerName'");
             return true;
         }, function (Server $server, bool $success) use ($senderName, $playerName, $rank) {
@@ -200,7 +198,7 @@ class RankProvider
      */
     public static function setJoinPower(string $rank, string $senderName, int $joinPower)
     {
-        AsyncExecutor::submitMySQLAsyncTask("RyzerCore", function (\mysqli $mysqli) use ($joinPower, $senderName, $rank){
+        AsyncExecutor::submitMySQLAsyncTask("RyzerCore", function (mysqli $mysqli) use ($joinPower, $senderName, $rank){
             $mysqli->query("UPDATE `Ranks` SET joinpower='$joinPower' WHERE rankname='$rank'");
             return true;
         }, function (Server $server, bool $success) use ($senderName, $rank, $joinPower){
@@ -220,7 +218,7 @@ class RankProvider
      */
     public static function removePlayerPermission(string $playerName, string $senderName, string $permission)
     {
-        AsyncExecutor::submitMySQLAsyncTask("RyzerCore", function (\mysqli $mysqli) use ($playerName, $senderName, $permission){
+        AsyncExecutor::submitMySQLAsyncTask("RyzerCore", function (mysqli $mysqli) use ($playerName, $senderName, $permission){
             $result = $mysqli->query("SELECT permissions From PlayerPerms WHERE playername='$playerName'");
             $newPermissions = "";
             if($result->num_rows > 0) {
@@ -256,7 +254,7 @@ class RankProvider
      */
     public static function addPermToPlayer(string $playerName, string $senderName, string $permission)
     {
-        AsyncExecutor::submitMySQLAsyncTask("RyzerCore", function (\mysqli $mysqli) use ($senderName, $playerName, $permission){
+        AsyncExecutor::submitMySQLAsyncTask("RyzerCore", function (mysqli $mysqli) use ($senderName, $playerName, $permission){
             $result = $mysqli->query("SELECT permissions From PlayerPerms WHERE playername='$playerName'");
             $newPermissions = "";
             if($result->num_rows > 0) {
@@ -302,7 +300,7 @@ class RankProvider
     }
 
     /**
-     * @param \baubolp\core\player\RyzerPlayer $player
+     * @param RyzerPlayer $player
      * @param string $message
      * @return string
      */

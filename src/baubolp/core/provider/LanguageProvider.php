@@ -7,7 +7,6 @@ namespace baubolp\core\provider;
 use baubolp\core\player\RyzerPlayerProvider;
 use baubolp\core\Ryzer;
 use mysqli;
-use mysqli_result;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 

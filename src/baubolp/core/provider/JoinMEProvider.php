@@ -8,15 +8,15 @@ use BauboLP\Cloud\CloudBridge;
 use BauboLP\Cloud\Packets\PlayerMessagePacket;
 use BauboLP\Cloud\Provider\CloudProvider;
 use baubolp\core\Ryzer;
+use mysqli;
 use pocketmine\Player;
-use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 
 class JoinMEProvider
 {
     /** @var array  */
-    public static $joinMe = [];
+    public static array $joinMe = [];
 
     const TEXTFORMAT_RGB = [
         [0, 0, 0],
@@ -56,7 +56,7 @@ class JoinMEProvider
         TextFormat::WHITE
     ];
 
-    private static $forbiddenGroups = [
+    private static array $forbiddenGroups = [
         'Lobby',
         'CWBW',
         'Clutches'
@@ -91,9 +91,9 @@ class JoinMEProvider
                 if(!isset($skinArray[$y]))
                     $strArray[$y] = "????????"; // 3D Skin
                 $key = ((64 * $y) + 8 + $x) * 4;
-                $r = ord($skin{$key});
-                $g = ord($skin{$key + 1});
-                $b = ord($skin{$key + 2});
+                $r = ord($skin[$key]);
+                $g = ord($skin[$key + 1]);
+                $b = ord($skin[$key + 2]);
                 $format = self::rgbToTextFormat($r, $g, $b);
                 $skinArray[$y] .= $format."█"; //█
             }
@@ -102,7 +102,7 @@ class JoinMEProvider
     }
 
     /**
-     * @param \pocketmine\Player $player
+     * @param Player $player
      */
     public static function createJoinMe(Player $player)
     {
@@ -118,7 +118,7 @@ class JoinMEProvider
 
         $name = $player->getName();
         $serverName = CloudProvider::getServer();
-        AsyncExecutor::submitMySQLAsyncTask("RyzerCore", function (\mysqli $mysqli) use ($name, $serverName){
+        AsyncExecutor::submitMySQLAsyncTask("RyzerCore", function (mysqli $mysqli) use ($name, $serverName){
             $mysqli->query("INSERT INTO `JoinMe`(`playername`, `server`) VALUES ('$name', '$serverName')");
         }, function (Server $server, $result) use ($name, $serverName){
             if(($player = $server->getPlayerExact($name)) != null)
@@ -133,7 +133,7 @@ class JoinMEProvider
     public static function deleteJoinMeIfExist(string $playerName)
     {
         if(isset(self::$joinMe[$playerName])) {
-            self::removeJoinMe($playerName, true);
+            self::removeJoinMe($playerName);
         }
     }
 
@@ -146,7 +146,7 @@ class JoinMEProvider
         if (isset(self::$joinMe[$playerName])) {
             unset(self::$joinMe[$playerName]);
             if ($mysql) {
-                AsyncExecutor::submitMySQLAsyncTask("RyzerCore", function (\mysqli $mysqli) use ($playerName) {
+                AsyncExecutor::submitMySQLAsyncTask("RyzerCore", function (mysqli $mysqli) use ($playerName) {
                     $mysqli->query("DELETE FROM JoinMe WHERE playername='$playerName'");
                 });
             }

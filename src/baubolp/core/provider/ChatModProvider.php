@@ -11,7 +11,7 @@ class ChatModProvider
 
     const WAIT_TIME = 1;
     /** @var array  */
-    public static $badWords = [
+    public static array $badWords = [
         "L2Play" => "Du spielst mega gut",
         "Hitler" => null,
         "Jude" => null,
@@ -48,7 +48,7 @@ class ChatModProvider
         "Multilabs" => null
     ];
 
-    public static $whitelistedURLS = [
+    public static array $whitelistedURLS = [
         "ryzer.be",
         "ryzer.be/pma",
         "builder.ryzer.be",
@@ -65,7 +65,7 @@ class ChatModProvider
         "yt.ryzer.be"
     ];
     /** @var array  */
-    public static $wait = [];
+    public static array $wait = [];
 
     /**
      * @param string $playerName
@@ -97,7 +97,7 @@ class ChatModProvider
     }
 
     /**
-     * @param \baubolp\core\player\RyzerPlayer $player
+     * @param RyzerPlayer $player
      * @param string $text
      * @return bool
      */
@@ -142,7 +142,7 @@ class ChatModProvider
     public static function isBadWord(string $message)
     {
         foreach (array_keys(self::$badWords) as $key) {
-            if (strpos(strtolower($message), strtolower($key)) !== false) {
+            if (str_contains(strtolower($message), strtolower($key))) {
                 if (self::$badWords[$key] != null)
                     return str_replace($key, self::$badWords[$key], $message);
                 else

@@ -5,20 +5,19 @@ namespace baubolp\core\listener\own;
 
 
 use pocketmine\entity\Entity;
-use pocketmine\entity\object\PrimedTNT;
 use pocketmine\event\Cancellable;
 use pocketmine\event\Event;
 
 class TNTLightEvent extends Event implements Cancellable
 {
-    /** @var \pocketmine\entity\Entity  */
-    private $primedTNT;
+    /** @var Entity */
+    private Entity $primedTNT;
     /** @var int  */
-    private $fuse;
+    private int $fuse;
     /** @var int  */
-    private $team;
+    private int $team;
     /** @var int  */
-    private $radius;
+    private int $radius;
 
     public function __construct(Entity $primedTNT, int $fuse, int $team, int $radius)
     {
@@ -45,7 +44,7 @@ class TNTLightEvent extends Event implements Cancellable
     }
 
     /**
-     * @return \pocketmine\entity\Entity
+     * @return Entity
      */
     public function getEntity(): Entity
     {

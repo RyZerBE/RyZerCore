@@ -78,7 +78,7 @@ class SelectPlayerForm extends MenuForm
                             break;
                         case "MLG Player":
                             $player->sendMessage(TrollSystem::Prefix.LanguageProvider::getMessageContainer('troll-mlg-player', $player->getName()));
-                            $item = Item::get(Item::COBWEB, 0, 1)->setCustomName(TextFormat::RED . "Make a MLG!");
+                            $item = Item::get(Item::COBWEB)->setCustomName(TextFormat::RED . "Make a MLG!");
                             $opfer->getInventory()->setItem(0, $item);
                             $opfer->setMotion(new Vector3(0, 7, 0));
                             break;

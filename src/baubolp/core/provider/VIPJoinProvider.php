@@ -8,16 +8,15 @@ use baubolp\core\player\RyzerPlayerProvider;
 use baubolp\core\Ryzer;
 use pocketmine\Player;
 use pocketmine\Server;
-use pocketmine\utils\TextFormat;
 
 class VIPJoinProvider
 {
     /** @var bool  */
-    private static $vipJoin = false;
+    private static bool $vipJoin = false;
     /** @var boolean */
-    private static $stopCheck = true;
-    /** @var int */
-    private static $players;
+    private static bool $stopCheck = true;
+    /** @var int|null */
+    private static ?int $players = null;
 
     /**
      * @return bool

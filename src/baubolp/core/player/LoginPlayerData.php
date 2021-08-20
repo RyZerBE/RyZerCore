@@ -9,7 +9,7 @@ use pocketmine\network\mcpe\protocol\LoginPacket;
 class LoginPlayerData
 {
     /** @var string */
-    private $playerName;
+    private string $playerName;
     /** @var string */
     private $cape_data;
     /** @var int */
@@ -42,7 +42,7 @@ class LoginPlayerData
     /** @var string */
     private $skin_geometry;
     /** @var string */
-    private $skin_geometry_name;
+    private string $skin_geometry_name;
     /** @var string */
     private $skin_id;
     /** @var int */
@@ -53,7 +53,7 @@ class LoginPlayerData
     /**
      * LoginPlayerData constructor.
      *
-     * @param \pocketmine\network\mcpe\protocol\LoginPacket $loginPacket
+     * @param LoginPacket $loginPacket
      */
     public function __construct(LoginPacket $loginPacket)
     {

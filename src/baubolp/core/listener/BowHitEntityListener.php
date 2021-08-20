@@ -42,7 +42,7 @@ class BowHitEntityListener implements Listener
         $player = $event->getPlayer();
         if($event->getItem()->getId() == Item::ENDER_PEARL && $event->getAction() === PlayerInteractEvent::RIGHT_CLICK_AIR) {
             $event->setCancelled();
-            $player->getInventory()->removeItem(Item::get(Item::ENDER_PEARL, 0, 1));
+            $player->getInventory()->removeItem(Item::get(Item::ENDER_PEARL));
             $nbt = new CompoundTag("", [
                 "Pos" => new ListTag("Pos", [
                     new DoubleTag("", $player->x),

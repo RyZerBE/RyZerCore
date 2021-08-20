@@ -5,7 +5,7 @@ namespace baubolp\core\util;
 trait InstantiableTrait {
 
     /** @var static $instance|null  */
-    private static $instance = null;
+    private static ?InstantiableTrait $instance = null;
 
     /**
      * @return static

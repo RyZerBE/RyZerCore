@@ -7,7 +7,6 @@ namespace baubolp\core\provider;
 use baubolp\core\player\RyzerPlayerProvider;
 use baubolp\core\Ryzer;
 use mysqli;
-use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
 
 class CoinProvider

@@ -6,12 +6,9 @@ namespace baubolp\core\entity;
 
 use BauboLP\BW\entity\TNTSheep\math\Facing;
 use pocketmine\block\Block;
-use pocketmine\entity\Attribute;
 use pocketmine\entity\Entity;
 use pocketmine\entity\projectile\Projectile;
-use pocketmine\entity\projectile\Snowball;
 use pocketmine\event\entity\ProjectileHitEvent;
-use pocketmine\event\inventory\InventoryPickupArrowEvent;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\level\Level;
@@ -158,7 +155,7 @@ class Arrow extends Projectile
             return;
         }
 
-        $item = ItemFactory::get(Item::ARROW, 0, 1);
+        $item = ItemFactory::get(Item::ARROW);
 
         $playerInventory = $player->getInventory();
         if($player->isSurvival() and !$playerInventory->canAddItem($item)){

@@ -5,7 +5,6 @@ namespace baubolp\core\listener;
 
 
 use baubolp\core\player\RyzerPlayerProvider;
-use pocketmine\entity\Entity;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\Listener;
 use pocketmine\network\mcpe\protocol\AnimatePacket;

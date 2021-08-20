@@ -23,6 +23,6 @@ class VerifyForm extends MenuForm
         $icon = ($isVerified == true) ? "textures/ui/confirm.png" : "textures/ui/realms_red_x.png";
         $options[] = new MenuOption(($isVerified == true) ? TextFormat::GREEN."VERIFIED" : TextFormat::RED.TextFormat::BOLD."NOT VERIFIED", new FormIcon($icon, FormIcon::IMAGE_TYPE_PATH));
 
-        parent::__construct(Ryzer::PREFIX.TextFormat::YELLOW."Verification", "", $options, function (Player $player, int $selectedOption): void{}, null);
+        parent::__construct(Ryzer::PREFIX.TextFormat::YELLOW."Verification", "", $options, function (Player $player, int $selectedOption): void{});
     }
 }

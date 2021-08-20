@@ -10,7 +10,6 @@ use baubolp\core\provider\LanguageProvider;
 use baubolp\core\Ryzer;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\utils\CommandException;
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;

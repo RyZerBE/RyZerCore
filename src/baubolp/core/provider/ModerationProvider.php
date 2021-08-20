@@ -9,12 +9,15 @@ use baubolp\core\player\RyzerPlayerProvider;
 use baubolp\core\Ryzer;
 use baubolp\core\util\Webhooks;
 use DateInterval;
+use DateTime;
 use DateTimeZone;
+use Exception;
+use mysqli;
+use mysqli_result;
 use pocketmine\command\ConsoleCommandSender;
 use pocketmine\Player;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
-use pocketmine\utils\MainLogger;
 use pocketmine\utils\TextFormat;
 
 class ModerationProvider
@@ -22,7 +25,7 @@ class ModerationProvider
 
     public static function loadBanReasons()
     {
-        Ryzer::getAsyncConnection()->executeQuery("SELECT * FROM BanReasons", "RyzerCore", function (\mysqli_result $result) {
+        Ryzer::getAsyncConnection()->executeQuery("SELECT * FROM BanReasons", "RyzerCore", function (mysqli_result $result) {
             $banReasons = [];
             $id = 0;
             if ($result->num_rows > 0) {
@@ -85,7 +88,7 @@ class ModerationProvider
      */
     public static function addBanToLog(string $playerName, string $endOfBan, string $reason, string $banid, $staff, $isBan = true)
     {
-        Ryzer::getAsyncConnection()->executeQuery("SELECT log From PlayerModeration WHERE playername='$playerName'", "RyzerCore", function (\mysqli_result $mysqli_result) use ($playerName, $reason, $staff, $endOfBan) {
+        Ryzer::getAsyncConnection()->executeQuery("SELECT log From PlayerModeration WHERE playername='$playerName'", "RyzerCore", function (mysqli_result $mysqli_result) use ($playerName, $reason, $staff, $endOfBan) {
 
             if ($mysqli_result->num_rows > 0) {
                 while ($data = $mysqli_result->fetch_assoc()) {
@@ -178,8 +181,8 @@ class ModerationProvider
     public static function createProof(string $id) {
         Ryzer::getMysqlProvider()->exec(new class($id) extends AsyncTask{
 
-            private $id;
-            private $mysqlData;
+            private string $id;
+            private array $mysqlData;
 
             public function __construct(string $id)
             {
@@ -190,7 +193,7 @@ class ModerationProvider
             public function onRun()
             {
                 $id = $this->id;
-                $mysqli = new \mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
+                $mysqli = new mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
                 $mysqli->query("INSERT INTO `Proofs`(`id`, `mid`) VALUES ('$id', '')");
                 $mysqli->close();
             }
@@ -204,7 +207,7 @@ class ModerationProvider
             if ($banPoints < 5) {
                 $ex = explode(":", $banData['duration']);
 
-                $now = new \DateTime('now', new DateTimeZone('Europe/Berlin'));
+                $now = new DateTime('now', new DateTimeZone('Europe/Berlin'));
                 $duration = (int)$ex[0];
                 if ($ex[1] == "H") {
                     $now->add(new DateInterval('PT' . $banPoints * $duration . "H"));
@@ -233,7 +236,7 @@ class ModerationProvider
             ['name' => "Grund", 'value' => $reason, 'inline' => false],
             ['name' => "Gebannt bis", 'value' => ModerationProvider::formatGermanDate($duration), 'inline' => false],
             ['name' => "Staff", 'value' => $staff, 'inline' => false],
-            ['name' => "ID", 'value' => $banid, 'inline' => false]], ['text' => "RyZerBE", 'icon_url' => Webhooks::ICON], null, "Es wurde ein Spieler gebannt", "");
+            ['name' => "ID", 'value' => $banid, 'inline' => false]], ['text' => "RyZerBE", 'icon_url' => Webhooks::ICON], null, "Es wurde ein Spieler gebannt");
     }
 
     /**
@@ -242,7 +245,7 @@ class ModerationProvider
      * @param int $mutePoints
      * @param string $banid
      * @param string $staff
-     * @throws \Exception
+     * @throws Exception
      */
     public static function setMute(string $playerName, array $banData, int $mutePoints, string $banid, string $staff)
     {
@@ -251,7 +254,7 @@ class ModerationProvider
             if ($mutePoints < 5) {
                 $ex = explode(":", $banData['duration']);
 
-                $now = new \DateTime('now', new DateTimeZone('Europe/Berlin'));
+                $now = new DateTime('now', new DateTimeZone('Europe/Berlin'));
                 $duration = (int)$ex[0];
                 if ($ex[1] == "H") {
                     $now->add(new DateInterval('PT' . $mutePoints * $duration . "H"));
@@ -273,7 +276,7 @@ class ModerationProvider
                 ['name' => "Grund", 'value' => $reason, 'inline' => false],
                 ['name' => "Gemutet bis", 'value' => ModerationProvider::formatGermanDate($duration), 'inline' => false],
                 ['name' => "Staff", 'value' => $staff, 'inline' => false],
-                ['name' => "ID", 'value' => $banid, 'inline' => false]], ['text' => "RyZerBE", 'icon_url' => Webhooks::ICON], null, "Es wurde ein Spieler gemutet", "");
+                ['name' => "ID", 'value' => $banid, 'inline' => false]], ['text' => "RyZerBE", 'icon_url' => Webhooks::ICON], null, "Es wurde ein Spieler gemutet");
 
         if (($obj = RyzerPlayerProvider::getRyzerPlayer($playerName)) != null) {
             $obj->setMuted(true);
@@ -303,10 +306,10 @@ class ModerationProvider
 
     public static function addWarn(string $playerName, string $sender, string $reason)
     {
-        $now = new \DateTime('now', new DateTimeZone('Europe/Berlin'));
+        $now = new DateTime('now', new DateTimeZone('Europe/Berlin'));
         $format = $now->format('Y-m-d H:i:s');
 
-        Ryzer::getAsyncConnection()->executeQuery("SELECT warns FROM PlayerModeration WHERE playername='$playerName'", 'RyzerCore', function (\mysqli_result $result) use ($playerName, $reason, $format, $sender) {
+        Ryzer::getAsyncConnection()->executeQuery("SELECT warns FROM PlayerModeration WHERE playername='$playerName'", 'RyzerCore', function (mysqli_result $result) use ($playerName, $reason, $format, $sender) {
             if ($result->num_rows > 0) {
                 $newWarLog = "";
                 while ($data = $result->fetch_assoc()) {
@@ -326,12 +329,12 @@ class ModerationProvider
         DiscordProvider::sendEmbedMessageToDiscord(Webhooks::STRAFLOG, "Spion",
             [['name' => "Spieler", 'value' => $playerName, 'inline' => false],
                 ['name' => "Grund", 'value' => $reason, 'inline' => false],
-                ['name' => "Staff", 'value' => $sender, 'inline' => false]], ['text' => "RyZerBE", 'icon_url' => Webhooks::ICON], null, "Es wurde ein Spieler verwarnt", "");
+                ['name' => "Staff", 'value' => $sender, 'inline' => false]], ['text' => "RyZerBE", 'icon_url' => Webhooks::ICON], null, "Es wurde ein Spieler verwarnt");
     }
 
     public static function addUnbanLog(string $playerName, string $reason, string $format, string $sender, bool $ban)
     {
-        Ryzer::getAsyncConnection()->executeQuery("SELECT unbanlog FROM PlayerModeration WHERE playername='$playerName'", 'RyzerCore', function (\mysqli_result $result) use ($playerName, $reason, $sender, $format, $ban) {
+        Ryzer::getAsyncConnection()->executeQuery("SELECT unbanlog FROM PlayerModeration WHERE playername='$playerName'", 'RyzerCore', function (mysqli_result $result) use ($playerName, $reason, $sender, $format, $ban) {
             if ($result->num_rows > 0) {
                 $newWarLog = "";
                 while ($data = $result->fetch_assoc()) {
@@ -351,7 +354,7 @@ class ModerationProvider
         DiscordProvider::sendEmbedMessageToDiscord(Webhooks::STRAFLOG, "Spion",
             [['name' => "Spieler", 'value' => $playerName, 'inline' => false],
                 ['name' => "Grund", 'value' => $reason, 'inline' => false],
-                ['name' => "Staff", 'value' => $sender, 'inline' => false]], ['text' => "RyZerBE", 'icon_url' => Webhooks::ICON], null, ($ban == true) ? "Es wurde ein Spieler entbannt" : "Es wurde ein Spieler entmutet", "");
+                ['name' => "Staff", 'value' => $sender, 'inline' => false]], ['text' => "RyZerBE", 'icon_url' => Webhooks::ICON], null, ($ban == true) ? "Es wurde ein Spieler entbannt" : "Es wurde ein Spieler entmutet");
     }
 
     /**

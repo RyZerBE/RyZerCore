@@ -15,7 +15,7 @@ class EditionFakerListener implements Listener
 {
 
     /**
-     * @param \pocketmine\event\server\DataPacketReceiveEvent $event
+     * @param DataPacketReceiveEvent $event
      */
     public function receivePacket(DataPacketReceiveEvent $event)
     {
@@ -32,7 +32,7 @@ class EditionFakerListener implements Listener
     }
 
     /**
-     * @param \baubolp\core\listener\own\EditionFakerEvent $event
+     * @param EditionFakerEvent $event
      */
     public function editionFaker(EditionFakerEvent $event)
     {

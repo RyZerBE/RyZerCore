@@ -5,7 +5,6 @@ namespace baubolp\core\listener;
 
 
 use BauboLP\Cloud\Bungee\BungeeAPI;
-use BauboLP\Cloud\Packets\PlayerDisconnectPacket;
 use baubolp\core\player\RyzerPlayerProvider;
 use baubolp\core\provider\LanguageProvider;
 use baubolp\core\provider\VIPJoinProvider;
@@ -21,7 +20,7 @@ use pocketmine\utils\TextFormat;
 class PlayerJoinListener implements Listener
 {
 
-    private $ips = ['5.181.151.61', '127.0.0.1'];
+    private array $ips = ['5.181.151.61', '127.0.0.1'];
 
     public function playerJoin(PlayerJoinEvent $event)
     {

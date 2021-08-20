@@ -4,7 +4,6 @@
 namespace baubolp\core\entity;
 
 
-use BauboLP\Cloud\Packets\PlayerMessagePacket;
 use InvalidArgumentException;
 use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
@@ -23,7 +22,6 @@ use pocketmine\math\Vector3;
 use pocketmine\level\utils\SubChunkIteratorManager;
 use pocketmine\network\mcpe\protocol\LevelEventPacket;
 use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
-use pocketmine\Player;
 use pocketmine\tile\Chest;
 use pocketmine\tile\Container;
 use pocketmine\tile\Tile;
@@ -31,26 +29,26 @@ use pocketmine\tile\Tile;
 class TNTExplosion
 {
     /** @var int */
-    private $rays = 16;
+    private int $rays = 16;
     /** @var Level */
-    public $level;
+    public Level $level;
     /** @var Position */
-    public $source;
+    public Position $source;
     /** @var float */
-    public $size;
+    public float $size;
 
-    /** @var \pocketmine\block\Block[] */
-    public $affectedBlocks = [];
+    /** @var Block[] */
+    public array $affectedBlocks = [];
     /** @var float */
-    public $stepLen = 0.3;
+    public float $stepLen = 0.3;
     /** @var Entity|Block|null */
-    private $what;
+    private Entity|null|Block $what;
 
-    /** @var \pocketmine\level\utils\SubChunkIteratorManager */
-    private $subChunkHandler;
+    /** @var SubChunkIteratorManager */
+    private SubChunkIteratorManager $subChunkHandler;
 
     /**
-     * @param \pocketmine\level\Position $center
+     * @param Position $center
      * @param float $size
      * @param Entity|Block|null $what
      */
@@ -153,16 +151,6 @@ class TNTExplosion
                 $this->affectedBlocks = $ev->getBlockList();
             }
         }
-
-        $explosionSize = $this->size * 2;
-        $minX = (int) floor($this->source->x - $explosionSize - 1);
-        $maxX = (int) ceil($this->source->x + $explosionSize + 1);
-        $minY = (int) floor($this->source->y - $explosionSize - 1);
-        $maxY = (int) ceil($this->source->y + $explosionSize + 1);
-        $minZ = (int) floor($this->source->z - $explosionSize - 1);
-        $maxZ = (int) ceil($this->source->z + $explosionSize + 1);
-
-        $explosionBB = new AxisAlignedBB($minX, $minY, $minZ, $maxX, $maxY, $maxZ);
 
         $list = $this->level->getNearbyEntities($this->what->getBoundingBox()->expandedCopy(4, 4, 4), $this->what instanceof Entity ? $this->what : null);
         foreach($list as $entity){

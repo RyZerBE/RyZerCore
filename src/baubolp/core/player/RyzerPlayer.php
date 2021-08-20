@@ -4,49 +4,59 @@
 namespace baubolp\core\player;
 
 
-use baubolp\core\Ryzer;
 use baubolp\core\util\Clan;
+use DateTime;
+use pocketmine\entity\Skin;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class RyzerPlayer
 {
-    public static $os = [0 => '???', 1 => 'Android', 2 => 'iOS', 3 => 'MacOS', 4 => 'FireOS', 5 => 'GearVR', 6 => 'HoloLens', 7 => 'Windows', 8 => 'Windows', 9 => 'Dedicated', 10 => 'Orbis', 11 => 'PS4'];
+    /** @var string[]  */
+    public static array $os = [0 => '???', 1 => 'Android', 2 => 'iOS', 3 => 'MacOS', 4 => 'FireOS', 5 => 'GearVR', 6 => 'HoloLens', 7 => 'Windows', 8 => 'Windows', 9 => 'Dedicated', 10 => 'Orbis', 11 => 'PS4'];
 
     /** @var Player */
-    private $player;
-    /** @var string */
-    private $language = "English";
-    /** @var \baubolp\core\player\LoginPlayerData  */
-    private $loginData;
-    /** @var bool  */
-    private $muted;
-    /** @var array  */
-    private $muteData;
-    /** @var string  */
-    private $rank = "Player";
-    /** @var int */
-    private $coins = 0;
-    /** @var bool */
-    private $particleStep = false;
-    /** @var null|string */
-    private $viewPlayer = null;
-    private $lastHit;
-    /** @var string  */
-    private $lastMessage = "#CoVid19";
-    /** @var \pocketmine\entity\Skin */
-    private $skin;
+    private Player $player;
     /** @var string|null */
-    private $nick;
+    private ?string $language = "English";
+    /** @var LoginPlayerData */
+    private LoginPlayerData $loginData;
+    /** @var bool  */
+    private bool $muted;
+    /** @var array  */
+    private array $muteData;
+    /** @var string  */
+    private string $rank = "Player";
+    /** @var int */
+    private int $coins = 0;
+    /** @var bool */
+    private bool $particleStep = false;
+    /** @var null|string */
+    private ?string $viewPlayer = null;
+    /** @var float  */
+    private float $lastHit;
+    /** @var string  */
+    private string $lastMessage = "#CoVid19";
+    /** @var Skin */
+    private Skin $skin;
+    /** @var string|null */
+    private ?string $nick;
     /** @var null|Clan */
-    private $clan = null;
+    private ?Clan $clan = null;
     /** @var string */
-    private $onlineTime;
-    /** @var \DateTime */
-    private $time;
+    private string $onlineTime;
+    /** @var DateTime */
+    private DateTime $time;
     /** @var boolean */
-    private $toggleRank = false;
+    private bool $toggleRank = false;
 
+    /**
+     * RyzerPlayer constructor.
+     * @param Player $player
+     * @param LoginPlayerData $loginData
+     * @param false $muted
+     * @param array $muteData
+     */
     public function __construct(Player $player, LoginPlayerData $loginData, $muted = false, $muteData = [])
     {
         $this->player = $player;
@@ -56,19 +66,19 @@ class RyzerPlayer
         $this->lastHit = time();
         $this->skin = $player->getSkin();
         $this->onlineTime = TextFormat::RED."???";
-        $this->time = new \DateTime('now');
+        $this->time = new DateTime('now');
     }
 
     /**
-     * @return \pocketmine\Player
+     * @return Player
      */
-    public function getPlayer(): \pocketmine\Player
+    public function getPlayer(): Player
     {
         return $this->player;
     }
 
     /**
-     * @return \baubolp\core\player\LoginPlayerData
+     * @return LoginPlayerData
      */
     public function getLoginData(): LoginPlayerData
     {
@@ -76,7 +86,7 @@ class RyzerPlayer
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getLanguage(): ?string
     {
@@ -84,7 +94,7 @@ class RyzerPlayer
     }
 
     /**
-     * @param string $language
+     * @param string|null $language
      */
     public function setLanguage(?string $language): void
     {
@@ -126,7 +136,7 @@ class RyzerPlayer
     /**
      * @param mixed $rank
      */
-    public function setRank($rank): void
+    public function setRank(mixed $rank): void
     {
         $this->rank = $rank;
     }
@@ -225,9 +235,9 @@ class RyzerPlayer
     }
 
     /**
-     * @return \pocketmine\entity\Skin
+     * @return Skin
      */
-    public function getBackupSkin(): \pocketmine\entity\Skin
+    public function getBackupSkin(): Skin
     {
         return $this->skin;
     }
@@ -290,9 +300,9 @@ class RyzerPlayer
     }
 
     /**
-     * @return \DateTime
+     * @return DateTime
      */
-    public function getTime(): \DateTime
+    public function getTime(): DateTime
     {
         return $this->time;
     }
@@ -318,9 +328,6 @@ class RyzerPlayer
      */
     public function getName(): string
     {
-        if($this->getNick() != null)
-            return $this->getNick();
-
-        return $this->getPlayer()->getName();
+        return ($this->getNick() ?? $this->getPlayer()->getName());
     }
 }

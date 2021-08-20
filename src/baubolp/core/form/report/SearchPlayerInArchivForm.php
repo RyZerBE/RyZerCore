@@ -10,7 +10,6 @@ use baubolp\core\Ryzer;
 use pocketmine\form\CustomForm;
 use pocketmine\form\CustomFormResponse;
 use pocketmine\form\element\Input;
-use pocketmine\form\MenuForm;
 use pocketmine\form\MenuOption;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;

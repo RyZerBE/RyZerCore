@@ -7,6 +7,7 @@ namespace baubolp\core\entity;
 use baubolp\core\Ryzer;
 use pocketmine\level\particle\FloatingTextParticle;
 use pocketmine\math\Vector3;
+use pocketmine\Player;
 use pocketmine\Server;
 
 class HoloGram extends FloatingTextParticle
@@ -28,7 +29,7 @@ class HoloGram extends FloatingTextParticle
     /**
      * @param string $text
      * @param string $title
-     * @param \pocketmine\Player[] $players
+     * @param Player[] $players
      */
     public function update(string $text, string $title, array $players = [])
     {

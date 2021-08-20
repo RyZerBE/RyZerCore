@@ -10,10 +10,8 @@ use baubolp\core\listener\own\RyZerPlayerAuthEvent;
 use baubolp\core\player\RyzerPlayer;
 use baubolp\core\player\RyzerPlayerProvider;
 use baubolp\core\provider\DiscordProvider;
-use baubolp\core\provider\JoinMEProvider;
 use baubolp\core\provider\LanguageProvider;
 use baubolp\core\provider\ModerationProvider;
-use baubolp\core\provider\NickProvider;
 use baubolp\core\provider\RankProvider;
 use baubolp\core\provider\StaffProvider;
 use baubolp\core\provider\VanishProvider;
@@ -21,6 +19,9 @@ use baubolp\core\provider\VIPJoinProvider;
 use baubolp\core\Ryzer;
 use baubolp\core\util\Clan;
 use baubolp\core\util\Webhooks;
+use DateTime;
+use DateTimeZone;
+use mysqli;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
@@ -28,22 +29,22 @@ use pocketmine\utils\TextFormat;
 class LoadAsyncDataTask extends AsyncTask
 {
     /** @var array */
-    private $loginData;
+    private array $loginData;
 
-    private $mysqlData;
+    private array $mysqlData;
     /** @var array */
-    private $os;
+    private array $os;
     /** @var string */
-    private $date;
+    private string $date;
     /** @var string  */
-    private $server;
+    private string $server;
 
     public function __construct(array $loginData, array $mysqlData)
     {
         $this->mysqlData = $mysqlData;
         $this->loginData = $loginData;
         $this->os = RyzerPlayer::$os;
-        $now = new \DateTime('now', new \DateTimeZone('Europe/Berlin'));
+        $now = new DateTime('now', new DateTimeZone('Europe/Berlin'));
         $this->date = $now->format("Y-m-d H:i:s");
         $this->server = CloudProvider::getServer();
     }
@@ -54,7 +55,7 @@ class LoadAsyncDataTask extends AsyncTask
     public function onRun()
     {
         $loginData = $this->loginData;
-        $mysqli = new \mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
+        $mysqli = new mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
         $playerName = $loginData['playerName'];
 
         $playerData = [];
@@ -144,7 +145,7 @@ class LoadAsyncDataTask extends AsyncTask
             $playerData['pm'] = false;
         }
 
-        $clanDB = new \mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'Clans');
+        $clanDB = new mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'Clans');
         $result = $clanDB->query("SELECT clan FROM ClanPlayers WHERE playername='$playerName'");
         if($result->num_rows > 0) {
             while($data = $result->fetch_assoc()) {
@@ -275,7 +276,7 @@ class LoadAsyncDataTask extends AsyncTask
 
         $playerData['status'] = null;
         if(explode("-", $this->server)[0] == "Lobby") {
-            $lobby = new \mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'Lobby');
+            $lobby = new mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'Lobby');
             $result = $lobby->query("SELECT * FROM `Status` WHERE playername='$playerName'");
             if($result->num_rows > 0) {
                 while($data = $result->fetch_assoc()) {
@@ -326,8 +327,8 @@ class LoadAsyncDataTask extends AsyncTask
 
                 if ($data['banduration'] != "") {
                     if ($data['banduration'] != "Permanent") {
-                        $now = new \DateTime('now', new \DateTimeZone('Europe/Berlin'));
-                        $bantime = new \DateTime($data['banduration']);
+                        $now = new DateTime('now', new DateTimeZone('Europe/Berlin'));
+                        $bantime = new DateTime($data['banduration']);
                         if ($now < $bantime) {
                             BungeeAPI::kickPlayer($data['playerName'], ModerationProvider::getBanScreen($data['reason'], ($data['language'] == "Deutsch") ? ModerationProvider::formatGermanDate($data['banduration']) : $data['banduration'],
                                 $data['banid'], $data['language'] == "English"));

@@ -11,9 +11,9 @@ use pocketmine\event\Event;
 class RyZerPlayerAuthEvent extends Event
 {
     /** @var RyzerPlayer */
-    private $ryZerPlayer;
+    private RyzerPlayer $ryZerPlayer;
     /** @var LoginPlayerData */
-    private $loginPlayerData;
+    private LoginPlayerData $loginPlayerData;
 
     public function __construct(RyzerPlayer $player, LoginPlayerData $data)
     {
@@ -22,7 +22,7 @@ class RyZerPlayerAuthEvent extends Event
     }
 
     /**
-     * @return \baubolp\core\player\RyzerPlayer
+     * @return RyzerPlayer
      */
     public function getRyZerPlayer(): RyzerPlayer
     {
@@ -30,7 +30,7 @@ class RyZerPlayerAuthEvent extends Event
     }
 
     /**
-     * @return \baubolp\core\player\LoginPlayerData
+     * @return LoginPlayerData
      */
     public function getLoginPlayerData(): LoginPlayerData
     {

@@ -8,6 +8,7 @@ use baubolp\core\form\JoinMeForm;
 use baubolp\core\provider\LanguageProvider;
 use baubolp\core\provider\MySQLProvider;
 use baubolp\core\Ryzer;
+use mysqli;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
@@ -29,8 +30,8 @@ class JoinMeCommand extends Command
 
         Ryzer::getMysqlProvider()->exec(new class($sender->getName()) extends AsyncTask{
             /** @var string */
-            private $name;
-            private $mysqlData;
+            private string $name;
+            private array $mysqlData;
 
             public function __construct(string $playerName)
             {
@@ -44,7 +45,7 @@ class JoinMeCommand extends Command
             public function onRun()
             {
                 $joinMe = [];
-                $mysqli = new \mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
+                $mysqli = new mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
                 $result = $mysqli->query("SELECT * FROM JoinMe");
                 if($result->num_rows > 0) {
                     while($data = $result->fetch_assoc()) {

@@ -8,13 +8,8 @@ use baubolp\core\provider\DiscordProvider;
 use baubolp\core\provider\LanguageProvider;
 use baubolp\core\Ryzer;
 use baubolp\core\util\Webhooks;
-use pocketmine\event\level\ChunkLoadEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerCommandPreprocessEvent;
-use pocketmine\event\server\DataPacketSendEvent;
-use pocketmine\level\ChunkLoader;
-use pocketmine\network\mcpe\protocol\LevelChunkPacket;
-use pocketmine\Player;
 use pocketmine\Server;
 
 class CommandListener implements Listener

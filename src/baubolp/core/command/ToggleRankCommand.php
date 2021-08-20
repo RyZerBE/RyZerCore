@@ -2,14 +2,13 @@
 
 namespace baubolp\core\command;
 
-use BauboLP\Cloud\Provider\CloudProvider;
 use baubolp\core\player\RyzerPlayerProvider;
 use baubolp\core\provider\LanguageProvider;
 use baubolp\core\provider\MySQLProvider;
 use baubolp\core\Ryzer;
+use mysqli;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\utils\CommandException;
 use pocketmine\Player;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
@@ -37,8 +36,8 @@ class ToggleRankCommand extends Command
             if($obj->isToggleRank()) {
                 Ryzer::getMysqlProvider()->exec(new class($sender->getName()) extends AsyncTask{
 
-                    private $playerName;
-                    private $mysqlData;
+                    private string $playerName;
+                    private array $mysqlData;
 
                     public function __construct(string $playerName)
                     {
@@ -51,7 +50,7 @@ class ToggleRankCommand extends Command
                      */
                     public function onRun()
                     {
-                        $mysqli = new \mysqli($this->mysqlData['host'] . ":3306", $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
+                        $mysqli = new mysqli($this->mysqlData['host'] . ":3306", $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
                         $name = $this->playerName;
                         $mysqli->query("DELETE FROM `ToggleRank` WHERE playername='$name'");
                         $mysqli->close();
@@ -68,8 +67,8 @@ class ToggleRankCommand extends Command
             }else {
                 Ryzer::getMysqlProvider()->exec(new class($sender->getName()) extends AsyncTask{
 
-                    private $playerName;
-                    private $mysqlData;
+                    private string $playerName;
+                    private array $mysqlData;
 
                     public function __construct(string $playerName)
                     {
@@ -82,7 +81,7 @@ class ToggleRankCommand extends Command
                      */
                     public function onRun()
                     {
-                        $mysqli = new \mysqli($this->mysqlData['host'] . ":3306", $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
+                        $mysqli = new mysqli($this->mysqlData['host'] . ":3306", $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
                         $name = $this->playerName;
                         $mysqli->query("INSERT INTO `ToggleRank`(`playername`) VALUES ('$name')");
                         $mysqli->close();

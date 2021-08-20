@@ -5,16 +5,13 @@ namespace baubolp\core\listener;
 
 
 use pocketmine\event\entity\EntityDamageByEntityEvent;
-use pocketmine\event\entity\EntityTeleportEvent;
 use pocketmine\event\Listener;
-use pocketmine\network\mcpe\protocol\BatchPacket;
-use pocketmine\network\mcpe\protocol\LevelChunkPacket;
 use pocketmine\Player;
 
 class SwitchesFixListener implements Listener
 {
     /** @var array     */
-    private $delay = [];
+    private array $delay = [];
 
     public function entityDamage(EntityDamageByEntityEvent $event)
     {

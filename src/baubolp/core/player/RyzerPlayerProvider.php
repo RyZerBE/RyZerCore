@@ -5,20 +5,18 @@ namespace baubolp\core\player;
 
 
 use baubolp\core\listener\own\PlayerRegisterEvent;
-use baubolp\core\task\LoadAsyncDataTask;
 use pocketmine\Player;
-use pocketmine\Server;
 
 class RyzerPlayerProvider
 {
-    /** @var \baubolp\core\player\RyzerPlayer[]  */
-    private static $players = [];
-    /** @var \baubolp\core\player\LoginPlayerData[]  */
-    public static $loginData = [];
+    /** @var RyzerPlayer[] */
+    private static array $players = [];
+    /** @var LoginPlayerData[] */
+    public static array $loginData = [];
 
 
     /**
-     * @param \pocketmine\Player $player
+     * @param Player $player
      */
     public static function registerRyzerPlayer(Player $player)
     {
@@ -29,7 +27,7 @@ class RyzerPlayerProvider
     }
 
     /**
-     * @return \baubolp\core\player\RyzerPlayer[]
+     * @return RyzerPlayer[]
      */
     public static function getRyzerPlayers(): array
     {
@@ -38,7 +36,7 @@ class RyzerPlayerProvider
 
     /**
      * @param string $player
-     * @return \baubolp\core\player\RyzerPlayer|null
+     * @return RyzerPlayer|null
      */
     public static function getRyzerPlayer(string $player): ?RyzerPlayer
     {

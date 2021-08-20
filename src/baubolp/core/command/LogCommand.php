@@ -7,11 +7,11 @@ namespace baubolp\core\command;
 use baubolp\core\provider\ModerationProvider;
 use baubolp\core\provider\MySQLProvider;
 use baubolp\core\Ryzer;
+use mysqli;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
-use pocketmine\utils\MainLogger;
 use pocketmine\utils\TextFormat;
 
 class LogCommand extends Command
@@ -38,9 +38,9 @@ class LogCommand extends Command
 
         Server::getInstance()->getAsyncPool()->submitTask(new class($playerName, $senderName, MySQLProvider::getMySQLData()) extends AsyncTask{
 
-            private $playerName;
-            private $mysqlData;
-            private $senderName;
+            private string $playerName;
+            private array $mysqlData;
+            private string $senderName;
 
             public function __construct(string $playerName, string $senderName, array $mysqlData)
             {
@@ -51,7 +51,7 @@ class LogCommand extends Command
 
             public function onRun()
             {
-                $mysqli = new \mysqli($this->mysqlData['host'].":3306", $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
+                $mysqli = new mysqli($this->mysqlData['host'].":3306", $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
 
                 $log = Ryzer::PREFIX.TextFormat::RED."Straflog über ".$this->playerName.TextFormat::GRAY.":\n";
 

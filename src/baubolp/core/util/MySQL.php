@@ -10,17 +10,17 @@ use mysqli;
 class MySQL
 {
     /** @var string */
-    private $host;
+    private string $host;
     /** @var string */
-    private $username;
+    private string $username;
     /** @var string */
-    private $password;
+    private string $password;
     /** @var string */
-    private $database;
+    private string $database;
     /** @var string */
-    private $index;
-    /** @var \mysqli */
-    private $sql;
+    private string $index;
+    /** @var mysqli */
+    private mysqli $sql;
 
     /**
      * MySQL constructor.
@@ -76,7 +76,7 @@ class MySQL
     }
 
     /**
-     * @return \mysqli
+     * @return mysqli
      */
     public function getSql(): mysqli
     {

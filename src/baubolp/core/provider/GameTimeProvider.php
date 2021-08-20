@@ -9,6 +9,9 @@ use baubolp\core\player\RyzerPlayerProvider;
 use baubolp\core\Ryzer;
 use baubolp\core\task\GameTimeTop5AsyncTask;
 use Closure;
+use DateTime;
+use DateTimeZone;
+use mysqli_result;
 use pocketmine\Server;
 
 class GameTimeProvider
@@ -16,7 +19,7 @@ class GameTimeProvider
 
     public static function getGameTime(string $username, Closure $closure, ...$extra_data)
     {
-        Ryzer::getAsyncConnection()->executeQuery("SELECT gametime FROM GameTime WHERE playername='$username'", "RyzerCore", function (\mysqli_result $result) {
+        Ryzer::getAsyncConnection()->executeQuery("SELECT gametime FROM GameTime WHERE playername='$username'", "RyzerCore", function (mysqli_result $result) {
             if ($result->num_rows > 0) {
                 while ($data = $result->fetch_assoc()) {
                     return $data['gametime'];
@@ -31,7 +34,7 @@ class GameTimeProvider
     {
         if (($p = RyzerPlayerProvider::getRyzerPlayer($username)) != null) {
             $date = $p->getTime();
-            $now = new \DateTime('now', new \DateTimeZone('Europe/Berlin'));
+            $now = new DateTime('now', new DateTimeZone('Europe/Berlin'));
             $h = $now->diff($date)->h;
             $i = $now->diff($date)->i;
 

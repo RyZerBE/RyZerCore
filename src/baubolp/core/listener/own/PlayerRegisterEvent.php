@@ -6,18 +6,17 @@ namespace baubolp\core\listener\own;
 
 use baubolp\core\player\LoginPlayerData;
 use baubolp\core\player\RyzerPlayer;
-use baubolp\core\player\RyzerPlayerProvider;
 use pocketmine\event\Event;
 use pocketmine\Player;
 
 class PlayerRegisterEvent extends Event
 {
-    /** @var \pocketmine\Player  */
-    private $player;
-    /** @var \baubolp\core\player\RyzerPlayer  */
-    private $ryzerPlayer;
-    /** @var \baubolp\core\player\LoginPlayerData  */
-    private $loginData;
+    /** @var Player */
+    private Player $player;
+    /** @var RyzerPlayer */
+    private RyzerPlayer $ryzerPlayer;
+    /** @var LoginPlayerData */
+    private LoginPlayerData $loginData;
 
     public function __construct(Player $player, LoginPlayerData $loginPlayerData, RyzerPlayer $ryzerPlayer)
     {
@@ -27,25 +26,25 @@ class PlayerRegisterEvent extends Event
     }
 
     /**
-     * @return \baubolp\core\player\LoginPlayerData
+     * @return LoginPlayerData
      */
-    public function getLoginData(): \baubolp\core\player\LoginPlayerData
+    public function getLoginData(): LoginPlayerData
     {
         return $this->loginData;
     }
 
     /**
-     * @return \pocketmine\Player
+     * @return Player
      */
-    public function getPlayer(): \pocketmine\Player
+    public function getPlayer(): Player
     {
         return $this->player;
     }
 
     /**
-     * @return \baubolp\core\player\RyzerPlayer
+     * @return RyzerPlayer
      */
-    public function getRyzerPlayer(): \baubolp\core\player\RyzerPlayer
+    public function getRyzerPlayer(): RyzerPlayer
     {
         return $this->ryzerPlayer;
     }

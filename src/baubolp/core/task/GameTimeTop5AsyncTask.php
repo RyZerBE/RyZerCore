@@ -5,6 +5,7 @@ namespace baubolp\core\task;
 
 
 use baubolp\core\provider\MySQLProvider;
+use mysqli;
 use pocketmine\level\particle\FloatingTextParticle;
 use pocketmine\math\Vector3;
 use pocketmine\scheduler\AsyncTask;
@@ -13,8 +14,8 @@ use pocketmine\utils\TextFormat;
 
 class GameTimeTop5AsyncTask extends AsyncTask
 {
-    private $username;
-    private $mysqlData;
+    private string $username;
+    private array $mysqlData;
 
     public function __construct(string $username)
     {
@@ -25,7 +26,7 @@ class GameTimeTop5AsyncTask extends AsyncTask
     public function onRun()
     {
         $gametimes = [];
-        $mysqli = new \mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
+        $mysqli = new mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
         $query = $mysqli->query("SELECT * FROM GameTime");
         if($query->num_rows > 0) {
             while ($data = $query->fetch_assoc()) {

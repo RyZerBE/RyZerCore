@@ -15,10 +15,10 @@ use pocketmine\Server;
 class VanishProvider
 {
     /** @var array  */
-    public static $vanishedPlayer = [];
+    public static array $vanishedPlayer = [];
 
     /**
-     * @param \baubolp\core\player\RyzerPlayer $player
+     * @param RyzerPlayer $player
      * @param bool $vanish
      */
     public static function vanishPlayer(RyzerPlayer $player, bool $vanish)
@@ -51,7 +51,7 @@ class VanishProvider
     }
 
     /**
-     * @param \pocketmine\Player $player
+     * @param Player $player
      */
     public static function removePlayerFromTab(Player $player): void
     {
@@ -67,7 +67,7 @@ class VanishProvider
     }
 
     /**
-     * @param \pocketmine\Player $player
+     * @param Player $player
      */
     public static function addPlayerToTab(Player $player): void
     {

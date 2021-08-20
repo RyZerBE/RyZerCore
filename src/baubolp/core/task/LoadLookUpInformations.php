@@ -9,7 +9,7 @@ use baubolp\core\provider\ModerationProvider;
 use baubolp\core\provider\MySQLProvider;
 use baubolp\core\provider\ReportProvider;
 use baubolp\core\Ryzer;
-use pocketmine\form\MenuOption;
+use mysqli;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
@@ -17,11 +17,11 @@ use pocketmine\utils\TextFormat;
 class LoadLookUpInformations extends AsyncTask
 {
     /** @var string  */
-    private $playerName;
+    private string $playerName;
     /** @var array */
-    private $mysqlData;
+    private array $mysqlData;
     /** @var string */
-    private $sender;
+    private string $sender;
 
     public function __construct(string $playerName, string $sender)
     {
@@ -32,7 +32,7 @@ class LoadLookUpInformations extends AsyncTask
 
     public function onRun()
     {
-        $mysqli = new \mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
+        $mysqli = new mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
         $playerData = [];
         $playerName = $this->playerName;
 
@@ -63,7 +63,7 @@ class LoadLookUpInformations extends AsyncTask
             }
         }
 
-        $clanDB = new \mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'Clans');
+        $clanDB = new mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'Clans');
         $result = $clanDB->query("SELECT clan FROM ClanPlayers WHERE playername='$playerName'");
         if($result->num_rows > 0) {
             while($data = $result->fetch_assoc()) {

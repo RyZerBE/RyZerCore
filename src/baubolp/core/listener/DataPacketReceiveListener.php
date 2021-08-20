@@ -12,18 +12,15 @@ use pocketmine\event\Listener;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\event\server\DataPacketSendEvent;
 use pocketmine\network\mcpe\protocol\ContainerClosePacket;
-use pocketmine\network\mcpe\protocol\InventoryTransactionPacket;
 use pocketmine\network\mcpe\protocol\LoginPacket;
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
-use pocketmine\network\mcpe\protocol\TextPacket;
 use pocketmine\Player;
-use pocketmine\utils\TextFormat;
 
 class DataPacketReceiveListener implements Listener
 {
 
     /** @var bool */
-    private $cancel_send = true; //INV-CRASHES FIX
+    private bool $cancel_send = true; //INV-CRASHES FIX
 
     public function packetReceive(DataPacketReceiveEvent $event)
     {

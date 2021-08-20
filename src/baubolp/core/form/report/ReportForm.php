@@ -5,13 +5,11 @@ namespace baubolp\core\form\report;
 
 
 use baubolp\core\provider\LanguageProvider;
-use baubolp\core\provider\ModerationProvider;
 use baubolp\core\provider\ReportProvider;
 use baubolp\core\Ryzer;
 use pocketmine\form\CustomForm;
 use pocketmine\form\CustomFormResponse;
 use pocketmine\form\element\Dropdown;
-use pocketmine\form\MenuForm;
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;

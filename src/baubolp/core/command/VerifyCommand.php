@@ -9,6 +9,7 @@ use baubolp\core\provider\LanguageProvider;
 use baubolp\core\provider\MySQLProvider;
 use baubolp\core\provider\VerifyProvider;
 use baubolp\core\Ryzer;
+use mysqli;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
@@ -29,8 +30,8 @@ class VerifyCommand extends Command
 
         Server::getInstance()->getAsyncPool()->submitTask(new class($sender->getName(), MySQLProvider::getMySQLData()) extends AsyncTask{
 
-            private $playerName;
-            private $mysqlData;
+            private string $playerName;
+            private array $mysqlData;
 
             public function __construct(string $playerName, array $mysqlData)
             {
@@ -40,7 +41,7 @@ class VerifyCommand extends Command
 
             public function onRun()
             {
-                $mysql = new \mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
+                $mysql = new mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'RyzerCore');
                 $name = $this->playerName;
 
                 $result = $mysql->query("SELECT * FROM Verify WHERE playername='$name'");
@@ -48,7 +49,7 @@ class VerifyCommand extends Command
                 if($result->num_rows > 0) {
                     while($data = $result->fetch_assoc()) {
                         $resultArray['token'] = $data['token'];
-                        $resultArray['isVerified'] = ($data['isverified'] != "false") ? true : false;
+                        $resultArray['isVerified'] = $data['isverified'] != "false";
                     }
                 }else {
                     $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';

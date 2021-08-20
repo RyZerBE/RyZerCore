@@ -14,13 +14,13 @@ class TrollSystem
 {
 
     /** @var null|PluginBase */
-    private static $instance = null;
+    private static ?PluginBase $instance = null;
     /** @var string[]  */
-    public $trollPlayers = [];
+    public array $trollPlayers = [];
 
-     public $antiDrop = [];
-     public $alone = [];
-     public $vanish = [];
+     public array $antiDrop = [];
+     public array $alone = [];
+     public array $vanish = [];
 
     const Prefix = TextFormat::DARK_PURPLE.TextFormat::BOLD."Troll ".TextFormat::RESET.TextFormat::GRAY;
 
@@ -64,9 +64,9 @@ class TrollSystem
     }
 
     /**
-     * @return \pocketmine\plugin\PluginBase|null
+     * @return PluginBase|null
      */
-    public function getPluginInstance(): ?\pocketmine\plugin\PluginBase
+    public function getPluginInstance(): ?PluginBase
     {
         return self::$instance;
     }

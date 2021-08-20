@@ -4,11 +4,8 @@
 namespace baubolp\core\command;
 
 
-use baubolp\core\player\RyzerPlayerProvider;
-use baubolp\core\provider\DiscordProvider;
 use baubolp\core\provider\ModerationProvider;
 use baubolp\core\Ryzer;
-use baubolp\core\util\Webhooks;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\utils\TextFormat;

@@ -9,6 +9,9 @@ use BauboLP\Cloud\Provider\CloudProvider;
 use baubolp\core\player\RyzerPlayerProvider;
 use baubolp\core\Ryzer;
 use baubolp\core\util\Webhooks;
+use DateTime;
+use DateTimeZone;
+use Exception;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat;
 
@@ -40,11 +43,11 @@ class ReportProvider
      * @param string $badPlayer
      * @param string $senderName
      * @param string $reason
-     * @throws \Exception
+     * @throws Exception
      */
     public static function addReport(string $badPlayer, string $senderName, string $reason)
     {
-        $now = new \DateTime('now', new \DateTimeZone('Europe/Berlin'));
+        $now = new DateTime('now', new DateTimeZone('Europe/Berlin'));
         $time = $now->format('Y-m-d H:i:s');
         $c = new Config(self::PATH);
         $reports = $c->get('Reports');
@@ -60,7 +63,7 @@ class ReportProvider
             [['name' => "Spieler", 'value' => $badPlayer, 'inline' => false],
             ['name' => 'Melder', 'value' => $senderName, 'inline' => false],
             ['name' => "Grund", 'value' => $reason, 'inline' => false],
-            ['name' => "Server", 'value' => CloudProvider::getServer(), 'inline' => false]], ['text' => "RyZerBE", 'icon_url' => Webhooks::ICON], null, "Ein Spieler wurde verdächtig", "");
+            ['name' => "Server", 'value' => CloudProvider::getServer(), 'inline' => false]], ['text' => "RyZerBE", 'icon_url' => Webhooks::ICON], null, "Ein Spieler wurde verdächtig");
         DiscordProvider::sendMessageToDiscord("Spion", "@Staff", Webhooks::REPORT_LOG);
     }
 
@@ -85,11 +88,11 @@ class ReportProvider
      * @param string $server
      * @param string $deviceId
      * @param string $ip
-     * @throws \Exception
+     * @throws Exception
      */
     public static function addReportToArchiv(string $badPlayer, string $senderName, string $reason, bool $accepted, string $staff, string $server, string $deviceId, string $ip)
     {
-        $now = new \DateTime('now', new \DateTimeZone('Europe/Berlin'));
+        $now = new DateTime('now', new DateTimeZone('Europe/Berlin'));
         $time = $now->format('Y-m-d H:i:s');
         $c = new Config(self::PATH);
         $archiv = $c->get('Archiv');
@@ -110,7 +113,7 @@ class ReportProvider
 
     /**
      * @param string $badPlayer
-     * @return array
+     * @return array|null
      */
     public static function getReportInformation(string $badPlayer): ?array
     {

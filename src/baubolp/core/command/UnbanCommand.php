@@ -6,6 +6,9 @@ namespace baubolp\core\command;
 
 use baubolp\core\provider\ModerationProvider;
 use baubolp\core\Ryzer;
+use DateTime;
+use DateTimeZone;
+use mysqli_result;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\Server;
@@ -37,7 +40,7 @@ class UnbanCommand extends Command
        $senderName = $sender->getName();
 
        if(strtolower($type) == "ban") {
-           Ryzer::getAsyncConnection()->executeQuery("SELECT ban FROM PlayerModeration WHERE playername='$playerName'", "RyzerCore", function (\mysqli_result $mysqli_result) use($senderName, $reason) {
+           Ryzer::getAsyncConnection()->executeQuery("SELECT ban FROM PlayerModeration WHERE playername='$playerName'", "RyzerCore", function (mysqli_result $mysqli_result) use($senderName, $reason) {
                if($mysqli_result->num_rows > 0) {
                    while ($data = $mysqli_result->fetch_assoc()) {
                        if($data['ban'] == "") {
@@ -79,14 +82,14 @@ class UnbanCommand extends Command
                     if($senderName == "CONSOLE") {
                         MainLogger::getLogger()->info(Ryzer::PREFIX.TextFormat::GREEN."Der Spieler ".TextFormat::AQUA.$playerName.TextFormat::GREEN." wurde entbannt.");
                     }
-                    $now = new \DateTime('now', new \DateTimeZone('Europe/Berlin'));
+                    $now = new DateTime('now', new DateTimeZone('Europe/Berlin'));
                     $format = $now->format('Y-m-d H:i:s');
                     ModerationProvider::addUnbanLog($playerName, $reason, $format, $senderName, true);
                     ModerationProvider::unban($playerName);
                 }
            });
        }elseif(strtolower($type) == "mute") {
-           Ryzer::getAsyncConnection()->executeQuery("SELECT mute FROM PlayerModeration WHERE playername='$playerName'", "RyzerCore", function (\mysqli_result $mysqli_result) use($senderName) {
+           Ryzer::getAsyncConnection()->executeQuery("SELECT mute FROM PlayerModeration WHERE playername='$playerName'", "RyzerCore", function (mysqli_result $mysqli_result) use($senderName) {
                if($mysqli_result->num_rows > 0) {
                    while ($data = $mysqli_result->fetch_assoc()) {
                        if($data['mute'] == "") {
@@ -125,7 +128,7 @@ class UnbanCommand extends Command
                    if($senderName == "CONSOLE") {
                        MainLogger::getLogger()->info(Ryzer::PREFIX.TextFormat::GREEN."Der Spieler ".TextFormat::AQUA.$playerName.TextFormat::GREEN." wurde entmutet.");
                    }
-                   $now = new \DateTime('now', new \DateTimeZone('Europe/Berlin'));
+                   $now = new DateTime('now', new DateTimeZone('Europe/Berlin'));
                    $format = $now->format('Y-m-d H:i:s');
                    ModerationProvider::addUnbanLog($playerName, $reason, $format, $senderName, false);
                    ModerationProvider::unmute($playerName);

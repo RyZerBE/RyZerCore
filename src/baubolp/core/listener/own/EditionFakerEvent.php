@@ -10,14 +10,14 @@ use pocketmine\utils\Config;
 
 class EditionFakerEvent extends Event
 {
-    /** @var \pocketmine\Player  */
-    private $player;
+    /** @var Player */
+    private Player $player;
     /** @var int */
-    private $input;
+    private int $input;
     /** @var int */
-    private $os;
+    private int $os;
     /** @var string  */
-    private $name;
+    private string $name;
 
     /**
      * EditionFakerEvent constructor.

@@ -36,6 +36,6 @@ class LanguageForm extends MenuForm
                 LanguageProvider::setLanguage($player->getName(), $language);
                 $player->sendMessage(Ryzer::PREFIX.LanguageProvider::getMessageContainer('selected-language', $player->getName(), ['#language' => $language]));
             }
-        }, null);
+        });
     }
 }

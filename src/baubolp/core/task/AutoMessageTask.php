@@ -12,7 +12,7 @@ use pocketmine\Server;
 class AutoMessageTask extends Task
 {
     /** @var int  */
-    private $i = 0;
+    private int $i = 0;
 
     /**
      * @inheritDoc
