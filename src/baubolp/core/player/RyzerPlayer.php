@@ -49,6 +49,8 @@ class RyzerPlayer
     private DateTime $time;
     /** @var boolean */
     private bool $toggleRank = false;
+    /** @var NetworkLevel|null  */
+    private ?NetworkLevel $networkLevel = null;
 
     /**
      * RyzerPlayer constructor.
@@ -329,5 +331,19 @@ class RyzerPlayer
     public function getName(): string
     {
         return ($this->getNick() ?? $this->getPlayer()->getName());
+    }
+
+    /**
+     * @return NetworkLevel|null
+     */
+    public function getNetworkLevel(): ?NetworkLevel{
+        return $this->networkLevel;
+    }
+
+    /**
+     * @param NetworkLevel|null $networkLevel
+     */
+    public function setNetworkLevel(?NetworkLevel $networkLevel): void{
+        $this->networkLevel = $networkLevel;
     }
 }

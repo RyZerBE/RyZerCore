@@ -158,11 +158,12 @@ class Loader
                 $mysqli->query("CREATE TABLE IF NOT EXISTS replayList(id INTEGER NOT NULL KEY AUTO_INCREMENT, playername varchar(16) NOT NULL, replays TEXT NOT NULL)");
                 $mysqli->query("CREATE TABLE IF NOT EXISTS vanish(id INTEGER NOT NULL KEY AUTO_INCREMENT, playername varchar(16) NOT NULL)");
 
-		$mysqli->query("CREATE TABLE IF NOT EXISTS Friends(id INTEGER NOT NULL KEY AUTO_INCREMENT, player varchar(16) NOT NULL, friends TEXT NOT NULL, friendRequests TEXT NOT NULL, allowFriendRequests int(11) NOT NULL, autoRequestAccept int(11) NOT NULL, onlineStatusMessage int(11) NOT NULL)");
+		        $mysqli->query("CREATE TABLE IF NOT EXISTS Friends(id INTEGER NOT NULL KEY AUTO_INCREMENT, player varchar(16) NOT NULL, friends TEXT NOT NULL, friendRequests TEXT NOT NULL, allowFriendRequests int(11) NOT NULL, autoRequestAccept int(11) NOT NULL, onlineStatusMessage int(11) NOT NULL)");
                 $mysqli->query("CREATE TABLE IF NOT EXISTS MonthlyMissions(id INTEGER NOT NULL KEY AUTO_INCREMENT, playername varchar(64) NOT NULL, mission1 varchar(64) NOT NULL, mission2 varchar(32) NOT NULL, mission3 varchar(64) NOT NULL, mission4 varchar(64) NOT NULL, mission5 varchar(64) NOT NULL, state varchar(16) NOT NULL)");
                 $mysqli->query("CREATE TABLE IF NOT EXISTS JoinMe(id INTEGER NOT NULL KEY AUTO_INCREMENT, playername varchar(32) NOT NULL, server varchar(64) NOT NULL)");
                 $mysqli->query("CREATE TABLE IF NOT EXISTS Staffs(id INTEGER NOT NULL KEY AUTO_INCREMENT, playername varchar(32) NOT NULL)");
-                $mysqli->query("CREATE TABLE IF NOT EXISTS Coins(id INTEGER NOT NULL KEY AUTO_INCREMENT, playername varchar(64) NOT NULL, coins varchar(32) NOT NULL)");
+                $mysqli->query("CREATE TABLE IF NOT EXISTS Coins(id INTEGER NOT NULL KEY AUTO_INCREMENT, playername varchar(64) NOT NULL, coins int NOT NULL)");
+                $mysqli->query("CREATE TABLE IF NOT EXISTS NetworkLevel(id INTEGER NOT NULL KEY AUTO_INCREMENT, playername varchar(64) NOT NULL, level int NOT NULL DEFAULT '0', level_progress int NOT NULL DEFAULT `0`)");
                 $mysqli->query("CREATE TABLE IF NOT EXISTS Nick(id INTEGER NOT NULL KEY AUTO_INCREMENT, playername varchar(64) NOT NULL, nick varchar(32) NOT NULL, skin TEXT NOT NULL)");
                 $mysqli->query("CREATE TABLE IF NOT EXISTS ToggleRank(id INTEGER NOT NULL KEY AUTO_INCREMENT, playername varchar(64) NOT NULL)");
                 $mysqli->query("CREATE TABLE IF NOT EXISTS GameTime(id INTEGER NOT NULL KEY AUTO_INCREMENT, playername varchar(32) NOT NULL, gametime varchar(128) NOT NULL)");

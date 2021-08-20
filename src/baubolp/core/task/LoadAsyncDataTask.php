@@ -2,11 +2,11 @@
 
 namespace baubolp\core\task;
 
-
 use BauboLP\BW\BW;
 use BauboLP\Cloud\Bungee\BungeeAPI;
 use BauboLP\Cloud\Provider\CloudProvider;
 use baubolp\core\listener\own\RyZerPlayerAuthEvent;
+use baubolp\core\player\NetworkLevel;
 use baubolp\core\player\RyzerPlayer;
 use baubolp\core\player\RyzerPlayerProvider;
 use baubolp\core\provider\DiscordProvider;
@@ -130,6 +130,19 @@ class LoadAsyncDataTask extends AsyncTask
         } else {
             $mysqli->query("INSERT INTO `Coins`(`playername`, `coins`) VALUES ('$playerName', '1000')");
             $playerData['coins'] = '1000';
+        }
+
+        //// NETWORK LEVEL \\\\
+        $result = $mysqli->query("SELECT * FROM NetworkLevel WHERE playername='$playerName'");
+        if ($result->num_rows > 0) {
+            while($data = $result->fetch_assoc()) {
+                $playerData["network_level_progress"] = $data["level_progress"];
+                $playerData["network_level"] = $data["level"];
+            }
+        } else {
+            $mysqli->query("INSERT INTO `NetworkLevel`(`playername`) VALUES ('$playerName')");
+            $playerData["network_level_progress"] = 0;
+            $playerData["network_level"] = 0;
 
         }
 
@@ -406,6 +419,7 @@ class LoadAsyncDataTask extends AsyncTask
                 $obj->setCoins($data['coins']);
                 $obj->setOnlineTime(TextFormat::GOLD.$data['gameTime'][0].TextFormat::AQUA."H ".TextFormat::GOLD.$data['gameTime'][1].TextFormat::AQUA."M");
                 $obj->setMoreParticle($data['pm']);
+                $obj->setNetworkLevel(new NetworkLevel($obj, $data["network_level"], $data["network_level_progress"]));
                 if($data['clan'] != null && $data['clan'] != "null") {
                     $obj->setClan(new Clan($data["clan"], $data["clanColor"].$data["clanTag"], (int)$data["clanElo"], $data["owner"]));
                 }
