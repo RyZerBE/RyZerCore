@@ -4,11 +4,13 @@
 namespace baubolp\core\player;
 
 
+use baubolp\core\provider\RankProvider;
 use baubolp\core\util\Clan;
 use DateTime;
 use pocketmine\entity\Skin;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
+use function str_replace;
 
 class RyzerPlayer
 {
@@ -345,5 +347,26 @@ class RyzerPlayer
      */
     public function setNetworkLevel(?NetworkLevel $networkLevel): void{
         $this->networkLevel = $networkLevel;
+    }
+
+    /**
+     * @param string|null $status
+     */
+    public function updateStatus(?string $status): void {
+        $clan = $this->getClan();
+        $player = $this->getPlayer();
+
+        if($this->isToggleRank()) {
+            $nametag = str_replace("{player_name}", $player->getName(), RankProvider::getNameTag("Player")); //PLAYER = DEFAULT
+        }else {
+            $nametag = str_replace("{player_name}", $player->getName(), RankProvider::getNameTag($this->getRank()));
+        }
+        $nametag = str_replace("&", TextFormat::ESCAPE, $nametag);
+        if($clan !== null) {
+            $player->setNameTag(TextFormat::YELLOW."~"." ".$nametag."\n".TextFormat::YELLOW.$clan->getClanTag().($status !== null ? "✎ ".$status : ""));
+        }else {
+            $player->setNameTag(TextFormat::YELLOW."~"." ".$nametag."\n".TextFormat::YELLOW.($status !== null ? "✎ ".$status : ""));
+        }
+        $player->setDisplayName($nametag);
     }
 }

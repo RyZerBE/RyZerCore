@@ -371,6 +371,17 @@ class LoadAsyncDataTask extends AsyncTask
                 return;
             }
 
+            //// COINS / PARTICLEMOD\\\\
+            if (($obj = RyzerPlayerProvider::getRyzerPlayer($data['playerName'])) != null) {
+                $obj->setCoins($data['coins']);
+                $obj->setOnlineTime(TextFormat::GOLD.$data['gameTime'][0].TextFormat::AQUA."H ".TextFormat::GOLD.$data['gameTime'][1].TextFormat::AQUA."M");
+                $obj->setMoreParticle($data['pm']);
+                $obj->setNetworkLevel(new NetworkLevel($obj, $data["network_level"], $data["network_level_progress"]));
+                if($data['clan'] != null && $data['clan'] != "null") {
+                    $obj->setClan(new Clan($data["clan"], $data["clanColor"].$data["clanTag"], (int)$data["clanElo"], $data["owner"]));
+                }
+            }
+
             //// PLAYER PERMS \\\\
             if (($obj = RyzerPlayerProvider::getRyzerPlayer($data['playerName'])) != null) {
                 $obj->setRank($data['rank']);
@@ -385,27 +396,7 @@ class LoadAsyncDataTask extends AsyncTask
                 }
                 if(!$cw) {
                     if($data['nick'] == null) {
-                        $status = $data['status'];
-                        if($data['toggleRank']) {
-                            $nametag = str_replace("{player_name}", $player->getName(), RankProvider::getNameTag("Player")); //PLAYER = DEFAULT
-                        }else {
-                            $nametag = str_replace("{player_name}", $player->getName(), RankProvider::getNameTag($data['rank']));
-                        }
-                        $nametag = str_replace("&", TextFormat::ESCAPE, $nametag);
-                        if($data['clan'] == null || $data['clan'] == "null") {
-                            if($status == null) {
-                                $player->setNameTag(str_replace("&", TextFormat::ESCAPE, $data['clanColor'])."~"." ".$nametag);
-                            }else {
-                                $player->setNameTag(str_replace("&", TextFormat::ESCAPE, $data['clanColor'])."~"." ".$nametag."\n".TextFormat::YELLOW."✎ ".$status);
-                            }
-                        }else {
-                            if($status == null) {
-                                $player->setNameTag(str_replace("&", TextFormat::ESCAPE, $data['clanColor']).$data['clanTag']." ".$nametag);
-                            }else {
-                                $player->setNameTag(str_replace("&", TextFormat::ESCAPE, $data['clanColor']).$data['clanTag']." ".$nametag."\n".TextFormat::YELLOW."✎ ".$status);
-                            }
-                        }
-                        $player->setDisplayName($nametag);
+                        $obj->updateStatus($data["status"]);
                     }else {
                         Ryzer::getNickProvider()->setNick($player, $obj, $data['nick'], $data['nickSkin']);
                         $player->sendMessage(Ryzer::PREFIX.LanguageProvider::getMessageContainer('nick-active', $player->getName(), ['#nick' => $data['nick']]));
@@ -414,17 +405,6 @@ class LoadAsyncDataTask extends AsyncTask
                     if(StaffProvider::isLogin($player->getName())) {
                         Ryzer::getNickProvider()->showAllNicksToTeam($player);
                     }
-                }
-            }
-
-            //// COINS / PARTICLEMOD\\\\
-            if (($obj = RyzerPlayerProvider::getRyzerPlayer($data['playerName'])) != null) {
-                $obj->setCoins($data['coins']);
-                $obj->setOnlineTime(TextFormat::GOLD.$data['gameTime'][0].TextFormat::AQUA."H ".TextFormat::GOLD.$data['gameTime'][1].TextFormat::AQUA."M");
-                $obj->setMoreParticle($data['pm']);
-                $obj->setNetworkLevel(new NetworkLevel($obj, $data["network_level"], $data["network_level_progress"]));
-                if($data['clan'] != null && $data['clan'] != "null") {
-                    $obj->setClan(new Clan($data["clan"], $data["clanColor"].$data["clanTag"], (int)$data["clanElo"], $data["owner"]));
                 }
             }
 

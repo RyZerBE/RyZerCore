@@ -9,7 +9,7 @@ class Clan {
     /** @var string  */
     private string $clanTag;
     /** @var int  */
-    private int $elo = 100;
+    private int $elo;
     /** @var string */
     private string $owner;
 
