@@ -7,6 +7,7 @@ use baubolp\core\command\ApplyCommand;
 use baubolp\core\command\BroadcastCommand;
 use baubolp\core\command\DeactivateVipJoinCommand;
 use baubolp\core\command\GamemodeCommand;
+use baubolp\core\command\NetworkLevelCommand;
 use baubolp\core\command\ToggleRankCommand;
 use baubolp\core\command\BanCommand;
 use baubolp\core\command\ClanUICommand;
@@ -15,7 +16,6 @@ use baubolp\core\command\GameTimeCommand;
 use baubolp\core\command\JoinMeCommand;
 use baubolp\core\command\KickCommand;
 use baubolp\core\command\LanguageCommand;
-use baubolp\core\command\ListCommand;
 use baubolp\core\command\LogCommand;
 use baubolp\core\command\LoginCommand;
 use baubolp\core\command\LookCommand;
@@ -57,8 +57,6 @@ use pocketmine\scheduler\AsyncTask;
 use pocketmine\scheduler\Task;
 use pocketmine\Server;
 use pocketmine\utils\MainLogger;
-use function mysqli_error;
-use function var_dump;
 
 class Loader
 {
@@ -117,7 +115,8 @@ class Loader
             'broadcast' => new BroadcastCommand(),
             'cp' => new WebInterfaceCommand(),
             "gamemode" => new GamemodeCommand(),
-            "vanish" => new VanishCommand()
+            "vanish" => new VanishCommand(),
+            "networklevel" => new NetworkLevelCommand()
         ];
 
         foreach (array_keys($commands) as $key) {
@@ -165,7 +164,7 @@ class Loader
                 $mysqli->query("CREATE TABLE IF NOT EXISTS JoinMe(id INTEGER NOT NULL KEY AUTO_INCREMENT, playername varchar(32) NOT NULL, server varchar(64) NOT NULL)");
                 $mysqli->query("CREATE TABLE IF NOT EXISTS Staffs(id INTEGER NOT NULL KEY AUTO_INCREMENT, playername varchar(32) NOT NULL)");
                 $mysqli->query("CREATE TABLE IF NOT EXISTS Coins(id INTEGER NOT NULL KEY AUTO_INCREMENT, playername varchar(64) NOT NULL, coins int NOT NULL)");
-                $mysqli->query("CREATE TABLE IF NOT EXISTS NetworkLevel(id INTEGER NOT NULL KEY AUTO_INCREMENT, playername varchar(64) NOT NULL, level INTEGER NOT NULL DEFAULT '1', level_progress INTEGER NOT NULL DEFAULT '0')");
+                $mysqli->query("CREATE TABLE IF NOT EXISTS NetworkLevel(id INTEGER NOT NULL KEY AUTO_INCREMENT, playername varchar(64) NOT NULL, level INTEGER NOT NULL DEFAULT '1', level_progress INTEGER NOT NULL DEFAULT '0', level_progress_today INTEGER NOT NULL DEFAULT '0', last_level_progress TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)");
                 $mysqli->query("CREATE TABLE IF NOT EXISTS Nick(id INTEGER NOT NULL KEY AUTO_INCREMENT, playername varchar(64) NOT NULL, nick varchar(32) NOT NULL, skin TEXT NOT NULL)");
                 $mysqli->query("CREATE TABLE IF NOT EXISTS ToggleRank(id INTEGER NOT NULL KEY AUTO_INCREMENT, playername varchar(64) NOT NULL)");
                 $mysqli->query("CREATE TABLE IF NOT EXISTS GameTime(id INTEGER NOT NULL KEY AUTO_INCREMENT, playername varchar(32) NOT NULL, gametime varchar(128) NOT NULL)");
@@ -232,7 +231,7 @@ class Loader
             'unban',
             'unban-ip',
             'list',
-            'playsound',
+            //'playsound',
             'say',
             'msg',
             'kick',

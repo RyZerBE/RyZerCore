@@ -25,6 +25,7 @@ use mysqli;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
+use function strtotime;
 
 class LoadAsyncDataTask extends AsyncTask
 {
@@ -138,12 +139,15 @@ class LoadAsyncDataTask extends AsyncTask
             while($data = $result->fetch_assoc()) {
                 $playerData["network_level_progress"] = $data["level_progress"];
                 $playerData["network_level"] = $data["level"];
+                $playerData["level_progress_today"] = $data["level_progress_today"];
+                $playerData["last_level_progress"] = $data["last_level_progress"];
             }
         } else {
             $mysqli->query("INSERT INTO `NetworkLevel`(`playername`) VALUES ('$playerName')");
             $playerData["network_level_progress"] = 0;
-            $playerData["network_level"] = 0;
-
+            $playerData["network_level"] = 1;
+            $playerData["level_progress_today"] = 0;
+            $playerData["last_level_progress"] = 0;
         }
 
         //// PARTICLE-MOD \\\\
@@ -376,7 +380,7 @@ class LoadAsyncDataTask extends AsyncTask
                 $obj->setCoins($data['coins']);
                 $obj->setOnlineTime(TextFormat::GOLD.$data['gameTime'][0].TextFormat::AQUA."H ".TextFormat::GOLD.$data['gameTime'][1].TextFormat::AQUA."M");
                 $obj->setMoreParticle($data['pm']);
-                $obj->setNetworkLevel(new NetworkLevel($obj, $data["network_level"], $data["network_level_progress"]));
+                $obj->setNetworkLevel(new NetworkLevel($obj, $data["network_level"], $data["network_level_progress"], $data["level_progress_today"], strtotime($data["last_level_progress"])));
                 if($data['clan'] != null && $data['clan'] != "null") {
                     $obj->setClan(new Clan($data["clan"], $data["clanColor"].$data["clanTag"], (int)$data["clanElo"], $data["owner"]));
                 }

@@ -4,9 +4,9 @@
 namespace baubolp\core\command;
 
 
+use baubolp\core\module\TrollSystem\TrollSystem;
 use baubolp\core\provider\StaffProvider;
 use baubolp\core\Ryzer;
-use baubolp\core\module\TrollSystem\TrollSystem;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;

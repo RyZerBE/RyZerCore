@@ -4,9 +4,9 @@
 namespace baubolp\core\module\TrollSystem\forms;
 
 
+use baubolp\core\module\TrollSystem\TrollSystem;
 use baubolp\core\provider\LanguageProvider;
 use baubolp\core\Ryzer;
-use baubolp\core\module\TrollSystem\TrollSystem;
 use pocketmine\form\MenuForm;
 use pocketmine\form\MenuOption;
 use pocketmine\item\Item;
