@@ -2,6 +2,9 @@
 
 namespace baubolp\core\util;
 
+use pocketmine\utils\TextFormat;
+use function str_replace;
+
 class Clan {
 
     /** @var string  */
@@ -37,7 +40,7 @@ class Clan {
      * @return string
      */
     public function getClanTag(): string{
-        return $this->clanTag;
+        return str_replace("&", TextFormat::ESCAPE, $this->clanTag);
     }
 
     /**

@@ -352,20 +352,20 @@ class RyzerPlayer
     /**
      * @param string|null $status
      */
-    public function updateStatus(?string $status): void {
+    public function updateStatus(?string $status): void{
         $clan = $this->getClan();
         $player = $this->getPlayer();
 
-        if($this->isToggleRank()) {
+        if($this->isToggleRank()){
             $nametag = str_replace("{player_name}", $player->getName(), RankProvider::getNameTag("Player")); //PLAYER = DEFAULT
-        }else {
+        }else{
             $nametag = str_replace("{player_name}", $player->getName(), RankProvider::getNameTag($this->getRank()));
         }
         $nametag = str_replace("&", TextFormat::ESCAPE, $nametag);
-        if($clan !== null) {
-            $player->setNameTag(TextFormat::YELLOW."~"." ".$nametag."\n".TextFormat::YELLOW.$clan->getClanTag().($status !== null ? "✎ ".$status : ""));
-        }else {
-            $player->setNameTag(TextFormat::YELLOW."~"." ".$nametag."\n".TextFormat::YELLOW.($status !== null ? "✎ ".$status : ""));
+        if($clan !== null){
+            $player->setNameTag($clan->getClanTag().TextFormat::RESET." ".$nametag."\n".(($status !== null ? "✎ ".$status : "")));
+        }else{
+            $player->setNameTag(TextFormat::YELLOW."~"." ".$nametag."\n".TextFormat::YELLOW.(($status !== null ? "✎ ".$status : "")));
         }
         $player->setDisplayName($nametag);
     }
