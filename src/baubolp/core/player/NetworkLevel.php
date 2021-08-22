@@ -77,8 +77,14 @@ class NetworkLevel {
      */
     public function getProgressToLevelUp(?int $level = null): int {
         $level = ($level ?? $this->getLevel());
-        if($level <= 1) return 100;
-        return ($level * 100 + (10 * $level));
+        return match (true) {
+            ($level <= 10) => 1000,
+            ($level <= 25) => 2000,
+            ($level <= 50) => 5000,
+            ($level <= 75) => 7500,
+            ($level <= 100) => 10000,
+            default => 15000
+        };
     }
 
     /**
@@ -105,13 +111,24 @@ class NetworkLevel {
      */
     public function addProgress(int $progress, ?Closure $closure = null): void {
         if(ceil($this->last_progress / 86400) !== ceil(time() / 86400)) $this->progress_today = 0;
+
+        $progress_today = $this->getProgressToday();
+        $multiplier = match (true) {
+            ($progress_today >= 10000) => 0.03,
+            ($progress_today >= 5000) => 0.1,
+            default => 1
+        };
+        $progress = (int)ceil($progress * $multiplier);
+
         $this->progress_today += $progress;
         $this->progress += $progress;
         $this->last_progress = time();
 
         NetworkLevelProvider::addLevelProgress($this->getPlayer()->getName(), $progress, $this->progress_today, $closure);
 
-        while($this->checkLevelUp()) //Nothing
+        while($this->checkLevelUp()){
+            //Nothing
+        }
         (new PlayerLevelProgressEvent($this->getPlayer()->getPlayer(), $progress))->call();
     }
 
