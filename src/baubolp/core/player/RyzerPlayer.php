@@ -42,7 +42,7 @@ class RyzerPlayer
     /** @var Skin */
     private Skin $skin;
     /** @var string|null */
-    private ?string $nick;
+    private ?string $nick = null;
     /** @var null|Clan */
     private ?Clan $clan = null;
     /** @var string */
