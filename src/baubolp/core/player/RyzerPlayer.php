@@ -353,7 +353,6 @@ class RyzerPlayer
      * @param string|null $status
      */
     public function updateStatus(?string $status): void{
-        $clan = $this->getClan();
         $player = $this->getPlayer();
 
         if($this->isToggleRank()){
@@ -362,11 +361,8 @@ class RyzerPlayer
             $nametag = str_replace("{player_name}", $player->getName(), RankProvider::getNameTag($this->getRank()));
         }
         $nametag = str_replace("&", TextFormat::ESCAPE, $nametag);
-        if($clan !== null){
-            $player->setNameTag($clan->getClanTag().TextFormat::RESET." ".$nametag."\n".(($status !== null ? "✎ ".$status : "")));
-        }else{
-            $player->setNameTag(TextFormat::YELLOW."~"." ".$nametag."\n".TextFormat::YELLOW.(($status !== null ? "✎ ".$status : "")));
-        }
+
+        $player->setNameTag($nametag.TextFormat::DARK_GRAY." [".TextFormat::GREEN.$this->getNetworkLevel()->getLevel()." Level".TextFormat::DARK_GRAY."]"."\n".TextFormat::YELLOW.(($status !== null ? "✎ ".$status : "")));
         $player->setDisplayName($nametag);
     }
 }

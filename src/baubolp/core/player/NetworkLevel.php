@@ -164,16 +164,17 @@ class NetworkLevel {
         $player = $this->getPlayer()->getPlayer();
 
         (new PlayerLevelUpEvent($player, $level))->call();
-        $player->sendMessage(Ryzer::PREFIX.implode("\n".Ryzer::PREFIX,
+        $player->sendMessage(str_repeat(TextFormat::GOLD."✰".TextFormat::YELLOW."❋", 7),);
+        $player->sendMessage(implode("\n",
                 [
-                    str_repeat(TextFormat::GOLD."✰".TextFormat::YELLOW."❋", 7),
-                    TextFormat::BOLD.TextFormat::GOLD."Level Up!",
-                    TextFormat::GREEN."You reached level ".TextFormat::GOLD.$level.TextFormat::GREEN."!",
                     TextFormat::GREEN."",
-                    str_repeat(TextFormat::GOLD."✰".TextFormat::YELLOW."❋", 7),
+                    Ryzer::PREFIX.TextFormat::BOLD.TextFormat::GOLD."Level Up!",
+                    Ryzer::PREFIX.TextFormat::GREEN."You reached level ".TextFormat::GOLD.$level.TextFormat::GREEN."!",
+                    TextFormat::GREEN."",
                 ]
             )
         );
+        $player->sendMessage(str_repeat(TextFormat::GOLD."✰".TextFormat::YELLOW."❋", 7),);
         $player->playSound("random.levelup", 100, 1, [$player]);
 
         //TODO: Rewards
