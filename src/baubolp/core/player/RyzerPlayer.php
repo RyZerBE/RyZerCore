@@ -362,7 +362,7 @@ class RyzerPlayer
         }
         $nametag = str_replace("&", TextFormat::ESCAPE, $nametag);
 
-        $player->setNameTag($nametag.TextFormat::DARK_GRAY." [".TextFormat::GREEN.$this->getNetworkLevel()->getLevel()." Level".TextFormat::DARK_GRAY."]"."\n".TextFormat::YELLOW.(($status !== null ? "✎ ".$status : "")));
+        $player->setNameTag($nametag.TextFormat::BLACK." [".$this->getNetworkLevel()->getLevelColor().$this->getNetworkLevel()->getLevel().TextFormat::BLACK."]"."\n".TextFormat::YELLOW.(($status !== null ? "✎ ".$status : "")));
         $player->setDisplayName($nametag);
     }
 }
