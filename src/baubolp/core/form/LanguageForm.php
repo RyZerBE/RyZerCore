@@ -31,8 +31,15 @@ class LanguageForm extends MenuForm
                     $options[] = new MenuOption(TextFormat::AQUA.$language."\n".TextFormat::WHITE.TextFormat::BOLD.count(array_keys(Ryzer::$translations[$language]))." translations", new FormIcon("https://media.discordapp.net/attachments/779814956270223380/868901452649734304/276speakinghead_100550.png?width=410&height=410"));
                 }
             }
+            if($obj->getPlayer()->hasPermission("language.edit"))
+                $options[] = new MenuOption(TextFormat::RED."Reload Languages", new FormIcon("textures/ui/refresh", FormIcon::IMAGE_TYPE_PATH));
         }
         parent::__construct(Ryzer::PREFIX."Language", "", $options, function (Player $player, int $selectedOption) use ($languages) : void{
+            if($selectedOption === count($languages)) {
+                LanguageProvider::reloadLanguages();
+                $player->sendMessage(Ryzer::PREFIX."Erfolgreich neugeladen!");
+                return;
+            }
             $language = $languages[$selectedOption];
             if(($obj = RyzerPlayerProvider::getRyzerPlayer($player->getName())) != null) {
                 if($obj->getPlayer()->hasPermission("language.edit")) {
