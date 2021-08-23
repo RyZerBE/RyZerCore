@@ -88,6 +88,22 @@ class NetworkLevel {
     }
 
     /**
+     * @param int|null $level
+     * @return string
+     */
+    public function getLevelColor(int $level = null): string{
+        $level = ($level ?? $this->getLevel());
+        return match (true) {
+            ($level <= 5) => TextFormat::DARK_GRAY,
+            ($level <= 10) => TextFormat::GRAY,
+            ($level <= 25) => TextFormat::BLUE,
+            ($level <= 50) => TextFormat::AQUA,
+            ($level <= 75) => TextFormat::LIGHT_PURPLE,
+            default => TextFormat::DARK_RED
+        };
+    }
+
+    /**
      * @return int
      */
     public function getProgressPercentage(): int {
@@ -106,18 +122,25 @@ class NetworkLevel {
     }
 
     /**
+     * @return float|int
+     */
+    public function getMultiplier(): float|int{
+        $progress_today = $this->getProgressToday();
+        return match (true) {
+            ($progress_today >= 10000) => 0.03,
+            ($progress_today >= 5000) => 0.1,
+            default => 1
+        };
+    }
+
+    /**
      * @param int $progress
      * @param Closure|null $closure
      */
     public function addProgress(int $progress, ?Closure $closure = null): void {
         if(ceil($this->last_progress / 86400) !== ceil(time() / 86400)) $this->progress_today = 0;
+        $multiplier = $this->getMultiplier();
 
-        $progress_today = $this->getProgressToday();
-        $multiplier = match (true) {
-            ($progress_today >= 10000) => 0.03,
-            ($progress_today >= 5000) => 0.1,
-            default => 1
-        };
         $progress = (int)ceil($progress * $multiplier);
 
         $this->progress_today += $progress;
