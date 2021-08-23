@@ -9,6 +9,8 @@ use baubolp\core\Ryzer;
 use mysqli;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
+use function array_keys;
+use function str_replace;
 
 class LanguageProvider
 {
@@ -53,6 +55,27 @@ class LanguageProvider
         AsyncExecutor::submitMySQLAsyncTask("RyzerCore", function (mysqli $mysqli) use ($language, $username){
             $mysqli->query("UPDATE PlayerLanguage SET selected_language='$language' WHERE playername='$username'");
         });
+    }
+
+    /**
+     * @param string $key
+     * @param string $language
+     * @param array $replaces
+     * @return string
+     */
+    public static function getTranslation(string $key, string $language, array $replaces = [], bool $escape = false): string
+    {
+        if(empty(Ryzer::$translations[$language][$key])) {
+            return "There is no translation with the key \"".$key."\"";
+        }
+
+        if($escape) return Ryzer::$translations[$language][$key];
+        $message = str_replace("&", TextFormat::ESCAPE, Ryzer::$translations[$language][$key]);
+        $message = str_replace("#nl", "\n", $message);
+        foreach (array_keys($replaces) as $key) {
+            $message = str_replace($key, $replaces[$key], $message);
+        }
+        return $message;
     }
 
     /**

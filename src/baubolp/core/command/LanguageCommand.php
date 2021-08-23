@@ -41,7 +41,7 @@ class LanguageCommand extends Command
             } else if($args[0] == "removetranslation") {
                 if($sender->hasPermission("languages.edit")) {
                     if (isset($args[1])) {
-                        $sender->sendMessage(Ryzer::PREFIX . TextFormat::GREEN . "The message with the key " . $args[1], " was removed!");
+                        $sender->sendMessage(Ryzer::PREFIX . TextFormat::GREEN . "The message with the key " . $args[1]. " was removed!");
                         LanguageProvider::removeKey($language, $args[1]);
                     } else {
                         $sender->sendMessage(Ryzer::PREFIX . TextFormat::YELLOW . "Syntax error: /language removetranslation [KEY]");
