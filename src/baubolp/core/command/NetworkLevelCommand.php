@@ -83,9 +83,9 @@ class NetworkLevelCommand extends Command {
             if($data === null) return;
 
             $networkLevel = $rbePlayer->getNetworkLevel();
-            $networkLevel->setLevel($data["level"]);
-            $networkLevel->setProgress($data["progress"]);
-            $networkLevel->addProgress($data["add_progress"]);
+            $networkLevel->setLevel((int)$data["level"]);
+            $networkLevel->setProgress((int)$data["progress"]);
+            $networkLevel->addProgress((int)$data["add_progress"]);
 
             $player->sendMessage(Ryzer::PREFIX."Network Level von " . $target->getName() . " wurde erfolgreich aktualisiert.");
         });
