@@ -7,6 +7,10 @@ use function str_replace;
 
 class Clan {
 
+    const CLOSE = 0;
+    const INVITE = 1;
+    const OPEN = 2;
+
     /** @var string  */
     private string $clanName;
     /** @var string  */

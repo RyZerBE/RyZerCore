@@ -162,34 +162,34 @@ class LoadAsyncDataTask extends AsyncTask
             $playerData['pm'] = false;
         }
 
-        $clanDB = new mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'Clans');
-        $result = $clanDB->query("SELECT clan FROM ClanPlayers WHERE playername='$playerName'");
+        $clanDB = new mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'BetterClans');
+        $result = $clanDB->query("SELECT * FROM ClanUsers WHERE playername='$playerName'");
         if($result->num_rows > 0) {
             while($data = $result->fetch_assoc()) {
-                $playerData['clan'] = $data['clan'];
+                $playerData['clan'] = $data['clan_name'];
             }
         }else {
             $playerData['clan'] = null;
         }
 
         $clanName = $playerData['clan'];
-        if($clanName != null && $clanName != "null") {
-            $result = $clanDB->query("SELECT * FROM Clans WHERE clanname='$clanName'");
+        if($clanName != null && $clanName != "") {
+            $result = $clanDB->query("SELECT * FROM Clans WHERE clan_name='$clanName'");
             if($result->num_rows > 0) {
                 while($data = $result->fetch_assoc()) {
                     $playerData['clanColor'] = $data['color'];
-                    $playerData['clanTag'] = $data['clantag'];
-                    $playerData['owner'] = $data['owner'];
+                    $playerData['clanTag'] = $data['clan_tag'];
+                    $playerData['owner'] = $data['clan_owner'];
                     $playerData["clanElo"] = $data["elo"];
                 }
             }else {
                 $playerData['clanTag'] = "";
-                $playerData['clanColor'] = "&e";
+                $playerData['clanColor'] = "§e";
                 $playerData["clanElo"] = 1000;
             }
         }else {
             $playerData['clanTag'] = "";
-            $playerData['clanColor'] = "&e";
+            $playerData['clanColor'] = "§e";
             $playerData["clanElo"] = 1000;
         }
 

@@ -1,46 +1,38 @@
 <?php
 
-
 namespace baubolp\core\form\clan;
 
-
 use BauboLP\Cloud\CloudBridge;
-use baubolp\core\provider\LanguageProvider;
+use baubolp\core\provider\MySQLProvider;
 use baubolp\core\Ryzer;
-use pocketmine\form\CustomForm;
-use pocketmine\form\CustomFormResponse;
-use pocketmine\form\element\Input;
+use jojoe77777\FormAPI\CustomForm;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
+use function str_replace;
 
-class CreateClanForm extends CustomForm
-{
+class CreateClanForm {
 
-    public function __construct()
-    {
-        $elements = [new Input("ClanName", TextFormat::RED."Clan Name", "RyZerBE", ""), new Input("ClanTag", TextFormat::RED."Clan Tag", "RBE", "")];
-        parent::__construct(Ryzer::PREFIX.TextFormat::RED."Clans", $elements, function (Player $player, CustomFormResponse $response): void{
-            $e1 = $this->getElement(0);
-            $e2 = $this->getElement(1);
+    /**
+     * @param Player $player
+     * @param array $extraData
+     */
+    public static function open(Player $player, array $extraData = []){
+        $form = new CustomForm(function(Player $player, $data): void{
+            if($data === null) return;
 
-            $clanName = $response->getString($e1->getName());
-            $clanTag = $response->getString($e2->getName());
-            if(str_replace(" ", "", $clanName) == "" || str_replace(" ", "", $clanTag) == "") {
-                $player->sendMessage(Ryzer::PREFIX.LanguageProvider::getMessageContainer('something-went-wrong', $player->getName()));
+            $clanName = str_replace(" ", "_", $data["clan_name"]);
+            $clanTag = str_replace(" ", "_", $data["clan_tag"]);
+
+            if(!MySQLProvider::checkInsert($clanName) || !MySQLProvider::checkInsert($clanTag)) {
+                $player->sendMessage(Ryzer::PREFIX.TextFormat::RED."MySQL Injections & Sonderzeichen sind nicht erlaubt!!");
                 return;
             }
 
-
-            if(is_string($clanName) && is_string($clanTag)) {
-                if(strlen($clanTag) > 5) {
-                    $player->sendMessage(Ryzer::PREFIX.LanguageProvider::getMessageContainer('clantag-too-long', $player->getName()));
-                    return;
-                }
-
-                CloudBridge::getCloudProvider()->dispatchProxyCommand($player->getName(), "clan create $clanName $clanTag");
-            }else {
-                $player->sendMessage(Ryzer::PREFIX.LanguageProvider::getMessageContainer('something-went-wrong', $player->getName()));
-            }
+            CloudBridge::getCloudProvider()->dispatchProxyCommand($player->getName(), "clan create $clanName $clanTag");
         });
+
+        $form->addInput(TextFormat::RED."Name of your clan", "", "", "clan_name");
+        $form->addInput(TextFormat::RED."Tag of your clan", "", "", "clan_tag");
+        $form->sendToPlayer($player);
     }
 }

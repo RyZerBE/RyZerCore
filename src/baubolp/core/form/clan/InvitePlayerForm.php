@@ -1,31 +1,36 @@
 <?php
 
-
 namespace baubolp\core\form\clan;
 
-
 use BauboLP\Cloud\CloudBridge;
+use baubolp\core\provider\MySQLProvider;
 use baubolp\core\Ryzer;
-use pocketmine\form\CustomForm;
-use pocketmine\form\CustomFormResponse;
-use pocketmine\form\element\Input;
+use jojoe77777\FormAPI\CustomForm;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
+use function str_replace;
 
-class InvitePlayerForm extends CustomForm
-{
+class InvitePlayerForm {
 
-    public function __construct()
-    {
-        $elements = [new Input("Invite", TextFormat::RED."Name of Player", "Steve", "")];
-        parent::__construct(Ryzer::PREFIX.TextFormat::RED."Clans", $elements, function (Player $player, CustomFormResponse $response): void {
-            $e = $this->getElement(0);
-            $playerName = $response->getString($e->getName());
-            if(strlen($playerName) > 16) {
+    /**
+     * @param Player $player
+     * @param array $extraData
+     */
+    public static function open(Player $player, array $extraData = []){
+        $form = new CustomForm(function(Player $player, $data): void{
+            if($data === null) return;
+
+            $playerName = $data["player_name"];
+
+            if(!MySQLProvider::checkInsert($playerName)) {
+                $player->sendMessage(Ryzer::PREFIX.TextFormat::RED."MySQL Injections & Sonderzeichen sind nicht erlaubt!!");
                 return;
             }
 
             CloudBridge::getCloudProvider()->dispatchProxyCommand($player->getName(), "clan invite $playerName");
         });
+
+        $form->addInput(TextFormat::RED."Name of player", "", "", "player_name");
+        $form->sendToPlayer($player);
     }
 }

@@ -7,6 +7,7 @@ namespace baubolp\core\provider;
 use baubolp\core\util\MySQL;
 use pocketmine\Server;
 use pocketmine\utils\Config;
+use function str_replace;
 
 class MySQLProvider
 {
@@ -98,6 +99,40 @@ class MySQLProvider
     public static function removeMySQLConnection(string $index)
     {
         unset(self::$mysql_connections[$index]);
+    }
+
+    /**
+     * OLD FUNCTION OF RUSHEROASE
+     * @param string $insert
+     * @return bool
+     */
+    public static function checkInsert(string $insert): bool{
+        $filters = [
+            "§",
+            "$".
+            ".",
+            ",",
+            "-",
+            "(",
+            ")",
+            '"',
+            "'",
+            ";",
+            "'",
+            "%",
+            "DELETE",
+            "INSERT",
+            "DROP",
+            "SELECT",
+            "*"
+        ];
+
+        $result = $insert;
+        foreach($filters as $filter){
+            $result = str_replace($filter, "", $insert);
+        }
+
+        return $insert === $result;
     }
 
     /**
