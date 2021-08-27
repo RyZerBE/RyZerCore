@@ -28,6 +28,7 @@ class ProgressRequestForm {
 
         $form->addButton(TextFormat::GREEN."Join ".TextFormat::GOLD.$clanName, 0, "textures/ui/confirm.png", "yes");
         $form->addButton(TextFormat::RED."Decline", 0, "textures/ui/realms_red_x.png", "no");
+        $form->setTitle(TextFormat::GOLD.TextFormat::BOLD."Clans");
         $form->sendToPlayer($player);
     }
 }

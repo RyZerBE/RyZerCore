@@ -7,7 +7,7 @@ use jojoe77777\FormAPI\SimpleForm;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
-class TopClansForm {
+class MemberRoleUpdateForm {
 
     /**
      * @param Player $player
@@ -17,13 +17,12 @@ class TopClansForm {
         $form = new SimpleForm(function(Player $player, $data) use ($extraData): void{
             if($data === null) return;
 
-            SearchClanForm::sendFormAfterLoad($player->getName(), $data);
+            $giveRole = $extraData["giveRoleName"];
+            CloudBridge::getCloudProvider()->dispatchProxyCommand($player->getName(), "clan role $giveRole $data");
         });
 
-        $i = 0;
-        foreach($extraData["top"] as $topClanName => $elo) {
-            $i++;
-            $form->addButton(TextFormat::RED.$i.". ".TextFormat::GOLD."$topClanName"."\n".TextFormat::YELLOW.$elo." Elo", -1, "", $topClanName);
+        foreach($extraData["roles"] as $roleName => $priority) {
+            $form->addButton(TextFormat::GREEN.$roleName, -1, "", $roleName);
         }
         $form->setTitle(TextFormat::GOLD.TextFormat::BOLD."Clans");
         $form->sendToPlayer($player);

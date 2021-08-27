@@ -4,6 +4,7 @@ namespace baubolp\core\form\clan;
 
 use jojoe77777\FormAPI\SimpleForm;
 use pocketmine\Player;
+use pocketmine\utils\TextFormat;
 
 class ClanRequestsForm {
 
@@ -20,6 +21,7 @@ class ClanRequestsForm {
         foreach($extraData["requests"] as $request) {
             $form->addButton($request, -1, "", $request);
         }
+        $form->setTitle(TextFormat::GOLD.TextFormat::BOLD."Clans");
         $form->sendToPlayer($player);
     }
 }

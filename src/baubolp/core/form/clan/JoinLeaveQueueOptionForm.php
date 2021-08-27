@@ -25,6 +25,7 @@ class JoinLeaveQueueOptionForm {
             }
         });
 
+        $form->setTitle(TextFormat::GOLD.TextFormat::BOLD."Clans");
         $form->addButton(TextFormat::GREEN."Join", 0, "textures/ui/confirm.png", "join");
         $form->addButton(TextFormat::RED."Leave", 0, "textures/ui/realms_red_x.png", "leave");
         $form->sendToPlayer($player);

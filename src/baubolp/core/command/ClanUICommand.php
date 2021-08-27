@@ -53,6 +53,13 @@ class ClanUICommand extends Command
                 return $loadedData; //NO CLAN
             }
 
+            $res = $mysqli->query("SELECT * FROM `ClanRoles`");
+            if($res->num_rows > 0) {
+                while($data = $res->fetch_assoc()) {
+                    $loadedData["roles"][$data["role_name"]] = $data["priority"];
+                }
+            }
+
             $res = $mysqli->query("SELECT * FROM Clans WHERE clan_name='$clanName'");
             if($res->num_rows > 0) {
                 while($data = $res->fetch_assoc()) {

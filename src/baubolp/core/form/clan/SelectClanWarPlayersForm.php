@@ -5,6 +5,7 @@ namespace baubolp\core\form\clan;
 use BauboLP\Cloud\CloudBridge;
 use jojoe77777\FormAPI\CustomForm;
 use pocketmine\Player;
+use pocketmine\utils\TextFormat;
 use function var_dump;
 
 class SelectClanWarPlayersForm {
@@ -30,6 +31,7 @@ class SelectClanWarPlayersForm {
         $form->addDropdown("Fighter 2", $players, null, "2");
         $form->addDropdown("Fighter 3", $players, null, "3");
         $form->addDropdown("Fighter 4", $players, null, "4");
+        $form->setTitle(TextFormat::DARK_AQUA.TextFormat::BOLD."ClanWar");
         $form->sendToPlayer($player);
     }#
 }

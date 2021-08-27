@@ -8,7 +8,6 @@ use baubolp\core\Ryzer;
 use jojoe77777\FormAPI\CustomForm;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
-use function str_replace;
 
 class InvitePlayerForm {
 

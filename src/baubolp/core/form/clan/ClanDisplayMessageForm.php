@@ -8,9 +8,8 @@ use baubolp\core\Ryzer;
 use jojoe77777\FormAPI\CustomForm;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
-use function str_replace;
 
-class CreateClanForm {
+class ClanDisplayMessageForm {
 
     /**
      * @param Player $player
@@ -20,20 +19,17 @@ class CreateClanForm {
         $form = new CustomForm(function(Player $player, $data): void{
             if($data === null) return;
 
-            $clanName = str_replace(" ", "_", $data["clan_name"]);
-            $clanTag = str_replace(" ", "_", $data["clan_tag"]);
+            $playerName = $data["message"];
 
-            if(!MySQLProvider::checkInsert($clanName) || !MySQLProvider::checkInsert($clanTag)) {
+            if(!MySQLProvider::checkInsert($playerName)) {
                 $player->sendMessage(Ryzer::PREFIX.TextFormat::RED."MySQL Injections & Sonderzeichen sind nicht erlaubt!!");
                 return;
             }
 
-            CloudBridge::getCloudProvider()->dispatchProxyCommand($player->getName(), "clan create $clanName $clanTag");
+            CloudBridge::getCloudProvider()->dispatchProxyCommand($player->getName(), "clan setmessage $playerName");
         });
 
-        $form->setTitle(TextFormat::GOLD.TextFormat::BOLD."Clans");
-        $form->addInput(TextFormat::RED."Name of your clan", "", "", "clan_name");
-        $form->addInput(TextFormat::RED."Tag of your clan", "", "", "clan_tag");
+        $form->addInput(TextFormat::RED."Your clan display info", "", $extraData["message"] ?? "", "message");
         $form->sendToPlayer($player);
     }
 }
