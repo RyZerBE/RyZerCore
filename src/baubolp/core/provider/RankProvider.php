@@ -44,7 +44,7 @@ class RankProvider
             $ranks = [];
             if($result->num_rows > 0) {
                 while ($data = $result->fetch_assoc()) {
-                    $ranks[$data['rankname']] = ['nametag' => $data['nametag'], 'chatprefix' => $data['chatprefix'], 'permissions' => explode(":", $data['permissions']), 'joinPower' => $data['joinpower']];
+                    $ranks[$data['rankname']] = ['nametag' => $data['nametag'], 'chatprefix' => $data['chatprefix'], 'permissions' => explode(":", $data['permissions']), 'joinPower' => $data['joinpower'], "color" => $data["color"]];
                 }
             }
 
@@ -52,7 +52,7 @@ class RankProvider
         }, function (Server $server, array $rankResult){
             foreach (array_keys($rankResult) as $key) {
                 $data = $rankResult[$key];
-                RankProvider::$ranks[$key] = new Rank($key, $data["nametag"], $data["chatprefix"], $data["permissions"], $data["joinPower"]);
+                RankProvider::$ranks[$key] = new Rank($key, $data["nametag"], $data["chatprefix"], $data["permissions"], $data["color"], $data["joinPower"]);
             }
             MainLogger::getLogger()->info(count($rankResult)." Ranks were loaded!");
         });
@@ -69,36 +69,45 @@ class RankProvider
 
     /**
      * @param string $rank
-     * @return mixed
+     * @return array|null
      */
-    public static function getRankPermissions(string $rank)
+    public static function getRankPermissions(string $rank): ?array
     {
         return self::$ranks[$rank]->getPermissions();
     }
 
     /**
      * @param string $rank
-     * @return mixed
+     * @return int|null
      */
-    public static function getRankJoinPower(string $rank)
+    public static function getRankJoinPower(string $rank): ?int
     {
         return self::$ranks[$rank]->getJoinPower();
     }
 
     /**
      * @param string $rank
-     * @return mixed
+     * @return string|null
      */
-    public static function getNameTag(string $rank)
+    public static function getNameTag(string $rank): ?string
     {
         return self::$ranks[$rank]->getNameTag();
     }
 
     /**
      * @param string $rank
-     * @return mixed
+     * @return string|null
      */
-    public static function getChatPrefix(string $rank)
+    public static function getColor(string $rank): ?string
+    {
+        return self::$ranks[$rank]->getColor();
+    }
+
+    /**
+     * @param string $rank
+     * @return string|null
+     */
+    public static function getChatPrefix(string $rank): ?string
     {
         return self::$ranks[$rank]->getChatPrefix();
     }
