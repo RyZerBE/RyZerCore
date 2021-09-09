@@ -10,6 +10,7 @@ use DateTime;
 use pocketmine\entity\Skin;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
+use function rand;
 use function str_replace;
 
 class RyzerPlayer
@@ -364,5 +365,14 @@ class RyzerPlayer
 
         $player->setNameTag($nametag.TextFormat::BLACK." [".$this->getNetworkLevel()->getLevelColor().$this->getNetworkLevel()->getLevel().TextFormat::BLACK."]"."\n".TextFormat::YELLOW.(($status !== null ? "✎ ".$status : "")));
         $player->setDisplayName($nametag);
+    }
+
+    /**
+     * @param int $min
+     * @param $max
+     */
+    public function giveXP(int $min, $max): void{
+        $xp = rand($min, $max);
+        //todo
     }
 }

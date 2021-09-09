@@ -6,7 +6,6 @@ use BauboLP\Cloud\CloudBridge;
 use jojoe77777\FormAPI\CustomForm;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
-use function var_dump;
 
 class SelectClanWarPlayersForm {
 

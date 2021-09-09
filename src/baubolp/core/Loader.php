@@ -235,7 +235,8 @@ class Loader
             'say',
             'msg',
             'kick',
-            'gamemode'
+            'gamemode',
+            'reload'
         ];
         $commandMap = Server::getInstance()->getCommandMap();
         foreach ($deaktivatecmd as $command) {

@@ -83,6 +83,9 @@ class ClanMainForm {
                 case "cw":
                     JoinLeaveQueueOptionForm::open($player, $extraData);
                     break;
+                case "cw_history":
+                    CWHistoryForm::open($player, $extraData);
+                    break;
             }
         });
         if(isset($extraData["clanName"])){//IS IN CLAN
@@ -95,12 +98,14 @@ class ClanMainForm {
             switch($extraData["role"]){
                 case "Member": //MEMBER
                     $form->addButton(TextFormat::YELLOW."Clan Info", 1, "https://media.discordapp.net/attachments/412217468287713282/880559672472535120/info.png?width=402&height=402", "clan_info");
+                    $form->addButton(TextFormat::GREEN."ClanWar History", 1, "https://media.discordapp.net/attachments/412217468287713282/885513348018470962/1800196.png?width=410&height=410", "cw_history");
                     $form->addButton(TextFormat::GOLD."TOP 10", 1, "https://media.discordapp.net/attachments/412217468287713282/880530145331519538/954-9547395_file-emoji-u1f3c5-svg-wikimedia-commons-3rd-place.png?width=275&height=402", "top_clans");
                     $form->addButton(TextFormat::RED."Leave Clan", 1, "https://media.discordapp.net/attachments/412217468287713282/880541899390324786/leave_clan.png?width=205&height=205", "leave");
                     break;
                 case "Moderator"://MODERATOR
                     $form->addButton(TextFormat::DARK_AQUA."ClanWar", 1, "https://media.discordapp.net/attachments/412217468287713282/880547998449418351/swords-312440_960_720.png?width=402&height=402", "cw");
                     $form->addButton(TextFormat::YELLOW."Clan Info", 1, "https://media.discordapp.net/attachments/412217468287713282/880559672472535120/info.png?width=402&height=402", "clan_info");
+                    $form->addButton(TextFormat::GREEN."ClanWar History", 1, "https://media.discordapp.net/attachments/412217468287713282/885513348018470962/1800196.png?width=410&height=410", "cw_history");
                     $form->addButton(TextFormat::GREEN."Co".TextFormat::AQUA."l".TextFormat::GOLD."or", 1, "https://media.discordapp.net/attachments/412217468287713282/880895769622753380/551221.png?width=402&height=402", "color");
                     $form->addButton(TextFormat::DARK_PURPLE."Display information", 1, "https://media.discordapp.net/attachments/412217468287713282/880896093041348628/3076404.png?width=402&height=402", "display_info");
                     $form->addButton(TextFormat::GOLD."TOP 10", 1, "https://media.discordapp.net/attachments/412217468287713282/880530145331519538/954-9547395_file-emoji-u1f3c5-svg-wikimedia-commons-3rd-place.png?width=275&height=402", "top_clans");
@@ -111,6 +116,7 @@ class ClanMainForm {
                 case "Leader"://Leader
                     $form->addButton(TextFormat::DARK_AQUA."ClanWar", 1, "https://media.discordapp.net/attachments/412217468287713282/880547998449418351/swords-312440_960_720.png?width=402&height=402", "cw");
                     $form->addButton(TextFormat::YELLOW."Clan Info", 1, "https://media.discordapp.net/attachments/412217468287713282/880559672472535120/info.png?width=402&height=402", "clan_info");
+                    $form->addButton(TextFormat::GREEN."ClanWar History", 1, "https://media.discordapp.net/attachments/412217468287713282/885513348018470962/1800196.png?width=410&height=410", "cw_history");
                     $form->addButton(TextFormat::GREEN."Co".TextFormat::AQUA."l".TextFormat::GOLD."or", 1, "https://media.discordapp.net/attachments/412217468287713282/880895769622753380/551221.png?width=402&height=402", "color");
                     $form->addButton(TextFormat::DARK_PURPLE."Display information", 1, "https://media.discordapp.net/attachments/412217468287713282/880896093041348628/3076404.png?width=402&height=402", "display_info");
                     $form->addButton(TextFormat::GOLD."TOP 10", 1, "https://media.discordapp.net/attachments/412217468287713282/880530145331519538/954-9547395_file-emoji-u1f3c5-svg-wikimedia-commons-3rd-place.png?width=275&height=402", "top_clans");
