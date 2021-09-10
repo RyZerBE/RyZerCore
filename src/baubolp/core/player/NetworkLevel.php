@@ -147,12 +147,20 @@ class NetworkLevel {
         $this->progress += $progress;
         $this->last_progress = time();
 
-        NetworkLevelProvider::addLevelProgress($this->getPlayer()->getName(), $progress, $this->progress_today, $closure);
-
+        NetworkLevelProvider::addLevelProgress($this->getPlayer()->getPlayer()->getName(), $progress, $this->progress_today, $closure);
+        $this->getPlayer()->getPlayer()->sendMessage(TextFormat::DARK_GRAY."[".TextFormat::BLUE."XP".TextFormat::DARK_GRAY."] ".TextFormat::GREEN."+ $progress XP");
         while($this->checkLevelUp()){
             //Nothing
         }
         (new PlayerLevelProgressEvent($this->getPlayer()->getPlayer(), $progress))->call();
+    }
+
+    /**
+     * @param int $xp
+     * @param Closure|null $closure
+     */
+    public function addXP(int $xp, ?Closure $closure){
+        $this->addProgress($xp, $closure);
     }
 
     /**
@@ -179,7 +187,7 @@ class NetworkLevel {
         return true;
     }
 
-    private function initLevelUp(): void {
+    private function initLevelUp(): void{
         $level = $this->getLevel();
         $this->setProgress(($this->getProgress() - $this->getProgressToLevelUp($level - 1)));
         if($this->getProgress() < 0) $this->setProgress(0);//This should not happen
@@ -200,6 +208,9 @@ class NetworkLevel {
         $player->sendMessage(str_repeat(TextFormat::GOLD."✰".TextFormat::YELLOW."❋", 7),);
         $player->playSound("random.levelup", 100, 1, [$player]);
 
-        //TODO: Rewards
+        $reward = NetworkLevelProvider::getReward($level);
+        if($reward === null) return;
+
+        $reward->call($this->getPlayer());
     }
 }

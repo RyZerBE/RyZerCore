@@ -4,6 +4,7 @@ namespace baubolp\core\command;
 
 use baubolp\core\player\RyzerPlayerProvider;
 use baubolp\core\provider\LanguageProvider;
+use baubolp\core\provider\NetworkLevelProvider;
 use baubolp\core\Ryzer;
 use jojoe77777\FormAPI\CustomForm;
 use jojoe77777\FormAPI\SimpleForm;
@@ -65,16 +66,17 @@ class NetworkLevelCommand extends Command {
                 $XPDiagram,
                 "",
                 LanguageProvider::getMessageContainer("next-level", $sender->getName(), ["#nextlevel" => $networkLevel->getLevelColor($nextLevel).$nextLevel, "#xp" => $neededXP])
-            ]; //todo: if you give xp, sent the player information about the multiplier (e.g You get 45 XP. Your Multiplier is under 100% so you got only 30% (=XP-PERCENT) of the won xp)
+            ];
 
             $form->setContent(implode("\n", $message));
             $form->setTitle(TextFormat::LIGHT_PURPLE."Network Level");
-            $form->addButton(TextFormat::GOLD."Belohnung 1");
-            $form->addButton(TextFormat::RED."Belohnung 2");
-            $form->addButton(TextFormat::GOLD."Belohnung 3");
-            $form->addButton(TextFormat::GOLD."Belohnung 4");
-            $form->addButton(TextFormat::GOLD."Belohnung 5");
-            $form->addButton(TextFormat::GOLD.".....");
+            foreach(NetworkLevelProvider::getRewards() as $reward) {
+                if($reward->getLevel() <= $networkLevel->getLevel()) {
+                    $form->addButton($rbePlayer->getNetworkLevel()->getLevelColor($reward->getLevel()).$reward->getName()."\n".TextFormat::GREEN."✔ RECEIVED ", 0, "textures/ui/confirm.png");
+                }else {
+                    $form->addButton($rbePlayer->getNetworkLevel()->getLevelColor($reward->getLevel()).$reward->getName()."\n".TextFormat::GRAY."Level §8• ".$rbePlayer->getNetworkLevel()->getLevelColor($reward->getLevel()).$reward->getLevel());
+                }
+            }
             $form->sendToPlayer($sender);
             return;
         }
