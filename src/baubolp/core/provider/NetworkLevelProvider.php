@@ -2,13 +2,52 @@
 
 namespace baubolp\core\provider;
 
+use baubolp\core\player\RyzerPlayer;
+use baubolp\core\util\LevelUpReward;
 use Closure;
 use mysqli;
-use function ceil;
-use function strtotime;
-use function time;
 
 class NetworkLevelProvider {
+    /** @var LevelUpReward[]  */
+    public static array $rewards = [];
+
+
+    public static function initRewards(): void{
+        self::registerRewards([
+            new LevelUpReward(2, "2000 Coins", function(int $level, RyzerPlayer $ryzerPlayer): void{
+              CoinProvider::addCoins($ryzerPlayer->getPlayer()->getName(), 2000);
+            })
+        ]);
+    }
+
+    /**
+     * @param LevelUpReward $reward
+     */
+    public static function registerReward(LevelUpReward $reward){
+        self::$rewards[$reward->getLevel()] = $reward;
+    }
+
+    /**
+     * @param LevelUpReward[] $rewards
+     */
+    public static function registerRewards(array $rewards){
+        foreach($rewards as $reward) self::$rewards[$reward->getLevel()] = $reward;
+    }
+
+    /**
+     * @param int $level
+     * @return LevelUpReward|null
+     */
+    public static function getReward(int $level): ?LevelUpReward{
+        return self::$rewards[$level] ?? null;
+    }
+
+    /**
+     * @return LevelUpReward[]
+     */
+    public static function getRewards(): array{
+        return self::$rewards;
+    }
 
     /**
      * @param string $playerName

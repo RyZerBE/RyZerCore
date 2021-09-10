@@ -11,6 +11,7 @@ use baubolp\core\provider\CoinProvider;
 use baubolp\core\provider\LanguageProvider;
 use baubolp\core\provider\ModerationProvider;
 use baubolp\core\provider\MySQLProvider;
+use baubolp\core\provider\NetworkLevelProvider;
 use baubolp\core\provider\NickProvider;
 use baubolp\core\provider\RankProvider;
 use baubolp\core\provider\ReportProvider;
@@ -118,6 +119,8 @@ class Ryzer extends PluginBase
         Loader::loadCommands();
         Loader::loadEvents();
         Loader::startTasks();
+
+        NetworkLevelProvider::initRewards();
 
         self::$backupSkin = new Skin("backup_skin" . rand(128, 100000), NPCSystem::getSkinBytes("backup_skin.png"), "", NPCSystem::$DEFAULT_GEOMETRY_DATA["name"], NPCSystem::$DEFAULT_GEOMETRY_DATA["geo"]);
 
