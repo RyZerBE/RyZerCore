@@ -60,10 +60,10 @@ class CWHistoryForm {
 
                     $strTime = "Vor ";
                     if($minutes <= 0) {
-                        $strTime .= $seconds." Sekunde/n";
+                        $strTime .= $seconds.(($seconds > 1) ? "Seconds" : "Second");
                     }else {
-                        $strTime .= $minutes." Minute/n";
-                        if($hours > 0) $strTime .= $hours.", Stunde/n";
+                        if($hours > 0) $strTime .= $hours.(($hours > 1) ? "Hours" : "Hour").", ";
+                        $strTime .= $minutes.(($minutes > 1) ? "Minutes" : "Minute");
                     }
                     $form->addButton(TextFormat::BLUE.$data["clan_1"].TextFormat::DARK_GRAY." VS ".TextFormat::RED.$data["clan_2"]."\n".TextFormat::GRAY.$strTime, -1, "", $date);
                 }else {
