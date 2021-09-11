@@ -67,7 +67,7 @@ class CWHistoryForm {
                     }
                     $form->addButton(TextFormat::BLUE.$data["clan_1"].TextFormat::DARK_GRAY." VS ".TextFormat::RED.$data["clan_2"]."\n".TextFormat::GRAY.$strTime, -1, "", $date);
                 }else {
-                    $form->addButton(TextFormat::BLUE.$data["clan_1"].TextFormat::DARK_GRAY." VS ".TextFormat::RED.$data["clan_2"]."\n".TextFormat::GRAY.$date, $date);
+                    $form->addButton(TextFormat::BLUE.$data["clan_1"].TextFormat::DARK_GRAY." VS ".TextFormat::RED.$data["clan_2"]."\n".TextFormat::GRAY.$date, -1, "", $date);
                 }
             }
 
