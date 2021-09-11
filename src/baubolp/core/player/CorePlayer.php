@@ -8,6 +8,7 @@ use baubolp\core\provider\ChatLogProvider;
 use baubolp\core\Ryzer;
 use BauboLP\NPC\entitys\NPCHuman;
 use pocketmine\block\Block;
+use pocketmine\block\BlockIds;
 use pocketmine\entity\Attribute;
 use pocketmine\entity\Effect;
 use pocketmine\entity\Entity;
@@ -451,20 +452,18 @@ class CorePlayer extends CPlayer
         }
 
         if($attacker instanceof Player) {
-            if($attacker->getInventory()->getItemInHand()->hasEnchantment(Enchantment::KNOCKBACK)) {
+            if($attacker->getInventory()->getItemInHand()->hasEnchantment(Enchantment::KNOCKBACK)){
                 $motion = clone $this->getMotion();
                 $motion->y /= 2;
                 $motion->y += 0.45;
                 if($motion->y > 0.45)
                     $motion->y = 0.45;
 
-		//$attacker->sendMessage("Motion->y: ".(float)$motion->y);
-
-                if(!$this->useLadder()) {
+                if(!$this->useLadder()){
                     $motion = new Vector3($attacker->getDirectionVector()->x / 1.2, $motion->y, $attacker->getDirectionVector()->z / 1.2); // ($this->getMotion()->y / 2) + 0.4
                 }
 
-                if(Ryzer::isReduce()) {
+                if(Ryzer::isReduce()){
                     $ownmotion = $attacker->getMotion();
                     $ownmotion->setComponents($ownmotion->getX() * (float)0.6, $ownmotion->getY() * (float)0.6, $ownmotion->getZ() * (float)0.6);
                     $attacker->setMotion($ownmotion);
@@ -498,17 +497,14 @@ class CorePlayer extends CPlayer
 
                 $motion = clone $this->motion;
 
+                $motion->x /= 2;
+                $motion->y /= 2;
+                $motion->z /= 2;
                 if($base >= 100) {
-                    $motion->x /= 2;
-                    $motion->y /= 2;
-                    $motion->z /= 2;
                     $motion->x += $x * $f * 1.3;
                     $motion->y += 0.70;
                     $motion->z += $z * $f * 1.3;
                 }else {
-                    $motion->x /= 2;
-                    $motion->y /= 2;
-                    $motion->z /= 2;
                     $motion->x += $x * $f * $base;
                     $motion->y += 0.50;
                     $motion->z += $z * $f * $base;
@@ -645,8 +641,7 @@ class CorePlayer extends CPlayer
     public function useLadder(): bool
     {
         foreach ($this->getBlocksAround() as $block) {
-            if($block->getId() === Block::LADDER)
-                return true;
+            if($block->getId() === BlockIds::LADDER) return true;
         }
         return false;
     }
