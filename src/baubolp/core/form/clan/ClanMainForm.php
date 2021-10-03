@@ -3,7 +3,9 @@
 namespace baubolp\core\form\clan;
 
 use BauboLP\Cloud\CloudBridge;
+use baubolp\core\form\ConfirmationForm;
 use baubolp\core\provider\AsyncExecutor;
+use baubolp\core\provider\LanguageProvider;
 use baubolp\core\Ryzer;
 use baubolp\core\util\Clan;
 use jojoe77777\FormAPI\SimpleForm;
@@ -55,7 +57,10 @@ class ClanMainForm {
                     ClanInformationForm::open($player, $extraData);
                     break;
                 case "leave":
-                    CloudBridge::getCloudProvider()->dispatchProxyCommand($playerName, "clan leave");
+                    ConfirmationForm::onOpen($player, LanguageProvider::getMessageContainer("clan-leave-confirm", $playerName, ["#clanName" => $extraData["clanName"] ?? "???"]),
+                        function(Player $player){
+                            CloudBridge::getCloudProvider()->dispatchProxyCommand($player->getName(), "clan leave");
+                        });
                     break;
                 case "invite":
                     InvitePlayerForm::open($player);
@@ -78,8 +83,10 @@ class ClanMainForm {
                     ClanDisplayMessageForm::open($player, $extraData);
                     break;
                 case "delete":
-                    CloudBridge::getCloudProvider()->dispatchProxyCommand($playerName, "clan delete");
-                    break;
+                    ConfirmationForm::onOpen($player, LanguageProvider::getMessageContainer("clan-delete-confirm", $playerName, ["#clanName" => $extraData["clanName"] ?? "???"]),
+                        function(Player $player){
+                            CloudBridge::getCloudProvider()->dispatchProxyCommand($player->getName(), "clan delete");
+                        });                    break;
                 case "cw":
                     JoinLeaveQueueOptionForm::open($player, $extraData);
                     break;

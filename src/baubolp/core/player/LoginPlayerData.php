@@ -11,44 +11,43 @@ class LoginPlayerData
     /** @var string */
     private string $playerName;
     /** @var string */
-    private $cape_data;
+    private string $cape_data;
     /** @var int */
-    private $client_random_id;
+    private int $client_random_id;
     /** @var int */
-    private $current_input_mode;
+    private int $current_input_mode;
     /** @var int */
-    private $default_input_mode;
+    private int $default_input_mode;
     /** @var string */
-    private $device_id;
+    private string $device_id;
     /** @var string */
-    private $device_model;
+    private string $device_model;
     /** @var int */
-    private $device_os;
+    private int $device_os;
     /** @var string */
-    private $game_version;
+    private string $game_version;
     /** @var int */
-    private $gui_scale;
+    private int $gui_scale;
     /** @var string */
-    private $language_code;
-    /** @var int */
+    private string $language_code;
     /** @var bool */
-    private $premium_skin;
+    private bool $premium_skin;
     /** @var string */
-    private $self_signed_id;
+    private string $self_signed_id;
     /** @var string */
-    private $server_address;
+    private string $server_address;
     /** @var string */
-    private $skin_data;
+    private string $skin_data;
     /** @var string */
-    private $skin_geometry;
+    private string $skin_geometry;
     /** @var string */
     private string $skin_geometry_name;
     /** @var string */
-    private $skin_id;
+    private string $skin_id;
     /** @var int */
-    private $ui_profile;
+    private int $ui_profile;
     /** @var string */
-    private $address;
+    private string $address;
 
     /**
      * LoginPlayerData constructor.
@@ -59,7 +58,7 @@ class LoginPlayerData
     {
         $data = $loginPacket->clientData;
         $this->playerName = $loginPacket->username;
-        $this->cape_data = $data["CapeData"];
+        $this->cape_data = $data["CapeData"] ?? "";
         $this->client_random_id = $data["ClientRandomId"];
         $this->current_input_mode = $data["CurrentInputMode"];
         $this->default_input_mode = $data["DefaultInputMode"];
@@ -69,15 +68,15 @@ class LoginPlayerData
         $this->game_version= $data["GameVersion"];
         $this->gui_scale = $data["GuiScale"];
         $this->language_code = $data["LanguageCode"];
-        $this->premium_skin = $data["PremiumSkin"];
+        $this->premium_skin = $data["PremiumSkin"] ?? false;
         $this->self_signed_id = $data["SelfSignedId"];
-        $this->server_address = $data["ServerAddress"];
+        $this->server_address = $data["ServerAddress"] ?? "5.181.151.61";
         $this->skin_data = $data["SkinData"];
-        $this->skin_geometry = $data["SkinGeometryData"];
+        $this->skin_geometry = $data["SkinGeometryData"] ?? "";
         $this->skin_geometry_name = "";
-        $this->skin_id = $data["SkinId"];
-        $this->ui_profile = $data["UIProfile"];
-        $this->address = $data['Waterdog_IP'];
+        $this->skin_id = $data["SkinId"] ?? 1;
+        $this->ui_profile = $data["UIProfile"] ?? 1;
+        $this->address = $data['Waterdog_IP'] ?? "0.0.0.0";
        // $this->xuid = $data['Waterdog_XUID']; #WaterdogPE
        // $this->uuid = $data['Waterdog_OriginalUUID']; #WaterdogPE
     }
@@ -216,6 +215,13 @@ class LoginPlayerData
     public function getUiProfile(): int
     {
         return $this->ui_profile;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPremiumSkin(): mixed{
+        return $this->premium_skin;
     }
 
     public function getDataArray()
