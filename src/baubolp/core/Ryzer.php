@@ -87,7 +87,8 @@ class Ryzer extends PluginBase
         "bw.start",
         "core.vanish",
         "altay.command.playsound",
-        "command.networklevel.use"
+        "command.networklevel.use",
+        "core.nick.list"
     ];
 
     /** @var MySQLProvider */
