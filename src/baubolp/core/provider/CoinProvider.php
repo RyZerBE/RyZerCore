@@ -4,6 +4,8 @@
 namespace baubolp\core\provider;
 
 
+use baubolp\core\event\PlayerCoinsAddEvent;
+use baubolp\core\event\PlayerCoinsRemoveEvent;
 use baubolp\core\player\RyzerPlayerProvider;
 use baubolp\core\Ryzer;
 use mysqli;
@@ -23,6 +25,8 @@ class CoinProvider
             if(($obj = RyzerPlayerProvider::getRyzerPlayer($playerName)) != null) {
                 $obj->setCoins($obj->getCoins() + $coins);
                 $obj->getPlayer()->sendMessage(Ryzer::PREFIX.LanguageProvider::getMessageContainer('added-coins', $obj->getPlayer()->getName(), ['#coins' => $coins." Coins"]));
+                $ev = new PlayerCoinsAddEvent($obj->getPlayer(), $coins);
+                $ev->call();
             }
         });
     }
@@ -39,6 +43,8 @@ class CoinProvider
             if(($obj = RyzerPlayerProvider::getRyzerPlayer($playerName)) != null) {
                 $obj->setCoins($obj->getCoins() - $coins);
                 $obj->getPlayer()->sendMessage(Ryzer::PREFIX.LanguageProvider::getMessageContainer('removed-coins', $obj->getPlayer()->getName(), ['#coins' => $coins." Coins"]));
+                $ev = new PlayerCoinsRemoveEvent($obj->getPlayer(), $coins);
+                $ev->call();
             }
         });
     }
