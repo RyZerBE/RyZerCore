@@ -366,13 +366,4 @@ class RyzerPlayer
         $player->setNameTag($nametag.TextFormat::BLACK." [".$this->getNetworkLevel()->getLevelColor().$this->getNetworkLevel()->getLevel().TextFormat::BLACK."]"."\n".TextFormat::YELLOW.(($status !== null ? "✎ ".$status : "")));
         $player->setDisplayName($nametag);
     }
-
-    /**
-     * @param int $min
-     * @param $max
-     */
-    public function giveXP(int $min, $max): void{
-        $xp = rand($min, $max);
-        //todo
-    }
 }

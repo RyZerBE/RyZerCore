@@ -11,37 +11,36 @@ use mysqli;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\Server;
+use pocketmine\utils\SingletonTrait;
+use function uniqid;
 
-class AsyncExecutor
-{
+class AsyncExecutor {
+    use SingletonTrait;
 
-    /**
-     * @param string $database
-     * @param Closure $function
-     * @param Closure|null $completeFunction
-     */
-    public static function submitMySQLAsyncTask(string $database, Closure $function, Closure $completeFunction = null)
-    {
-        if ($function === null) return;
-        if(strlen($database) === 0) return;
+    /** @var array  */
+    public array $syncClosures = [];
 
+    public static function submitMySQLAsyncTask(string $database, Closure $function, Closure $completeFunction = null): void{
+        if(empty($database)) return;
+
+        $id = uniqid();
+        AsyncExecutor::getInstance()->syncClosures[$id] = $completeFunction;
         Server::getInstance()->getAsyncPool()->submitTask(
-            new class($function, $completeFunction, $database) extends AsyncTask {
+            new class($function, $id, $database) extends AsyncTask {
                 /** @var Closure */
                 /* function (mysqli $mysqli) */
                 private Closure $function;
-                /** @var Closure */
-                /* function (Server $server, mixed $result)*/
-                private ?Closure $completeFunction;
+                /** @var string  */
+                private string $id;
                 /** @var string */
                 private string $database;
                 /** @var array */
                 private array $mysqlData;
 
-                public function __construct(Closure $function, ?Closure $completeFunction, string $database)
+                public function __construct(Closure $function, string $id, string $database)
                 {
                     $this->function = $function;
-                    $this->completeFunction = $completeFunction;
+                    $this->id = $id;
                     $this->database = $database;
                     $this->mysqlData = MySQLProvider::getMySQLData();
                 }
@@ -61,10 +60,9 @@ class AsyncExecutor
 
                 public function onCompletion(Server $server)
                 {
-                    if ($this->completeFunction === null) return;
-
                     try {
-                        $completeFunction = $this->completeFunction;
+                        $completeFunction = AsyncExecutor::getInstance()->syncClosures[$this->id] ?? null;
+                        if($completeFunction === null) return;
                         $completeFunction($server, $this->getResult());
                     }catch (Exception $e) {
                         $server->getLogger()->error($e->getMessage()."\n". $e->getTraceAsString());
