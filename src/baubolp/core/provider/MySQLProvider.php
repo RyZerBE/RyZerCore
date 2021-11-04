@@ -5,9 +5,12 @@ namespace baubolp\core\provider;
 
 
 use baubolp\core\util\MySQL;
+use Exception;
 use pocketmine\Server;
 use pocketmine\utils\Config;
+use function mysqli_ping;
 use function str_replace;
+use function var_dump;
 
 class MySQLProvider
 {
@@ -74,10 +77,17 @@ class MySQLProvider
     {
         if(array_key_exists($index, self::$mysql_connections)){
             $connection = self::$mysql_connections[$index];
-            if(!mysqli_ping($connection->getSql())) {
+            try {
+                if(!mysqli_ping($connection->getSql())) {
+                    self::removeMySQLConnection($index);
+                    self::addMySQLConnections($index, new MySQL($connection->getIndex(), $connection->getHost(), $connection->getDatabase(), $connection->getPassword(), $connection->getUsername()));
+                }
+            }catch(Exception $e) {
+                var_dump($e->getMessage());
                 self::removeMySQLConnection($index);
                 self::addMySQLConnections($index, new MySQL($connection->getIndex(), $connection->getHost(), $connection->getDatabase(), $connection->getPassword(), $connection->getUsername()));
             }
+
             return self::$mysql_connections[$index];
         }
 

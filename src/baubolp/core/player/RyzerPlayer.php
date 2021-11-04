@@ -6,6 +6,7 @@ namespace baubolp\core\player;
 
 use baubolp\core\provider\RankProvider;
 use baubolp\core\util\Clan;
+use baubolp\core\util\time\TimeAPI;
 use DateTime;
 use pocketmine\entity\Skin;
 use pocketmine\Player;
@@ -32,6 +33,8 @@ class RyzerPlayer
     private string $rank = "Player";
     /** @var int */
     private int $coins = 0;
+    /** @var int */
+    public int $gameTimeTicks = 0;
     /** @var bool */
     private bool $particleStep = false;
     /** @var null|string */
@@ -289,19 +292,11 @@ class RyzerPlayer
     }
 
     /**
-     * @param string $onlineTime
-     */
-    public function setOnlineTime(string $onlineTime): void
-    {
-        $this->onlineTime = $onlineTime;
-    }
-
-    /**
      * @return string
      */
     public function getOnlineTime(): string
     {
-        return $this->onlineTime;
+        return TimeAPI::convert($this->gameTimeTicks)->asShortString();
     }
 
     /**
@@ -348,6 +343,13 @@ class RyzerPlayer
      */
     public function setNetworkLevel(?NetworkLevel $networkLevel): void{
         $this->networkLevel = $networkLevel;
+    }
+
+    /**
+     * @return int
+     */
+    public function getGameTimeTicks(): int{
+        return $this->gameTimeTicks;
     }
 
     /**

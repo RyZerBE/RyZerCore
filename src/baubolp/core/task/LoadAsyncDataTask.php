@@ -276,26 +276,23 @@ class LoadAsyncDataTask extends AsyncTask
         $result = $mysqli->query("SELECT * FROM GameTime WHERE playername='$playerName'");
         if($result->num_rows > 0) {
             while($data = $result->fetch_assoc()) {
-                $playerData['gameTime'] = explode(":", $data['gametime']);
+                $playerData['ticks'] = (int)$data["ticks"];
             }
         }else {
-            $playerData['gameTime'] = [0, 0];
-            $mysqli->query("INSERT INTO `GameTime`(`playername`, `gametime`) VALUES ('$playerName', '0:0')");
+            $playerData['ticks'] = 0;
+            $mysqli->query("INSERT INTO `GameTime`(`playername`, `ticks`) VALUES ('$playerName', '0')");
         }
 
         $result = $mysqli->query("SELECT * FROM ToggleRank WHERE playername='$playerName'");
-        if($result->num_rows > 0) {
-            $playerData['toggleRank'] = true;
-        }else {
-            $playerData['toggleRank'] = false;
-        }
+        $playerData['toggleRank'] = $result->num_rows > 0;
+
 
         //// VANISH \\\\
         $result = $mysqli->query("SELECT * FROM vanish WHERE playername = '$playerName'");
         $playerData["isVanished"] = $result->num_rows > 0;
 
         $playerData['status'] = null;
-        if(explode("-", $this->server)[0] == "Lobby") {
+        if((explode("-", $this->server)[0] ?? "Lobby") == "Lobby") {
             $lobby = new mysqli($this->mysqlData['host'] . ':3306', $this->mysqlData['user'], $this->mysqlData['password'], 'Lobby');
             $result = $lobby->query("SELECT * FROM `Status` WHERE playername='$playerName'");
             if($result->num_rows > 0) {
@@ -330,7 +327,7 @@ class LoadAsyncDataTask extends AsyncTask
                 if (($obj = RyzerPlayerProvider::getRyzerPlayer($data['playerName'])) != null)
                     $obj->setLanguage("English");
 
-                DiscordProvider::sendMessageToDiscord("RyZerBE", "**".$data['playerName']."** ist nun ein Spieler auf unserem Netzwerk **#".$data['nums']."**", Webhooks::NEW_PLAYERS_NETWORK);
+                #DiscordProvider::sendMessageToDiscord("RyZerBE", "**".$data['playerName']."** ist nun ein Spieler auf unserem Netzwerk **#".$data['nums']."**", Webhooks::NEW_PLAYERS_NETWORK);
             } else {
                 if (($obj = RyzerPlayerProvider::getRyzerPlayer($data['playerName'])) != null)
                     $obj->setLanguage($data['language']);
@@ -378,7 +375,7 @@ class LoadAsyncDataTask extends AsyncTask
             //// COINS / PARTICLEMOD\\\\
             if (($obj = RyzerPlayerProvider::getRyzerPlayer($data['playerName'])) != null) {
                 $obj->setCoins($data['coins']);
-                $obj->setOnlineTime(TextFormat::GOLD.$data['gameTime'][0].TextFormat::AQUA."H ".TextFormat::GOLD.$data['gameTime'][1].TextFormat::AQUA."M");
+                $obj->gameTimeTicks = $data["ticks"];
                 $obj->setMoreParticle($data['pm']);
                 $obj->setNetworkLevel(new NetworkLevel($obj, $data["network_level"], $data["network_level_progress"], $data["level_progress_today"], strtotime($data["last_level_progress"])));
                 if($data['clan'] != null && $data['clan'] != "null") {

@@ -207,6 +207,7 @@ class Ryzer extends PluginBase {
 
     /**
      * @return String
+     * @deprecated
      */
     public static function getRandomLobby(): string
     {
@@ -320,6 +321,7 @@ class Ryzer extends PluginBase {
     /**
      * @param string $playerName
      * @return string
+     * @deprecated
      */
     public static function getHeadURL(string $playerName): string
     {

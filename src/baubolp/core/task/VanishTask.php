@@ -23,5 +23,9 @@ class VanishTask extends Task
                 VanishProvider::vanishPlayer($ryzerPlayer, true);
             }
         }
+
+        foreach(RyzerPlayerProvider::getRyzerPlayers() as $player) {
+            $player->gameTimeTicks++;
+        }
     }
 }

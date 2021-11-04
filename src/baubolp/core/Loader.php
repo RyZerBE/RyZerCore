@@ -49,6 +49,7 @@ use baubolp\core\task\AutoMessageTask;
 use baubolp\core\task\DelayTask;
 use baubolp\core\task\StaffAsyncTask;
 use baubolp\core\task\UnblockIpTask;
+use baubolp\core\task\VanishTask;
 use baubolp\core\util\MySQL;
 use mysqli;
 use pocketmine\permission\Permission;
@@ -167,7 +168,7 @@ class Loader
                 $mysqli->query("CREATE TABLE IF NOT EXISTS NetworkLevel(id INTEGER NOT NULL KEY AUTO_INCREMENT, playername varchar(64) NOT NULL, level INTEGER NOT NULL DEFAULT '1', level_progress INTEGER NOT NULL DEFAULT '0', level_progress_today INTEGER NOT NULL DEFAULT '0', last_level_progress TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)");
                 $mysqli->query("CREATE TABLE IF NOT EXISTS Nick(id INTEGER NOT NULL KEY AUTO_INCREMENT, playername varchar(64) NOT NULL, nick varchar(32) NOT NULL, skin TEXT NOT NULL)");
                 $mysqli->query("CREATE TABLE IF NOT EXISTS ToggleRank(id INTEGER NOT NULL KEY AUTO_INCREMENT, playername varchar(64) NOT NULL)");
-                $mysqli->query("CREATE TABLE IF NOT EXISTS GameTime(id INTEGER NOT NULL KEY AUTO_INCREMENT, playername varchar(32) NOT NULL, gametime varchar(128) NOT NULL)");
+                $mysqli->query("CREATE TABLE IF NOT EXISTS GameTime(id INTEGER NOT NULL KEY AUTO_INCREMENT, playername varchar(32) NOT NULL, ticks INT NOT NULL)");
                 $mysqli2->query("CREATE TABLE IF NOT EXISTS ChatLogs(id varchar(16) NOT NULL, log TEXT NOT NULL)");
                 $mysqli->query("CREATE TABLE IF NOT EXISTS Ranks(id INTEGER NOT NULL KEY AUTO_INCREMENT, rankname varchar(64) NOT NULL, nametag varchar(64) NOT NULL, chatprefix varchar(64) NOT NULL, permissions TEXT NOT NULL, joinpower integer NOT NULL)");
                 $mysqli->query("CREATE TABLE IF NOT EXISTS PlayerModeration(id INTEGER NOT NULL KEY AUTO_INCREMENT, playername varchar(64) NOT NULL, ban varchar(32), banduration varchar(64), mute varchar(64), muteduration varchar(64), unbanlog TEXT NOT NULL, warns TEXT, log TEXT, banpoints varchar(16) NOT NULL, mutepoints varchar(16) NOT NULL, banid varchar(16), muteid varchar(16))");
@@ -262,6 +263,7 @@ class Loader
         Ryzer::getPlugin()->getScheduler()->scheduleRepeatingTask(new UnblockIpTask(), 1);
         Ryzer::getPlugin()->getScheduler()->scheduleRepeatingTask(new DelayTask(), 1);
         Ryzer::getPlugin()->getScheduler()->scheduleRepeatingTask(new AutoMessageTask(), 20 * (60 * 5));
+        Ryzer::getPlugin()->getScheduler()->scheduleRepeatingTask(new VanishTask(), 20);
 
         Ryzer::getPlugin()->getScheduler()->scheduleRepeatingTask(new class extends Task {
             public function onRun(int $currentTick)
