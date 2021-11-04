@@ -37,8 +37,7 @@ use pocketmine\utils\TextFormat;
 use TobiasDev\DatabaseAPI\Connection;
 use TobiasDev\DatabaseAPI\DatabaseAPI;
 
-class Ryzer extends PluginBase
-{
+class Ryzer extends PluginBase {
 
     const PREFIX = TextFormat::WHITE.TextFormat::BOLD."RyZer".TextFormat::RED.TextFormat::BOLD."BE ".TextFormat::RESET;
     /** @var Skin */
