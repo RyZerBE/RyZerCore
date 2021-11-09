@@ -3,6 +3,8 @@
 namespace ryzerbe\core\util;
 
 use Closure;
+use pocketmine\utils\TextFormat;
+use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\player\RyZerPlayer;
 
 class LevelUpReward {
@@ -31,8 +33,7 @@ class LevelUpReward {
         $closure = $this->closure;
         if($closure === null) return;
 
-        //todo
-       // $ryzerPlayer->getPlayer()->sendMessage(TextFormat::DARK_GRAY."[".TextFormat::BLUE."XP".TextFormat::DARK_GRAY."] ".LanguageProvider::getMessageContainer("level-reward-unlocked", $ryzerPlayer->getPlayer()->getName(), ["#reward" => $this->getName()]));
+        $ryzerPlayer->getPlayer()->sendMessage(TextFormat::DARK_GRAY."[".TextFormat::BLUE."XP".TextFormat::DARK_GRAY."] ".LanguageProvider::getMessageContainer("level-reward-unlocked", $ryzerPlayer->getPlayer(), ["#reward" => $this->getName()]));
         $closure($this->level, $ryzerPlayer);
     }
 

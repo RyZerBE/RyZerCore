@@ -2,7 +2,12 @@
 
 namespace ryzerbe\core\player\networklevel;
 
+use Closure;
 use pocketmine\utils\TextFormat;
+use ryzerbe\core\event\player\networklevel\PlayerLevelProgressEvent;
+use ryzerbe\core\event\player\networklevel\PlayerLevelUpEvent;
+use ryzerbe\core\player\RyZerPlayer;
+use ryzerbe\core\RyZerBE;
 
 class NetworkLevel {
 
@@ -107,7 +112,7 @@ class NetworkLevel {
      */
     public function addLevel(int $level = 1, ?Closure $closure = null): void {
         $this->level += $level;
-        NetworkLevelProvider::addLevel($this->getPlayer()->getName(), $level, $closure);
+        NetworkLevelProvider::addLevel($this->getPlayer()->getPlayer()->getName(), $level, $closure);
 
         $this->initLevelUp();
     }
@@ -160,7 +165,7 @@ class NetworkLevel {
      */
     public function setLevel(int $level, ?Closure $closure = null): void{
         $this->level = $level;
-        NetworkLevelProvider::setLevel($this->getPlayer()->getName(), $level, $closure);
+        NetworkLevelProvider::setLevel($this->getPlayer()->getPlayer()->getName(), $level, $closure);
     }
 
     /**
@@ -169,7 +174,7 @@ class NetworkLevel {
      */
     public function setProgress(int $progress, ?Closure $closure = null): void{
         $this->progress = $progress;
-        NetworkLevelProvider::setLevelProgress($this->getPlayer()->getName(), $progress, $closure);
+        NetworkLevelProvider::setLevelProgress($this->getPlayer()->getPlayer()->getName(), $progress, $closure);
     }
 
     private function checkLevelUp(): bool {
@@ -186,17 +191,17 @@ class NetworkLevel {
         $player = $this->getPlayer()->getPlayer();
 
         (new PlayerLevelUpEvent($player, $level))->call();
-        $player->sendMessage(str_repeat(TextFormat::GOLD."✰".TextFormat::YELLOW."❋", 7),);
+        $player->sendMessage(str_repeat(TextFormat::GOLD."✰".TextFormat::YELLOW."❋", 7));
         $player->sendMessage(implode("\n",
                 [
                     TextFormat::GREEN."",
-                    Ryzer::PREFIX.TextFormat::BOLD.TextFormat::GOLD."Level Up!",
-                    Ryzer::PREFIX.TextFormat::GREEN."You reached level ".TextFormat::GOLD.$level.TextFormat::GREEN."!",
+                    RyZerBE::PREFIX.TextFormat::BOLD.TextFormat::GOLD."Level Up!",
+                    RyZerBE::PREFIX.TextFormat::GREEN."You reached level ".TextFormat::GOLD.$level.TextFormat::GREEN."!",
                     TextFormat::GREEN."",
                 ]
             )
         );
-        $player->sendMessage(str_repeat(TextFormat::GOLD."✰".TextFormat::YELLOW."❋", 7),);
+        $player->sendMessage(str_repeat(TextFormat::GOLD."✰".TextFormat::YELLOW."❋", 7));
         $player->playSound("random.levelup", 100, 1, [$player]);
 
         $reward = NetworkLevelProvider::getReward($level);

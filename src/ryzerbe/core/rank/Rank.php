@@ -3,6 +3,7 @@
 namespace ryzerbe\core\rank;
 
 use mysqli;
+use pocketmine\permission\PermissionManager;
 use ryzerbe\core\util\async\AsyncExecutor;
 use function array_search;
 use function implode;
@@ -74,6 +75,13 @@ class Rank {
     }
 
     /**
+     * @return array
+     */
+    public function getPermissionFormat(): array{
+        return RankManager::getInstance()->convertPermFormat($this->permissions);
+    }
+
+    /**
      * @return string
      */
     public function getRankName(): string{
@@ -121,5 +129,26 @@ class Rank {
         AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($joinPower, $rankName): void{
             $mysqli->query("UPDATE `ranks` SET joinpower='$joinPower' WHERE rankname='$rankName'");
         });
+    }
+
+    /**
+     * @param string $chatPrefix
+     */
+    public function setChatPrefix(string $chatPrefix): void{
+        $this->chatPrefix = $chatPrefix;
+    }
+
+    /**
+     * @param string $color
+     */
+    public function setColor(string $color): void{
+        $this->color = $color;
+    }
+
+    /**
+     * @param string $nameTag
+     */
+    public function setNameTag(string $nameTag): void{
+        $this->nameTag = $nameTag;
     }
 }

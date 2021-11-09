@@ -2,14 +2,24 @@
 
 namespace ryzerbe\core;
 
+use pocketmine\block\BlockFactory;
+use pocketmine\entity\Entity;
 use pocketmine\event\Listener;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\TextFormat;
 use ReflectionClass;
 use ReflectionException;
+use ryzerbe\core\block\TNTBlock;
+use ryzerbe\core\command\GameTimeCommand;
 use ryzerbe\core\command\LanguageCommand;
+use ryzerbe\core\command\RankCommand;
+use ryzerbe\core\command\VerifyCommand;
+use ryzerbe\core\entity\Arrow;
+use ryzerbe\core\entity\EnderPearl;
 use ryzerbe\core\language\LanguageProvider;
+use ryzerbe\core\player\networklevel\NetworkLevelProvider;
 use ryzerbe\core\rank\RankManager;
+use ryzerbe\core\task\RyZerUpdateTask;
 use ryzerbe\core\util\Settings;
 
 class RyZerBE extends PluginBase {
@@ -21,16 +31,24 @@ class RyZerBE extends PluginBase {
 
     public function onEnable(){
         self::$plugin = $this;
+
         $this->initListener(__DIR__."/listener/");
         $this->initCommands();
+        $this->initBlocks();
+        $this->initEntities();
+
         Settings::getInstance()->initMySQL();
         RankManager::getInstance();
+
         $this->boot();
     }
 
     public function boot(){
         LanguageProvider::fetchLanguages();
+        NetworkLevelProvider::initRewards();
         RankManager::getInstance()->fetchRanks();
+
+        $this->getScheduler()->scheduleRepeatingTask(new RyZerUpdateTask(), 1);
     }
 
     /**
@@ -56,8 +74,20 @@ class RyZerBE extends PluginBase {
 
     private function initCommands(): void{
         $this->getServer()->getCommandMap()->registerAll("core", [
-            new LanguageCommand()
+            new LanguageCommand(),
+            new RankCommand(),
+            new GameTimeCommand(),
+            new VerifyCommand()
         ]);
+    }
+
+    private function initEntities(): void{
+        Entity::registerEntity(EnderPearl::class, true, ["minecraft:enderpearl", "Enderpearl"]); // Java Enderpearl
+        Entity::registerEntity(Arrow::class, true, ['Arrow', 'minecraft:arrow']); //Bow-Knockback...
+    }
+
+    public function initBlocks(): void{
+        BlockFactory::registerBlock(new TNTBlock(), true); //TEAM TNT
     }
 
     /**

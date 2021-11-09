@@ -3,9 +3,12 @@
 namespace ryzerbe\core\rank;
 
 use mysqli;
+use pocketmine\permission\PermissionManager;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
+use pocketmine\utils\TextFormat;
 use ryzerbe\core\util\async\AsyncExecutor;
+use function str_replace;
 
 class RankManager {
     use SingletonTrait;
@@ -16,7 +19,7 @@ class RankManager {
     public array $ranks = [];
 
     public function __construct(){
-        $this->backupRank = new Rank("Player", "§f{player_name}", "§fS §8× §7{player_name} §8» §7{MSG}", "§f", 0, []);
+        $this->backupRank = new Rank("Player", "&f{player_name}", "&fS &8× &7{player_name} &8» &7{MSG}", "&f", 0, []);
     }
 
     /**
@@ -42,10 +45,25 @@ class RankManager {
 
     /**
      * @param string $rankName
+     * @param string $nameTag
+     * @param string $chatPrefix
+     * @param string $color
+     * @param int $joinPower
      */
-    public function createRank(string $rankName): void{
-        AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($rankName){
-            $mysqli->query("INSERT INTO `ranks`(`rankname`, `nametag`, `chatprefix`, `color`, `joinpower`, `permissions`) VALUES ('$rankName', '§f{player_name}', '§f$rankName §8× §7{player_name} §8» §7{MSG}', '§f', '0', '')");
+    public function createRank(string $rankName, string $nameTag, string $chatPrefix, string $color, int $joinPower): void{
+        AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($rankName, $joinPower, $chatPrefix, $nameTag, $color){ //&f$rankName &8× &7{player_name} &8» &7{MSG}
+            $mysqli->query("INSERT INTO `ranks`(`rankname`, `nametag`, `chatprefix`, `color`, `joinpower`, `permissions`) VALUES ('$rankName', '$nameTag', '$chatPrefix', '$color', '$joinPower', '') ON DUPLICATE KEY UPDATE nametag='$nameTag',chatprefix='$chatPrefix',color='$color',joinpower='$joinPower'");
+        }, function(Server $server, $result) use ($rankName, $chatPrefix, $nameTag, $joinPower, $color): void{
+            $rank = RankManager::getInstance()->getRank($rankName);
+            if($rank !== null) {
+                $rank->setJoinPower($joinPower);
+                $rank->setNameTag(str_replace("&", TextFormat::ESCAPE, $nameTag));
+                $rank->setChatPrefix(str_replace("&", TextFormat::ESCAPE, $chatPrefix));
+                $rank->setColor(str_replace("&", TextFormat::ESCAPE, $color));
+                return;
+            }
+            $rank = new Rank($rankName, $nameTag, $chatPrefix, $color, $joinPower, []);
+            RankManager::getInstance()->addRank($rank);
         });
     }
 
@@ -62,7 +80,7 @@ class RankManager {
             return $ranks;
         }, function(Server $server, array $rankResult){
             foreach($rankResult as $rankName => $data){
-                $rank = new Rank($rankName, $data["nametag"], $data["chatprefix"], $data["color"], $data["joinPower"], $data["permissions"]);
+                $rank = new Rank($rankName, str_replace("&", TextFormat::ESCAPE, $data["nametag"]), str_replace("&", TextFormat::ESCAPE, $data["chatprefix"]), str_replace("&", TextFormat::ESCAPE, $data["color"]), $data["joinPower"], $data["permissions"]);
                 RankManager::getInstance()->addRank($rank);
             }
         });
@@ -74,5 +92,34 @@ class RankManager {
      */
     public function getRank(string $rankName): ?Rank{
         return $this->ranks[$rankName] ?? null;
+    }
+
+    /**
+     * @param string $playerName
+     * @param Rank $rank
+     */
+    public function setRank(string $playerName, Rank $rank){
+        $rankName = $rank->getRankName();
+        AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use($rank, $playerName): void{
+            $mysqli->query("UPDATE `playerranks` SET rankname='$rankName' WHERE player='$playerName'");
+        });
+    }
+
+    /**
+     * @param array $permissions
+     * @return array
+     */
+    public function convertPermFormat(array $permissions): array{
+        $perms = [];
+        foreach ($permissions as $perm) {
+            if ($perm == "*") {
+                foreach(PermissionManager::getInstance()->getPermissions() as $permission) {
+                    $perms[$permission->getName()] = true;
+                }
+            } else {
+                $perms[$perm] = true;
+            }
+        }
+        return $perms;
     }
 }

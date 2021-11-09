@@ -2,6 +2,8 @@
 
 namespace ryzerbe\core\player;
 
+use BauboLP\Cloud\CloudBridge;
+use BauboLP\Cloud\Packets\PlayerDisconnectPacket;
 use pocketmine\block\Block;
 use pocketmine\block\BlockIds;
 use pocketmine\entity\Attribute;
@@ -53,6 +55,23 @@ use UnexpectedValueException;
 use pocketmine\Player as PMPlayer;
 
 class PMMPPlayer extends PMPlayer {
+
+    /**
+     * @param string $reason
+     */
+    public function kickFromProxy(string $reason): void{
+        $pk = new PlayerDisconnectPacket();
+        $pk->addData("playerName", $this->getPlayer()->getName());
+        $pk->addData("message", $reason);
+        CloudBridge::getInstance()->getClient()->getPacketHandler()->writePacket($pk);
+    }
+
+    /**
+     * @return RyZerPlayer|null
+     */
+    public function getRyZerPlayer(): ?RyZerPlayer{
+        return RyZerPlayerProvider::getRyzerPlayer($this);
+    }
 
     public function handleInventoryTransaction(InventoryTransactionPacket $packet): bool
     {

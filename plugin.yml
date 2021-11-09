@@ -6,3 +6,11 @@ description: RyzerCore for RyzerBE
 version: 2.0
 loadbefore:
   - ChestOpening
+
+permissions:
+  ryzer.admin:
+    default: op
+  ryzer.vanish:
+    default: op
+  ryzer.rank:
+    default: op
