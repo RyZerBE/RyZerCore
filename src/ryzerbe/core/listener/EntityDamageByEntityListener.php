@@ -8,6 +8,7 @@ use pocketmine\event\Listener;
 use pocketmine\item\enchantment\Enchantment;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\ActorEventPacket;
+use pocketmine\network\mcpe\protocol\AnimatePacket;
 use pocketmine\Player;
 use ryzerbe\core\player\PMMPPlayer;
 use ryzerbe\core\util\Settings;
@@ -24,9 +25,19 @@ class EntityDamageByEntityListener implements Listener {
     public function entityDamage(EntityDamageByEntityEvent $event){
         $player = $event->getDamager();
         $entity = $event->getEntity();
-        if(!$player instanceof Player){
+        if(!$player instanceof PMMPPlayer){
             $event->setCancelled(false); //NO DELAY
             return;
+        }
+
+        $ryzerPlayer = $player->getRyZerPlayer();
+        if($ryzerPlayer === null) return;
+
+        if($ryzerPlayer->getPlayerSettings()->isMoreParticleActivated()) {
+            $pk = new AnimatePacket();
+            $pk->action = AnimatePacket::ACTION_CRITICAL_HIT;
+            $pk->entityRuntimeId = $entity->getId();
+            $player->getServer()->broadcastPacket([$player], $pk);
         }
 
         if(!isset($this->delay[$player->getName()]))
@@ -39,7 +50,7 @@ class EntityDamageByEntityListener implements Listener {
         }
         $event->setModifier(0, EntityDamageEvent::MODIFIER_TOTEM);
         $this->delay[$player->getName()] = microtime(true) + 0.5;
-        if($player instanceof PMMPPlayer && $entity instanceof PMMPPlayer){
+        if($entity instanceof PMMPPlayer){
             $item = $player->getInventory()->getItemInHand();
             if($item->hasEnchantment(Enchantment::KNOCKBACK) && !$event->isCancelled()){
                 $event->setCancelled();

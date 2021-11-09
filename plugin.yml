@@ -16,3 +16,13 @@ permissions:
     default: op
   ryzer.login:
     default: op
+  ryzer.coins.admin:
+    default: op
+  ryzer.broadcast:
+    default: op
+  ryzer.teamchat:
+    default: op
+  ryzer.gamemode:
+    default: op
+  ryzer.gamemode.other:
+    default: op

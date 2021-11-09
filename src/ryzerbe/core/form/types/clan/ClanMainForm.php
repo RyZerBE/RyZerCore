@@ -18,7 +18,7 @@ class ClanMainForm {
      * @param Player $player
      * @param array $extraData
      */
-    public static function open(Player $player, array $extraData){
+    public static function open(Player $player, array $extraData = []){
         $form = new SimpleForm(function(Player $player, $data) use ($extraData): void{
             if($data === null) return;
 

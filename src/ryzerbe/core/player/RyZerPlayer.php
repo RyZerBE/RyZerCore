@@ -8,9 +8,10 @@ use BauboLP\Cloud\Packets\PlayerMoveServerPacket;
 use mysqli;
 use pocketmine\Player;
 use pocketmine\Server;
-use pocketmine\utils\TextFormat;
 use ryzerbe\core\event\player\RyZerPlayerAuthEvent;
+use ryzerbe\core\player\data\LoginPlayerData;
 use ryzerbe\core\player\networklevel\NetworkLevel;
+use ryzerbe\core\player\setting\PlayerSettings;
 use ryzerbe\core\provider\CoinProvider;
 use ryzerbe\core\rank\Rank;
 use ryzerbe\core\rank\RankManager;
@@ -44,6 +45,8 @@ class RyZerPlayer {
 
     /** @var Clan|null  */
     private ?Clan $clan;
+    /** @var PlayerSettings  */
+    private PlayerSettings $playerSettings;
 
     /**
      * @param Player $player
@@ -53,6 +56,7 @@ class RyZerPlayer {
         $this->player = $player;
         $this->loginPlayerData = $playerData;
         $this->rank = RankManager::getInstance()->getBackupRank();
+        $this->playerSettings = new PlayerSettings();
         $this->loadData();
     }
 
@@ -61,6 +65,13 @@ class RyZerPlayer {
      */
     public function getPlayer(): Player{
         return $this->player;
+    }
+
+    /**
+     * @return PlayerSettings
+     */
+    public function getPlayerSettings(): PlayerSettings{
+        return $this->playerSettings;
     }
 
     /**
@@ -271,7 +282,7 @@ class RyZerPlayer {
             AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($languageName, $playerName): void{
                 $mysqli->query("UPDATE playerlanguage SET language='$languageName' WHERE player='$playerName'");
             });
-        }
+        } //todo: save settings
     }
 
     /**

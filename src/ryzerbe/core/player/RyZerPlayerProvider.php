@@ -3,6 +3,7 @@
 namespace ryzerbe\core\player;
 
 use pocketmine\Player;
+use ryzerbe\core\player\data\LoginPlayerData;
 
 class RyZerPlayerProvider {
 

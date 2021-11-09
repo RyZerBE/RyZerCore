@@ -1,6 +1,6 @@
 <?php
 
-namespace ryzerbe\core\player;
+namespace ryzerbe\core\player\data;
 
 use pocketmine\network\mcpe\protocol\LoginPacket;
 

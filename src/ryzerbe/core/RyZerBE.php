@@ -10,11 +10,18 @@ use pocketmine\utils\TextFormat;
 use ReflectionClass;
 use ReflectionException;
 use ryzerbe\core\block\TNTBlock;
+use ryzerbe\core\command\BroadcastCommand;
+use ryzerbe\core\command\ClanUiCommand;
+use ryzerbe\core\command\CoinCommand;
+use ryzerbe\core\command\GamemodeCommand;
 use ryzerbe\core\command\GameTimeCommand;
 use ryzerbe\core\command\LanguageCommand;
 use ryzerbe\core\command\RankCommand;
+use ryzerbe\core\command\SettingsCommand;
+use ryzerbe\core\command\TeamchatCommand;
 use ryzerbe\core\command\VanishCommand;
 use ryzerbe\core\command\VerifyCommand;
+use ryzerbe\core\command\YouTubeCommand;
 use ryzerbe\core\entity\Arrow;
 use ryzerbe\core\entity\EnderPearl;
 use ryzerbe\core\language\LanguageProvider;
@@ -81,7 +88,14 @@ class RyZerBE extends PluginBase {
             new RankCommand(),
             new GameTimeCommand(),
             new VerifyCommand(),
-            new VanishCommand()
+            new VanishCommand(),
+            new BroadcastCommand(),
+            new ClanUiCommand(),
+            new CoinCommand(),
+            new GamemodeCommand(),
+            new SettingsCommand(),
+            new TeamchatCommand(),
+            new YouTubeCommand()
         ]);
     }
 
