@@ -2,7 +2,7 @@
 
 namespace ryzerbe\core\provider;
 
-class MySQLProvider {
+class MySQLProvider implements RyZerProvider{
 
     /**
      * OLD FUNCTION OF RUSHEROASE

@@ -10,7 +10,7 @@ use pocketmine\Server;
 use ryzerbe\core\player\RyZerPlayer;
 use ryzerbe\core\player\RyZerPlayerProvider;
 
-class VanishProvider {
+class VanishProvider implements RyZerProvider{
 
     /** @var array  */
     public static array $vanishedPlayer = [];

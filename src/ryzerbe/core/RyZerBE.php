@@ -13,11 +13,13 @@ use ryzerbe\core\block\TNTBlock;
 use ryzerbe\core\command\GameTimeCommand;
 use ryzerbe\core\command\LanguageCommand;
 use ryzerbe\core\command\RankCommand;
+use ryzerbe\core\command\VanishCommand;
 use ryzerbe\core\command\VerifyCommand;
 use ryzerbe\core\entity\Arrow;
 use ryzerbe\core\entity\EnderPearl;
 use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\player\networklevel\NetworkLevelProvider;
+use ryzerbe\core\provider\StaffProvider;
 use ryzerbe\core\rank\RankManager;
 use ryzerbe\core\task\RyZerUpdateTask;
 use ryzerbe\core\util\Settings;
@@ -47,6 +49,7 @@ class RyZerBE extends PluginBase {
         LanguageProvider::fetchLanguages();
         NetworkLevelProvider::initRewards();
         RankManager::getInstance()->fetchRanks();
+        StaffProvider::refresh();
 
         $this->getScheduler()->scheduleRepeatingTask(new RyZerUpdateTask(), 1);
     }
@@ -77,7 +80,8 @@ class RyZerBE extends PluginBase {
             new LanguageCommand(),
             new RankCommand(),
             new GameTimeCommand(),
-            new VerifyCommand()
+            new VerifyCommand(),
+            new VanishCommand()
         ]);
     }
 

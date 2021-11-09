@@ -11,7 +11,7 @@ use ryzerbe\core\player\RyZerPlayerProvider;
 use ryzerbe\core\RyZerBE;
 use ryzerbe\core\util\async\AsyncExecutor;
 
-class CoinProvider {
+class CoinProvider implements RyZerProvider {
 
     /**
      * @param string $playerName

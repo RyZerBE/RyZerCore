@@ -328,4 +328,8 @@ class RyZerPlayer {
         $pk->addData("serverName", $serverName);
         CloudBridge::getInstance()->getClient()->getPacketHandler()->writePacket($pk);
     }
+
+    public function sendToLobby(): void{
+        CloudBridge::getCloudProvider()->dispatchProxyCommand($this->getPlayer()->getName(), "hub");
+    }
 }

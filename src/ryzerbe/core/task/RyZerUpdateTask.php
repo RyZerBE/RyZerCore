@@ -6,6 +6,7 @@ use pocketmine\scheduler\Task;
 use pocketmine\Server;
 use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\player\RyZerPlayerProvider;
+use ryzerbe\core\provider\StaffProvider;
 use ryzerbe\core\provider\VanishProvider;
 use ryzerbe\core\RyZerBE;
 use ryzerbe\core\util\Settings;
@@ -38,6 +39,10 @@ class RyZerUpdateTask extends Task {
             foreach(Server::getInstance()->getOnlinePlayers() as $player){
                 $player->sendMessage("\n\n\n\n".RyZerBE::PREFIX.LanguageProvider::getMessageContainer($autoMessage, $player)."\n");
             }
+        }
+
+        if($currentTick % (20 * 60) === 0){
+            StaffProvider::refresh();
         }
     }
 }

@@ -4,6 +4,7 @@ namespace ryzerbe\core\player;
 
 use BauboLP\Cloud\CloudBridge;
 use BauboLP\Cloud\Packets\PlayerDisconnectPacket;
+use BauboLP\Cloud\Packets\PlayerMoveServerPacket;
 use pocketmine\block\Block;
 use pocketmine\block\BlockIds;
 use pocketmine\entity\Attribute;
@@ -64,6 +65,20 @@ class PMMPPlayer extends PMPlayer {
         $pk->addData("playerName", $this->getPlayer()->getName());
         $pk->addData("message", $reason);
         CloudBridge::getInstance()->getClient()->getPacketHandler()->writePacket($pk);
+    }
+
+    /**
+     * @param string $serverName
+     */
+    public function connectServer(string $serverName){
+        $pk = new PlayerMoveServerPacket();
+        $pk->addData("playerNames", $this->getPlayer()->getName());
+        $pk->addData("serverName", $serverName);
+        CloudBridge::getInstance()->getClient()->getPacketHandler()->writePacket($pk);
+    }
+
+    public function sendToLobby(): void{
+        CloudBridge::getCloudProvider()->dispatchProxyCommand($this->getPlayer()->getName(), "hub");
     }
 
     /**

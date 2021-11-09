@@ -14,3 +14,5 @@ permissions:
     default: op
   ryzer.rank:
     default: op
+  ryzer.login:
+    default: op

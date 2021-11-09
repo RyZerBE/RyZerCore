@@ -25,6 +25,7 @@ class RankCommand extends Command {
      */
     public function execute(CommandSender $sender, string $commandLabel, array $args): void{
         if(!$sender instanceof Player) return;
+        if(!$this->testPermission($sender)) return;
 
         RankMainForm::onOpen($sender);
     }
