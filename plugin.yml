@@ -26,3 +26,19 @@ permissions:
     default: op
   ryzer.gamemode.other:
     default: op
+  ryzer.gamemode.creative:
+    default: op
+  ryzer.history:
+    default: op
+  ryzer.ban:
+    default: op
+  ryzer.ban.perma:
+    default: op
+  ryzer.unban:
+    default: op
+  ryzer.banentryreset:
+    default: op
+  ryzer.kick:
+    default: op
+  ryzer.joinme:
+    default: op

@@ -3,6 +3,7 @@
 namespace ryzerbe\core\player\data;
 
 use pocketmine\network\mcpe\protocol\LoginPacket;
+use function trim;
 
 class LoginPlayerData {
 
@@ -47,6 +48,70 @@ class LoginPlayerData {
     /** @var string */
     private string $address;
 
+    /** @var int */
+    public const ANDROID = 1;
+    /** @var int */
+    public const IOS = 2;
+    /** @var int */
+    public const OSX = 3;
+    /** @var int */
+    public const FIREOS = 4;
+    /** @var int */
+    public const VRGEAR = 5;
+    /** @var int */
+    public const VRHOLOLENS = 6;
+    /** @var int */
+    public const WINDOWS_10 = 7;
+    /** @var int */
+    public const WINDOWS_32 = 8;
+    /** @var int */
+    public const DEDICATED = 9;
+    /** @var int */
+    public const TVOS = 10;
+    /** @var int */
+    public const PS4 = 11;
+    /** @var int */
+    public const SWITCH = 12;
+    /** @var int */
+    public const XBOX = 13;
+    /** @var int */
+    public const LINUX = 20; // For linux
+
+    /** @var int */
+    public const KEYBOARD = 1;
+    /** @var int */
+    public const TOUCH = 2;
+    /** @var int */
+    public const CONTROLLER = 3;
+    /** @var int */
+    public const MOTION_CONTROLLER = 4;
+
+    /** @var string[] */
+    private array $deviceOSValues = [
+        self::ANDROID => 'Android',
+        self::IOS => 'iOS',
+        self::OSX => 'OSX',
+        self::FIREOS => 'FireOS',
+        self::VRGEAR => 'VRGear',
+        self::VRHOLOLENS => 'VRHololens',
+        self::WINDOWS_10 => 'Win10',
+        self::WINDOWS_32 => 'Win32',
+        self::DEDICATED => 'Dedicated',
+        self::TVOS => 'TVOS',
+        self::PS4 => 'PS4',
+        self::SWITCH => 'Nintendo Switch',
+        self::XBOX => 'Xbox',
+        self::LINUX => 'Linux'
+    ];
+
+    /** @var string[] */
+    private array $inputValues = [
+        self::KEYBOARD => 'Keyboard',
+        self::TOUCH => 'Touch',
+        self::CONTROLLER => 'Controller',
+        self::MOTION_CONTROLLER => 'Motion-Controller'
+    ];
+
     /**
      * LoginPlayerData constructor.
      *
@@ -75,8 +140,19 @@ class LoginPlayerData {
         $this->skin_id = $data["SkinId"] ?? 1;
         $this->ui_profile = $data["UIProfile"] ?? 1;
         $this->address = $data['Waterdog_IP'] ?? "0.0.0.0";
-        // $this->xuid = $data['Waterdog_XUID']; #WaterdogPE
-        // $this->uuid = $data['Waterdog_OriginalUUID']; #WaterdogPE
+
+        if (trim($this->getDeviceModel()) == '') {
+            switch ($this->getDeviceOs()) {
+                case self::ANDROID:
+                    $this->device_os = self::LINUX;
+                    $this->device_model = "Linux";
+                    break;
+                case self::XBOX:
+                    $this->device_os = self::XBOX;
+                    $this->device_model = "Xbox One";
+                    break;
+            }
+        }
     }
 
     /**
@@ -222,56 +298,6 @@ class LoginPlayerData {
         return $this->premium_skin;
     }
 
-    public function getDataArray()
-    {
-        return [
-            'playerName' => $this->playerName,
-            'deviceModel' => $this->getDeviceModel(),
-            'deviceId' => $this->getDeviceId(),
-            'capeData' => $this->getCapeData(),
-            'clientRandomId' => $this->getClientRandomId(),
-            'currentInputMode' => $this->getCurrentInputMode(),
-            'defaultInputMode' => $this->getDefaultInputMode(),
-            'deviceOs' => $this->getDeviceOs(),
-            'gameVersion' => $this->getGameVersion(),
-            'guiScale' => $this->getGuiScale(),
-            'languageCode' => $this->getLanguageCode(),
-            'selfSignedId' => $this->getSelfSignedId(),
-            'serverAddress' => $this->getServerAddress(),
-            'skinData' => $this->getSkinData(),
-            'skimGeometry' => $this->getSkinGeometry(),
-            'skinId' => $this->getSkinId(),
-            'uiProfile' => $this->getUiProfile(),
-            'address' =>   $this->getAddress(),
-            'ip' => $this->getAddress(),
-        ];
-    }
-
-    public function toArray()
-    {
-        return [
-            'playerName' => $this->playerName,
-            'deviceModel' => $this->getDeviceModel(),
-            'deviceId' => $this->getDeviceId(),
-            'capeData' => $this->getCapeData(),
-            'clientRandomId' => $this->getClientRandomId(),
-            'currentInputMode' => $this->getCurrentInputMode(),
-            'defaultInputMode' => $this->getDefaultInputMode(),
-            'deviceOs' => $this->getDeviceOs(),
-            'gameVersion' => $this->getGameVersion(),
-            'guiScale' => $this->getGuiScale(),
-            'languageCode' => $this->getLanguageCode(),
-            'selfSignedId' => $this->getSelfSignedId(),
-            'serverAddress' => $this->getServerAddress(),
-            'skinData' => $this->getSkinData(),
-            'skimGeometry' => $this->getSkinGeometry(),
-            'skinId' => $this->getSkinId(),
-            'uiProfile' => $this->getUiProfile(),
-            'address' =>   $this->getAddress(),
-            'ip' => $this->getAddress()
-        ];
-    }
-
     /**
      * @return string
      */
@@ -286,5 +312,19 @@ class LoginPlayerData {
     public function getIP(): string
     {
         return $this->address;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDeviceOsName(): string{
+        return $this->deviceOSValues[$this->getDeviceOs()] ?? "???";
+    }
+
+    /**
+     * @return string
+     */
+    public function getOsInputName(): string{
+        return $this->inputValues[$this->getCurrentInputMode()] ?? "???";
     }
 }

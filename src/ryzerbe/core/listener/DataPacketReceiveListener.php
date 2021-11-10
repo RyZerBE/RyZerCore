@@ -5,7 +5,7 @@ namespace ryzerbe\core\listener;
 use pocketmine\event\Listener;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\network\mcpe\protocol\LoginPacket;
-use ryzerbe\core\player\LoginPlayerData\data;
+use ryzerbe\core\player\data\LoginPlayerData;
 use ryzerbe\core\player\RyZerPlayerProvider;
 
 class DataPacketReceiveListener implements Listener {

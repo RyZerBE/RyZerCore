@@ -10,6 +10,7 @@ use ryzerbe\core\provider\StaffProvider;
 use ryzerbe\core\provider\VanishProvider;
 use ryzerbe\core\RyZerBE;
 use ryzerbe\core\util\Settings;
+use ryzerbe\core\util\TaskUtils;
 use function array_rand;
 
 class RyZerUpdateTask extends Task {
@@ -34,14 +35,14 @@ class RyZerUpdateTask extends Task {
             }
         }
 
-        if($currentTick % ((20 * 60) * 3) === 0){
+        if($currentTick % TaskUtils::minutesToTicks(3) === 0){
             $autoMessage = Settings::$autoMessages[array_rand(Settings::$autoMessages)];
             foreach(Server::getInstance()->getOnlinePlayers() as $player){
                 $player->sendMessage("\n\n\n\n".RyZerBE::PREFIX.LanguageProvider::getMessageContainer($autoMessage, $player)."\n");
             }
         }
 
-        if($currentTick % (20 * 60) === 0){
+        if($currentTick % TaskUtils::minutesToTicks(1) === 0){
             StaffProvider::refresh();
         }
     }

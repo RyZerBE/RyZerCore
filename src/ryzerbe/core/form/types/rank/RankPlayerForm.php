@@ -30,7 +30,7 @@ class RankPlayerForm extends Form {
                 return;
             }
 
-            $ryzerPlayer->setRank($rank, true, true);
+            $ryzerPlayer->setRank($rank, true, true, true);
             $player->sendMessage(RyZerBE::PREFIX.TextFormat::GRAY."Der Spieler ".TextFormat::GOLD.$ryzerPlayer->getPlayer()->getName().TextFormat::GRAY." hat den Rang ".$rank->getColor().$rank->getRankName().TextFormat::RESET.TextFormat::GREEN." erhalten.");
         });
         $form->addInput("Name of the player", "Chillihero", "", "player");

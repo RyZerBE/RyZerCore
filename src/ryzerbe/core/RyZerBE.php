@@ -10,15 +10,21 @@ use pocketmine\utils\TextFormat;
 use ReflectionClass;
 use ReflectionException;
 use ryzerbe\core\block\TNTBlock;
+use ryzerbe\core\command\BanCommand;
+use ryzerbe\core\command\BanHistoryDeleteCommand;
 use ryzerbe\core\command\BroadcastCommand;
 use ryzerbe\core\command\ClanUiCommand;
 use ryzerbe\core\command\CoinCommand;
 use ryzerbe\core\command\GamemodeCommand;
 use ryzerbe\core\command\GameTimeCommand;
+use ryzerbe\core\command\JoinMeCommand;
+use ryzerbe\core\command\KickCommand;
 use ryzerbe\core\command\LanguageCommand;
+use ryzerbe\core\command\PunishHistoryCommand;
 use ryzerbe\core\command\RankCommand;
 use ryzerbe\core\command\SettingsCommand;
 use ryzerbe\core\command\TeamchatCommand;
+use ryzerbe\core\command\UnbanCommand;
 use ryzerbe\core\command\VanishCommand;
 use ryzerbe\core\command\VerifyCommand;
 use ryzerbe\core\command\YouTubeCommand;
@@ -83,6 +89,15 @@ class RyZerBE extends PluginBase {
     }
 
     private function initCommands(): void{
+        $commands = ["help", "gamemode", "list", "tell", "about", "ping", "playsound", "stopsound", "version", "me", "seed", "title", "defaultgamemode", "spawnpoint", "pardon", "pardon-ip", "plugins", "reload", "save-off", "save-on", "transferserver", "checkperm", "ban", "ban-ip", "makeserver", "makeplugin", "difficulty", "extractplugin", "genplugin", "banlist", "kick", "particle", "say", "kill"];
+        $commandMap = $this->getServer()->getCommandMap();
+        foreach($commands as $command){
+            if($commandMap->getCommand($command) !== null){
+                $commandMap->unregister($commandMap->getCommand($command));
+            }
+        }
+
+
         $this->getServer()->getCommandMap()->registerAll("core", [
             new LanguageCommand(),
             new RankCommand(),
@@ -95,7 +110,13 @@ class RyZerBE extends PluginBase {
             new GamemodeCommand(),
             new SettingsCommand(),
             new TeamchatCommand(),
-            new YouTubeCommand()
+            new YouTubeCommand(),
+            new BanCommand(),
+            new UnbanCommand(),
+            new BanHistoryDeleteCommand(),
+            new PunishHistoryCommand(),
+            new KickCommand(),
+            new JoinMeCommand()
         ]);
     }
 

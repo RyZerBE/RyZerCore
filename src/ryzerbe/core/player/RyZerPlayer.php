@@ -5,21 +5,26 @@ namespace ryzerbe\core\player;
 use BauboLP\Cloud\CloudBridge;
 use BauboLP\Cloud\Packets\PlayerDisconnectPacket;
 use BauboLP\Cloud\Packets\PlayerMoveServerPacket;
+use Exception;
 use mysqli;
 use pocketmine\Player;
 use pocketmine\Server;
 use ryzerbe\core\event\player\RyZerPlayerAuthEvent;
+use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\player\data\LoginPlayerData;
 use ryzerbe\core\player\networklevel\NetworkLevel;
 use ryzerbe\core\player\setting\PlayerSettings;
 use ryzerbe\core\provider\CoinProvider;
+use ryzerbe\core\provider\PunishmentProvider;
 use ryzerbe\core\rank\Rank;
 use ryzerbe\core\rank\RankManager;
 use ryzerbe\core\RyZerBE;
 use ryzerbe\core\util\async\AsyncExecutor;
 use ryzerbe\core\util\Clan;
+use ryzerbe\core\util\punishment\PunishmentReason;
 use ryzerbe\core\util\Settings;
 use ryzerbe\core\util\time\TimeAPI;
+use function str_replace;
 
 class RyZerPlayer {
 
@@ -57,7 +62,6 @@ class RyZerPlayer {
         $this->loginPlayerData = $playerData;
         $this->rank = RankManager::getInstance()->getBackupRank();
         $this->playerSettings = new PlayerSettings();
-        $this->loadData();
     }
 
     /**
@@ -84,11 +88,16 @@ class RyZerPlayer {
     /**
      * @param Rank $rank
      * @param bool $pushPermissions
+     * @param bool $changePrefix
      * @param bool $mysql
      */
-    public function setRank(Rank $rank, bool $pushPermissions = true, bool $mysql = false): void{
+    public function setRank(Rank $rank, bool $pushPermissions = true, bool $changePrefix = true, bool $mysql = false): void{
         $this->rank = $rank;
 
+        if($changePrefix) {
+            $this->getPlayer()->setNameTag(str_replace("{player_name}", $this->getPlayer()->getName(), $rank->getNameTag()));
+            $this->getPlayer()->setDisplayName(str_replace("{player_name}", $this->getPlayer()->getName(), $rank->getNameTag()));
+        }
         if($pushPermissions) $this->getPlayer()->addAttachment(RyZerBE::getPlugin())->setPermissions($rank->getPermissionFormat());
         if($mysql) RankManager::getInstance()->setRank($this->getPlayer()->getName(), $rank);
     }
@@ -158,6 +167,20 @@ class RyZerPlayer {
             }else{
                 $mysqli->query("INSERT INTO `playerlanguage`(`player`) VALUES ('$playerName')");
                 $playerData["language"] = null;
+            }
+
+            $res = $mysqli->query("SELECT * FROM punishments WHERE player='$playerName' AND type='".PunishmentReason::BAN."'");
+            if($res->num_rows > 0) {
+                while($data = $res->fetch_assoc()) {
+                    if(PunishmentProvider::activatePunishment($data["until"])) {
+                        $untilString = PunishmentProvider::getUntilFormat($data["until"]);
+
+                        $playerData["ban_until"] = $untilString;
+                        $playerData["ban_staff"] = $data["created_by"];
+                        $playerData["ban_reason"] = $data["reason"];
+                        break;
+                    }
+                }
             }
 
             $res = $mysqli->query("SELECT * FROM coins WHERE player='$playerName'");
@@ -237,15 +260,22 @@ class RyZerPlayer {
             if($player === null) return;
 
             $ryzerPlayer = RyZerPlayerProvider::getRyzerPlayer($player);
-            if($ryzerPlayer === null) return;
 
-            $ryzerPlayer->setCoins($playerData["coins"] ?? 0);
-            $ryzerPlayer->gameTimeTicks = $playerData["ticks"] ?? 0;
+            if($ryzerPlayer === null) return;
             if($playerData["language"] === null) {
                 $player->getServer()->dispatchCommand($player, "lang");
             }else {
                 $ryzerPlayer->setLanguage($playerData["language"] ?? "English");
             }
+
+            if(isset($playerData["ban_until"])) {
+                $ryzerPlayer->kick(LanguageProvider::getMessageContainer("ban-screen", $player, ["#staff" => $playerData["ban_staff"], "#until" => $playerData["ban_until"], "#reason" => $playerData["ban_reason"]]));
+                return;
+            }
+
+            $ryzerPlayer->setCoins($playerData["coins"] ?? 0);
+            $ryzerPlayer->gameTimeTicks = $playerData["ticks"] ?? 0;
+
 
             $rank = RankManager::getInstance()->getRank($playerData["rank"] ?? "Player");
             if($rank === null) $rank = RankManager::getInstance()->getBackupRank();
@@ -342,5 +372,24 @@ class RyZerPlayer {
 
     public function sendToLobby(): void{
         CloudBridge::getCloudProvider()->dispatchProxyCommand($this->getPlayer()->getName(), "hub");
+    }
+
+    /**
+     * @param PunishmentReason $reason
+     * @param string $staff
+     */
+    public function punish(PunishmentReason $reason, string $staff){
+        try {
+            PunishmentProvider::punishPlayer($this->getPlayer()->getName(), $staff, $reason);
+        }catch(Exception $e) {}
+    }
+
+    /**
+     * @param string $reason
+     * @param string $staff
+     * @param int $type
+     */
+    public function unpunish(string $reason, string $staff, int $type = PunishmentReason::MUTE){
+        PunishmentProvider::unpunishPlayer($this->getPlayer()->getName(), $staff, $reason, $type);
     }
 }

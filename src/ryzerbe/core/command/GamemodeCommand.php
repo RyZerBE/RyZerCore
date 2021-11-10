@@ -40,7 +40,7 @@ class GamemodeCommand extends Command
         }
 
         if($gm == Player::CREATIVE) {
-            if(!$sender->hasPermission("core.gamemode.1")) {
+            if(!$sender->hasPermission("ryzer.gamemode.creative")) {
                 $sender->sendMessage(RyZerBE::PREFIX.TextFormat::RED."Denkst auch, du wärst Gott hahahahaha");
                 return;
             }
