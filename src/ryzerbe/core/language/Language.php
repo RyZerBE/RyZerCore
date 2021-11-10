@@ -114,13 +114,13 @@ class Language {
         if($message === null) {
             return "There is no translation with the key \"".$key."\"";
         }
-
-        if($noEscape) return $message;
-        $message = str_replace("&", TextFormat::ESCAPE, $message);
         $message = str_replace("#nl", "\n", $message);
         foreach (array_keys($replaces) as $key) {
             $message = str_replace($key, $replaces[$key], $message);
         }
+
+        if($noEscape) return $message;
+        $message = str_replace("&", TextFormat::ESCAPE, $message);
         return $message;
     }
 
@@ -137,6 +137,7 @@ class Language {
 
         $message = str_replace("&", TextFormat::ESCAPE, $message);
         $message = str_replace("#nl", "\n", $message);
+        $message = str_replace("#newLine", "\n", $message);
         foreach (array_keys($replaces) as $key) {
             $message = str_replace($key, $replaces[$key], $message);
         }

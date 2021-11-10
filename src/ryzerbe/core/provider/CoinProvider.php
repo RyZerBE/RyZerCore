@@ -4,8 +4,8 @@ namespace ryzerbe\core\provider;
 
 use mysqli;
 use pocketmine\Server;
-use ryzerbe\core\event\coin\PlayerCoinsAddEvent;
-use ryzerbe\core\event\coin\PlayerCoinsRemoveEvent;
+use ryzerbe\core\event\player\coin\PlayerCoinsAddEvent;
+use ryzerbe\core\event\player\coin\PlayerCoinsRemoveEvent;
 use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\player\RyZerPlayerProvider;
 use ryzerbe\core\RyZerBE;

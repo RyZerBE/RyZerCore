@@ -1,6 +1,6 @@
 <?php
 
-namespace ryzerbe\core\event\coin;
+namespace ryzerbe\core\event\player\coin;
 
 use pocketmine\event\player\PlayerEvent;
 use pocketmine\Player;

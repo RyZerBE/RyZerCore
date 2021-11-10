@@ -11,8 +11,8 @@ use ryzerbe\core\RyZerBE;
 
 class NetworkLevel {
 
-    /** @var RyzerPlayer  */
-    private RyzerPlayer $player;
+    /** @var RyZerPlayer  */
+    private RyZerPlayer $player;
 
     /** @var int  */
     private int $level;
@@ -25,13 +25,13 @@ class NetworkLevel {
 
     /**
      * NetworkLevel constructor.
-     * @param RyzerPlayer $player
+     * @param RyZerPlayer $player
      * @param int $level
      * @param int $progress
      * @param int $progress_today
      * @param int $last_progress
      */
-    public function __construct(RyzerPlayer $player, int $level, int $progress, int $progress_today, int $last_progress){
+    public function __construct(RyZerPlayer $player, int $level, int $progress, int $progress_today, int $last_progress){
         $this->player = $player;
         $this->level = $level;
         $this->progress = $progress;
@@ -42,7 +42,7 @@ class NetworkLevel {
     /**
      * @return RyzerPlayer
      */
-    public function getPlayer(): RyzerPlayer{
+    public function getPlayer(): RyZerPlayer{
         return $this->player;
     }
 

@@ -5,6 +5,7 @@ namespace ryzerbe\core\player;
 use BauboLP\Cloud\CloudBridge;
 use BauboLP\Cloud\Packets\PlayerDisconnectPacket;
 use BauboLP\Cloud\Packets\PlayerMoveServerPacket;
+use DateTime;
 use Exception;
 use mysqli;
 use pocketmine\Player;
@@ -52,6 +53,12 @@ class RyZerPlayer {
     private ?Clan $clan;
     /** @var PlayerSettings  */
     private PlayerSettings $playerSettings;
+    /** @var DateTime|null  */
+    private ?DateTime $mute = null;
+    /** @var string  */
+    private string $muteReason = "???";
+    /** @var string */
+    private string $id = "???";
 
     /**
      * @param Player $player
@@ -178,10 +185,13 @@ class RyZerPlayer {
                         $playerData["ban_until"] = $untilString;
                         $playerData["ban_staff"] = $data["created_by"];
                         $playerData["ban_reason"] = $data["reason"];
+                        $playerData["ban_id"] = $data["id"];
                         break;
                     }
                 }
             }
+
+            //todo: set mute data
 
             $res = $mysqli->query("SELECT * FROM coins WHERE player='$playerName'");
             if($res->num_rows > 0){
@@ -269,7 +279,7 @@ class RyZerPlayer {
             }
 
             if(isset($playerData["ban_until"])) {
-                $ryzerPlayer->kick(LanguageProvider::getMessageContainer("ban-screen", $player, ["#staff" => $playerData["ban_staff"], "#until" => $playerData["ban_until"], "#reason" => $playerData["ban_reason"]]));
+                $ryzerPlayer->kick(LanguageProvider::getMessage("ban-screen", $ryzerPlayer->getLanguageName(), ["#staff" => $playerData["ban_staff"], "#until" => $playerData["ban_until"], "#reason" => $playerData["ban_reason"], "#id" => $playerData["ban_id"]]));
                 return;
             }
 
@@ -297,7 +307,7 @@ class RyZerPlayer {
         $playerName = $this->getPlayer()->getName();
 
         AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($gameTimeTicks, $playerName): void{
-            $mysqli->query("UPDATE gametime SET ticks='$$gameTimeTicks' WHERE player='$playerName'");
+            $mysqli->query("UPDATE gametime SET ticks='$gameTimeTicks' WHERE player='$playerName'");
         });
     }
 
@@ -391,5 +401,54 @@ class RyZerPlayer {
      */
     public function unpunish(string $reason, string $staff, int $type = PunishmentReason::MUTE){
         PunishmentProvider::unpunishPlayer($this->getPlayer()->getName(), $staff, $reason, $type);
+    }
+
+    /**
+     * @return DateTime|null
+     */
+    public function getMuteTime(): ?DateTime{
+        return $this->mute;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMuteId(): string{
+        return $this->id;
+    }
+
+    /**
+     * @return DateTime|null
+     */
+    public function getMute(): ?DateTime{
+        return $this->mute;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMuteReason(): string{
+        return $this->muteReason;
+    }
+
+    /**
+     * @param string $muteReason
+     */
+    public function setMuteReason(string $muteReason): void{
+        $this->muteReason = $muteReason;
+    }
+
+    /**
+     * @param DateTime|null $mute
+     */
+    public function setMute(?DateTime $mute): void{
+        $this->mute = $mute;
+    }
+
+    /**
+     * @param string $id
+     */
+    public function setMuteId(string $id): void{
+        $this->id = $id;
     }
 }

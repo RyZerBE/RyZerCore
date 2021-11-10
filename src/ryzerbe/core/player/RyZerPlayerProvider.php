@@ -18,7 +18,7 @@ class RyZerPlayerProvider {
      */
     public static function registerRyzerPlayer(Player $player)
     {
-        $rbePlayer = new RyzerPlayer($player, RyzerPlayerProvider::$loginData[$player->getName()]);
+        $rbePlayer = new RyZerPlayer($player, self::$loginData[$player->getName()]);
         self::$players[$player->getName()] = $rbePlayer;
         $rbePlayer->loadData();
     }
@@ -35,7 +35,7 @@ class RyZerPlayerProvider {
      * @param Player|string $player
      * @return RyzerPlayer|null
      */
-    public static function getRyzerPlayer(Player|string $player): ?RyzerPlayer
+    public static function getRyzerPlayer(Player|string $player): ?RyZerPlayer
     {
         if($player instanceof Player) $player = $player->getName();
 

@@ -64,12 +64,13 @@ class LanguageProvider {
     /**
      * @param string $key
      * @param string $languageName
+     * @param array $replaces
      * @return string
      */
-    public static function getMessage(string $key, string $languageName){
+    public static function getMessage(string $key, string $languageName, array $replaces = []){
         $language = self::getLanguage($languageName);
         if($language === null) return $key;
 
-        return $language->getMessage($key, [], true);
+        return $language->getMessage($key, $replaces, true);
     }
 }

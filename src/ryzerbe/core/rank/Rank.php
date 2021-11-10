@@ -112,8 +112,8 @@ class Rank {
         if(!$mysql) return;
 
         $rankName = $this->rankName;
-        AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($permString, $rankName): void{
-            $mysqli->query("UPDATE `ranks` SET permissions='$permString' WHERE rankname='$rankName'");
+        AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($permission, $rankName): void{
+            $mysqli->query("UPDATE `ranks` SET permissions='$permission' WHERE rankname='$rankName'");
         });
     }
 

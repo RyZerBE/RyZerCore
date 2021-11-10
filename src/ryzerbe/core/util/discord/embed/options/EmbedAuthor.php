@@ -1,6 +1,6 @@
 <?php
 
-namespace ryzerbe\core\util\embed\options;
+namespace ryzerbe\core\util\discord\embed\options;
 
 class EmbedAuthor {
     /** @var string */

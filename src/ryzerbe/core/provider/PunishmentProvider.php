@@ -14,9 +14,10 @@ use ryzerbe\core\util\async\AsyncExecutor;
 use ryzerbe\core\util\discord\color\DiscordColor;
 use ryzerbe\core\util\discord\DiscordMessage;
 use ryzerbe\core\util\discord\WebhookLinks;
-use ryzerbe\core\util\embed\DiscordEmbed;
-use ryzerbe\core\util\embed\options\EmbedField;
+use ryzerbe\core\util\discord\embed\DiscordEmbed;
+use ryzerbe\core\util\discord\embed\options\EmbedField;
 use ryzerbe\core\util\punishment\PunishmentReason;
+use function array_search;
 
 class PunishmentProvider implements RyZerProvider {
 
@@ -60,16 +61,15 @@ class PunishmentProvider implements RyZerProvider {
      * @param PunishmentReason $punishmentReason
      */
     public static function addReason(PunishmentReason $punishmentReason): void{
-        self::$punishmentReasons[$punishmentReason->getReasonName()] = $punishmentReason;
+        self::$punishmentReasons[] = $punishmentReason;
     }
 
     /**
-     * @param PunishmentReason|string $punishmentReason
+     * @param PunishmentReason $punishmentReason
      */
-    public static function removeReason(PunishmentReason|string $punishmentReason): void{
-        if($punishmentReason instanceof PunishmentReason) $punishmentReason = $punishmentReason->getReasonName();
+    public static function removeReason(PunishmentReason $punishmentReason): void{
 
-        unset(self::$punishmentReasons[$punishmentReason]);
+        unset(self::$punishmentReasons[array_search($punishmentReason, self::$punishmentReasons)]);
     }
 
     /**
@@ -103,10 +103,12 @@ class PunishmentProvider implements RyZerProvider {
             $discordMessage->addEmbed($discordEmbed);
             $discordMessage->send();
 
-            $pk = new PlayerDisconnectPacket();
-            $pk->addData("playerName", $playerName);
-            $pk->addData("reason", TextFormat::RED."You have been banned from our network!");
-            CloudBridge::getInstance()->getClient()->getPacketHandler()->writePacket($pk);
+            if($type === PunishmentReason::BAN) {
+                $pk = new PlayerDisconnectPacket();
+                $pk->addData("playerName", $playerName);
+                $pk->addData("message", TextFormat::RED."You have been banned from our network!");
+                CloudBridge::getInstance()->getClient()->getPacketHandler()->writePacket($pk);
+            }
 
             $player = $server->getPlayerExact($staff);
             if($player === null) return;
@@ -122,7 +124,7 @@ class PunishmentProvider implements RyZerProvider {
      */
     public static function unpunishPlayer(string $playerName, string $staff, string $reason, int $type){
         AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($playerName, $reason, $staff, $type): void{
-            $mysqli->query("UPDATE `punishements` SET unban='unban#$staff#$reason' WHERE player='$xboxId' AND type='$type' AND unban not like 'unban%'");
+            $mysqli->query("UPDATE `punishments` SET until='unban#$staff#$reason' WHERE player='$playerName' AND type='$type' AND until not like 'unban%'");
         }, function(Server $server, $result) use ($playerName, $reason, $staff, $type): void{
             $typeString = $type === PunishmentReason::BAN ? "entbannt" : "entmutet";
             $discordMessage = new DiscordMessage(WebhookLinks::PUNISHMENT_LOG);
@@ -181,13 +183,13 @@ class PunishmentProvider implements RyZerProvider {
         $until = [];
 
         if ($month > 0)
-            $until[] = TextFormat::RED . $month . TextFormat::GREEN . " Months";
+            $until[] = "&c" . $month . "&a" . " Months";
         if ($days > 0)
-            $until[] = TextFormat::RED . $days . TextFormat::GREEN . " Days";
+            $until[] = "&c" . $days . "&a" . " Days";
         if ($hours > 0)
-            $until[] = TextFormat::RED . $hours . TextFormat::GREEN . " Hours";
+            $until[] = "&c" . $hours . "&a" . " Hours";
         if ($minutes > 0)
-            $until[] = TextFormat::RED . $minutes . TextFormat::GREEN . " Minutes";
+            $until[] = "&c" . $minutes . "&a" . " Minutes";
 
         return implode(", ", $until);
     }

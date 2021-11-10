@@ -10,6 +10,7 @@ use ryzerbe\core\rank\Rank;
 use ryzerbe\core\rank\RankManager;
 use ryzerbe\core\RyZerBE;
 use function array_search;
+use function str_replace;
 
 class RankDesignForm extends Form {
 
@@ -32,8 +33,8 @@ class RankDesignForm extends Form {
         });
 
         $colors = ["&1", "&2", "&3", "&4", "&5", "&6", "&7", "&8", "&9", "&f", "&c", "&e", "&g", "&a", "&d"];
-        $form->addInput(TextFormat::RED."Nametag of rank", "", $rank->getNameTag(), "nametag");
-        $form->addInput(TextFormat::RED."Chatprefix of rank", "", $rank->getChatPrefix(), "chatperfix");
+        $form->addInput(TextFormat::RED."Nametag of rank", "", str_replace("§", "&", $rank->getNameTag()), "nametag");
+        $form->addInput(TextFormat::RED."Chatprefix of rank", "", str_replace("§", "&", $rank->getChatPrefix()), "chatperfix");
         $form->addDropdown(TextFormat::RED."Color of rank", $colors, array_search($rank->getColor(), $colors), "color");
         $form->sendToPlayer($player);
     }

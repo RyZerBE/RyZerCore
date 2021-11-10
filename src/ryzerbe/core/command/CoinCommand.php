@@ -37,13 +37,13 @@ class CoinCommand extends Command {
             return;
         }
 
-        if(empty($args[1]) || empty($args[2]) || empty($args[3])) {
+        if(empty($args[1]) || empty($args[2])) {
             $sender->sendMessage(RyZerBE::PREFIX.TextFormat::RED."Syntax error: /coins <add|set|remove> <Spieler:string> <Coins:int>");
             return;
         }
 
-        $playerName = $args[2];
-        $coins = $args[3];
+        $playerName = $args[1];
+        $coins = $args[2];
         if(!is_string($playerName) || !is_numeric($coins) || $coins < 0) {
             $sender->sendMessage(RyZerBE::PREFIX.TextFormat::RED."Du bist einfach zu dumm um Coins zu vergeben..");
             return;

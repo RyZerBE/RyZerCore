@@ -29,5 +29,6 @@ class RankMainForm extends Form {
         $form->setTitle(TextFormat::RED.TextFormat::BOLD."Ranks");
         $form->addButton(TextFormat::GREEN."Create Rank", 1, "https://media.discordapp.net/attachments/602115215307309066/907559017243631636/218648.png?width=663&height=702", "create");
         $form->addButton(TextFormat::RED."Ranks", 1, "https://media.discordapp.net/attachments/602115215307309066/907558166605230080/1805999.png?width=410&height=410", "ranks");
+        $form->sendToPlayer($player);
     }
 }

@@ -19,7 +19,7 @@ class RankManager {
     public array $ranks = [];
 
     public function __construct(){
-        $this->backupRank = new Rank("Player", "&f{player_name}", "&fS &8× &7{player_name} &8» &7{MSG}", "&f", 0, []);
+        $this->backupRank = new Rank("Player", "§f{player_name}", "§fS §8× §7{player_name} §8» §7{MSG}", "§f", 0, []);
     }
 
     /**
@@ -62,7 +62,7 @@ class RankManager {
                 $rank->setColor(str_replace("&", TextFormat::ESCAPE, $color));
                 return;
             }
-            $rank = new Rank($rankName, $nameTag, $chatPrefix, $color, $joinPower, []);
+            $rank = new Rank($rankName, str_replace("&", TextFormat::ESCAPE, $nameTag), str_replace("&", TextFormat::ESCAPE, $chatPrefix), str_replace("&", TextFormat::ESCAPE, $color), $joinPower, []);
             RankManager::getInstance()->addRank($rank);
         });
     }
@@ -100,8 +100,8 @@ class RankManager {
      */
     public function setRank(string $playerName, Rank $rank){
         $rankName = $rank->getRankName();
-        AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use($rank, $playerName): void{
-            $mysqli->query("UPDATE `playerranks` SET rankname='$rankName' WHERE player='$playerName'");
+        AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use($rank, $playerName, $rankName): void{
+            $mysqli->query("INSERT INTO `playerranks`(`player`, `rankname`, `permissions`) VALUES ('$playerName', '$rankName', '') ON DUPLICATE KEY rankname='$rankName'");
         });
     }
 

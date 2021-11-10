@@ -10,6 +10,7 @@ use ryzerbe\core\provider\PunishmentProvider;
 use ryzerbe\core\RyZerBE;
 use ryzerbe\core\util\punishment\PunishmentReason;
 use function in_array;
+use function is_numeric;
 
 class BanCommand extends Command {
 
@@ -61,6 +62,10 @@ class BanCommand extends Command {
             return;
         }
 
+        if(!is_numeric($args[1])) {
+            $sender->sendMessage(RyZerBE::PREFIX.TextFormat::RED."Bitte nutze eine valide BanID!");
+            return;
+        }
         $punishment = PunishmentProvider::getPunishmentReasonById($args[1]);
         if($punishment === null) {
             $sender->sendMessage(RyZerBE::PREFIX.TextFormat::RED."Diese Id existiert nicht!");

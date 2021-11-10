@@ -11,6 +11,7 @@ use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\player\RyZerPlayerProvider;
 use ryzerbe\core\RyZerBE;
 use function array_keys;
+use function array_values;
 use function count;
 use function strtolower;
 
@@ -127,11 +128,12 @@ class LanguageForm extends Form {
         });
         foreach($languages as $language){
             if(strtolower($language) == strtolower($ryzerPlayer->getLanguageName())){
-                $form->addButton(TextFormat::AQUA.TextFormat::BOLD.$language."\n".TextFormat::WHITE.TextFormat::BOLD.count(array_keys(LanguageProvider::$languages))." translations", 1, "https://media.discordapp.net/attachments/779814956270223380/868901452649734304/276speakinghead_100550.png?width=410&height=410", $language);
+                $form->addButton(TextFormat::AQUA.TextFormat::BOLD.$language."\n".TextFormat::WHITE.TextFormat::BOLD.count(LanguageProvider::$languages[$language]->getTranslations())." translations", 1, "https://media.discordapp.net/attachments/779814956270223380/868901452649734304/276speakinghead_100550.png?width=410&height=410", $language);
             }else{
-                $form->addButton(TextFormat::AQUA.$language."\n".TextFormat::WHITE.count(array_keys(LanguageProvider::$languages))." translations", 1, "https://media.discordapp.net/attachments/779814956270223380/868901452649734304/276speakinghead_100550.png?width=410&height=410", $language);
+                $form->addButton(TextFormat::AQUA.$language."\n".TextFormat::WHITE.count(LanguageProvider::$languages[$language]->getTranslations())." translations", 1, "https://media.discordapp.net/attachments/779814956270223380/868901452649734304/276speakinghead_100550.png?width=410&height=410", $language);
             }
         }
-        if($player->hasPermission("language.admin")) $form->addButton(TextFormat::RED."Reload Languages", 0, "texutres/ui/refresh", "reload");
+        if($player->hasPermission("language.admin")) $form->addButton(TextFormat::RED."Reload Languages", 0, "textures/ui/refresh", "reload");
+        $form->sendToPlayer($player);
     }
 }

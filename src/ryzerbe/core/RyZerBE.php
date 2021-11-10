@@ -20,6 +20,7 @@ use ryzerbe\core\command\GameTimeCommand;
 use ryzerbe\core\command\JoinMeCommand;
 use ryzerbe\core\command\KickCommand;
 use ryzerbe\core\command\LanguageCommand;
+use ryzerbe\core\command\LoginCommand;
 use ryzerbe\core\command\PunishHistoryCommand;
 use ryzerbe\core\command\RankCommand;
 use ryzerbe\core\command\SettingsCommand;
@@ -32,10 +33,12 @@ use ryzerbe\core\entity\Arrow;
 use ryzerbe\core\entity\EnderPearl;
 use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\player\networklevel\NetworkLevelProvider;
+use ryzerbe\core\provider\PunishmentProvider;
 use ryzerbe\core\provider\StaffProvider;
 use ryzerbe\core\rank\RankManager;
 use ryzerbe\core\task\RyZerUpdateTask;
 use ryzerbe\core\util\Settings;
+use function var_dump;
 
 class RyZerBE extends PluginBase {
 
@@ -63,6 +66,7 @@ class RyZerBE extends PluginBase {
         NetworkLevelProvider::initRewards();
         RankManager::getInstance()->fetchRanks();
         StaffProvider::refresh();
+        PunishmentProvider::loadReasons();
 
         $this->getScheduler()->scheduleRepeatingTask(new RyZerUpdateTask(), 1);
     }
@@ -116,7 +120,8 @@ class RyZerBE extends PluginBase {
             new BanHistoryDeleteCommand(),
             new PunishHistoryCommand(),
             new KickCommand(),
-            new JoinMeCommand()
+            new JoinMeCommand(),
+            new LoginCommand()
         ]);
     }
 

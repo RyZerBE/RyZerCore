@@ -69,7 +69,7 @@ class PunishHistoryCommand extends Command {
                 }
 
                 $entryId = $banData[5];
-                $createdDate = date("H:i d-m-Y", $banData[0]);
+                $createdDate = $banData[0];
                 $reason = $banData[3];
                 $staff = $banData[1];
                 if ($banData[4] === PunishmentReason::BAN) {

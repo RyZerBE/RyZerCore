@@ -13,8 +13,9 @@ use ryzerbe\core\util\async\AsyncExecutor;
 use ryzerbe\core\util\discord\color\DiscordColor;
 use ryzerbe\core\util\discord\DiscordMessage;
 use ryzerbe\core\util\discord\WebhookLinks;
-use ryzerbe\core\util\embed\DiscordEmbed;
-use ryzerbe\core\util\embed\options\EmbedField;
+use ryzerbe\core\util\discord\embed\DiscordEmbed;
+use ryzerbe\core\util\discord\embed\options\EmbedField;
+use function count;
 
 class BanHistoryDeleteCommand extends Command {
 
@@ -42,9 +43,10 @@ class BanHistoryDeleteCommand extends Command {
         if(is_numeric($args[0])) {
             $entryId = $args[0];
             AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function (mysqli $mysqli) use ($entryId){
-                $mysqli->query("DELETE FROM `punishments` WHERE id='$entryId'");
-                if(count($mysqli->error_list) > 0) return false;
+                $res = $mysqli->query("SELECT * FROM punishments WHERE id='$entryId'");
+                if($res->num_rows <= 0 || count($mysqli->error_list)) return false;
 
+                $mysqli->query("DELETE FROM `punishments` WHERE id='$entryId'");
                 return true;
             }, function (Server $server, bool $success) use ($sender, $entryId){
                 if($sender === null) return;
@@ -69,9 +71,10 @@ class BanHistoryDeleteCommand extends Command {
         }else {
             $playerName = $args[0];
             AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function (mysqli $mysqli) use ($playerName) {
-                $mysqli->query("DELETE FROM `punishments` WHERE player='$playerName'");
-                if (count($mysqli->error_list) > 0) return false;
+                $res = $mysqli->query("SELECT * FROM punishments WHERE player='$playerName'");
+                if($res->num_rows <= 0 || count($mysqli->error_list)) return false;
 
+                $mysqli->query("DELETE FROM `punishments` WHERE player='$playerName'");
                 return true;
             }, function (Server $server, bool $success) use ($sender, $playerName) {
                 if ($sender === null) return;

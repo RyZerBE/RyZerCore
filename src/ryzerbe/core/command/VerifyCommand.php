@@ -39,7 +39,7 @@ class VerifyCommand extends Command {
                     $token .= $characters[rand(0, $charactersLength - 1)];
                 }
 
-                $mysqli->query("INSERT INTO `verify`(`player`, `token`) VALUES ('$playerName', '$token')");
+                $mysqli->query("INSERT INTO `verify`(`player`, `token`, `verified`) VALUES ('$playerName', '$token', '')");
                 return ["token" => $token, "verified" => false];
             }
 

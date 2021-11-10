@@ -1,11 +1,11 @@
 <?php
 
-namespace ryzerbe\core\util\embed;
+namespace ryzerbe\core\util\discord\embed;
 
 use DateTime;
 use pocketmine\utils\Color;
-use ryzerbe\core\util\embed\options\EmbedAuthor;
-use ryzerbe\core\util\embed\options\EmbedField;
+use ryzerbe\core\util\discord\embed\options\EmbedAuthor;
+use ryzerbe\core\util\discord\embed\options\EmbedField;
 
 class DiscordEmbed {
     /** @var array */
