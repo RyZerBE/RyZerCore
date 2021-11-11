@@ -2,17 +2,13 @@
 
 namespace ryzerbe\core\provider;
 
-class MySQLProvider implements RyZerProvider{
+use function str_contains;
 
-    /**
-     * OLD FUNCTION OF RUSHEROASE
-     * @param string $insert
-     * @return bool
-     */
+class MySQLProvider implements RyZerProvider{
     public static function checkInsert(string $insert): bool{
         $filters = [
             "§",
-            "$".
+            "$",
             ".",
             ",",
             "-",
@@ -29,12 +25,9 @@ class MySQLProvider implements RyZerProvider{
             "SELECT",
             "*"
         ];
-
-        $result = $insert;
-        foreach($filters as $filter){
-            $result = str_replace($filter, "", $insert);
+        foreach($filters as $filter) {
+            if(str_contains($insert, $filter)) return false;
         }
-
-        return $insert === $result;
+        return true;
     }
 }
