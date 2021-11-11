@@ -2,10 +2,10 @@
 
 namespace ryzerbe\core\command;
 
-use BauboLP\Cloud\Bungee\BungeeAPI;
 use BauboLP\Cloud\CloudBridge;
 use BauboLP\Cloud\Packets\PlayerMessagePacket;
 use BauboLP\Cloud\Provider\CloudProvider;
+use DateTime;
 use jojoe77777\FormAPI\SimpleForm;
 use mysqli;
 use pocketmine\command\Command;
@@ -44,7 +44,7 @@ class JoinMeCommand extends Command {
             $joinMe = [];
             if($res->num_rows > 0) {
                 while($data = $res->fetch_assoc()) {
-                    if($data["time"] < $time) {
+                    if((new DateTime($data["time"]))->diff(new DateTime())->m >= 1) {
                         $mysqli->query("DELETE FROM joinme WHERE player='".$data["player"]."'");
                         continue;
                     }
@@ -85,6 +85,7 @@ class JoinMeCommand extends Command {
                     });
                     return;
                 }
+
                 $ryzerPlayer->connectServer($data);
             });
 

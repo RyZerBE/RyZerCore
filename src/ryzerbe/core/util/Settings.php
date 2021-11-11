@@ -39,6 +39,10 @@ class Settings {
         AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli): void{
             $mysqli->query("CREATE TABLE IF NOT EXISTS `playerlanguage` (`player` VARCHAR(32) NOT NULL, `language` VARCHAR(16) NOT NULL DEFAULT 'English') ENGINE = InnoDB");
             $mysqli->query("CREATE TABLE IF NOT EXISTS `coins` (`player` VARCHAR(32) NOT NULL, `coins` INT NOT NULL DEFAULT '0') ENGINE = InnoDB");
+            $mysqli->query("CREATE TABLE IF NOT EXISTS `party` (`owner` VARCHAR(32) NOT NULL, `open` INT NOT NULL DEFAULT '1') ENGINE = InnoDB");
+            $mysqli->query("CREATE TABLE IF NOT EXISTS `partymember` (`player` VARCHAR(32) NOT NULL, `party` VARCHAR(32) NOT NULL, `role` INT NOT NULL DEFAULT '0') ENGINE = InnoDB");
+            $mysqli->query("CREATE TABLE IF NOT EXISTS `partyrequest` (`player` VARCHAR(32) NOT NULL, `party` VARCHAR(32) NOT NULL, 'time' TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP) ENGINE = InnoDB");
+            $mysqli->query("CREATE TABLE IF NOT EXISTS `partyban` (`player` VARCHAR(32) NOT NULL, `party` VARCHAR(32) NOT NULL) ENGINE = InnoDB");
             $mysqli->query("CREATE TABLE IF NOT EXISTS `ranks` (`rankname` VARCHAR(32) KEY NOT NULL, `nametag` TEXT NOT NULL, `chatprefix` TEXT NOT NULL, `permissions` TEXT NOT NULL, `joinpower` INT NOT NULL, `color` varchar(5) NOT NULL) ENGINE = InnoDB");
             $mysqli->query("CREATE TABLE IF NOT EXISTS `gametime` (`player` VARCHAR(32) KEY NOT NULL, `ticks` INT NOT NULL DEFAULT '0') ENGINE = InnoDB");
             $mysqli->query("CREATE TABLE IF NOT EXISTS `verify` ( `player` VARCHAR(32) NOT NULL , `token` VARCHAR(8) NOT NULL , `verified` TEXT NOT NULL ) ENGINE = InnoDB;");

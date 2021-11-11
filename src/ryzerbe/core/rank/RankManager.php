@@ -101,7 +101,7 @@ class RankManager {
     public function setRank(string $playerName, Rank $rank){
         $rankName = $rank->getRankName();
         AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use($rank, $playerName, $rankName): void{
-            $mysqli->query("INSERT INTO `playerranks`(`player`, `rankname`, `permissions`) VALUES ('$playerName', '$rankName', '') ON DUPLICATE KEY rankname='$rankName'");
+            $mysqli->query("INSERT INTO `playerranks`(`player`, `rankname`, `permissions`) VALUES ('$playerName', '$rankName', '') ON DUPLICATE KEY UPDATE rankname='$rankName'");
         });
     }
 

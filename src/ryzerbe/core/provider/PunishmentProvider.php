@@ -17,6 +17,7 @@ use ryzerbe\core\util\discord\WebhookLinks;
 use ryzerbe\core\util\discord\embed\DiscordEmbed;
 use ryzerbe\core\util\discord\embed\options\EmbedField;
 use ryzerbe\core\util\punishment\PunishmentReason;
+use ryzerbe\core\util\Settings;
 use function array_search;
 
 class PunishmentProvider implements RyZerProvider {
@@ -163,6 +164,30 @@ class PunishmentProvider implements RyZerProvider {
         if($now > $datetime) return false;
 
         return true;
+    }
+
+    /**
+     * @param string $playerName
+     * @return int
+     */
+    public static function getSyncBanPoints(string $playerName): int{
+        $data = Settings::$mysqlLoginData;
+        $mysqli = new mysqli($data["host"], $data["user"], $data["password"], "RyZerCore");
+        $res = $mysqli->query("SELECT * FROM punishments WHERE player='$playerName' AND type='".PunishmentReason::BAN."'");
+        $mysqli->close();
+        return $res->num_rows;
+    }
+
+    /**
+     * @param string $playerName
+     * @return int
+     */
+    public static function getSyncMutePoints(string $playerName): int{
+        $data = Settings::$mysqlLoginData;
+        $mysqli = new mysqli($data["host"], $data["user"], $data["password"], "RyZerCore");
+        $res = $mysqli->query("SELECT * FROM punishments WHERE player='$playerName' AND type='".PunishmentReason::MUTE."'");
+        $mysqli->close();
+        return $res->num_rows;
     }
 
     /**

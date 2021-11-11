@@ -5,17 +5,20 @@ namespace ryzerbe\core\player;
 use BauboLP\Cloud\CloudBridge;
 use BauboLP\Cloud\Packets\PlayerDisconnectPacket;
 use BauboLP\Cloud\Packets\PlayerMoveServerPacket;
+use BauboLP\Cloud\Provider\CloudProvider;
 use DateTime;
 use Exception;
 use mysqli;
 use pocketmine\Player;
 use pocketmine\Server;
+use pocketmine\utils\TextFormat;
 use ryzerbe\core\event\player\RyZerPlayerAuthEvent;
 use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\player\data\LoginPlayerData;
 use ryzerbe\core\player\networklevel\NetworkLevel;
 use ryzerbe\core\player\setting\PlayerSettings;
 use ryzerbe\core\provider\CoinProvider;
+use ryzerbe\core\provider\PartyProvider;
 use ryzerbe\core\provider\PunishmentProvider;
 use ryzerbe\core\rank\Rank;
 use ryzerbe\core\rank\RankManager;
@@ -25,7 +28,9 @@ use ryzerbe\core\util\Clan;
 use ryzerbe\core\util\punishment\PunishmentReason;
 use ryzerbe\core\util\Settings;
 use ryzerbe\core\util\time\TimeAPI;
+use function implode;
 use function str_replace;
+use function stripos;
 
 class RyZerPlayer {
 
@@ -176,22 +181,21 @@ class RyZerPlayer {
                 $playerData["language"] = null;
             }
 
-            $res = $mysqli->query("SELECT * FROM punishments WHERE player='$playerName' AND type='".PunishmentReason::BAN."'");
+            $res = $mysqli->query("SELECT * FROM punishments WHERE player='$playerName'");
             if($res->num_rows > 0) {
                 while($data = $res->fetch_assoc()) {
                     if(PunishmentProvider::activatePunishment($data["until"])) {
                         $untilString = PunishmentProvider::getUntilFormat($data["until"]);
 
-                        $playerData["ban_until"] = $untilString;
-                        $playerData["ban_staff"] = $data["created_by"];
-                        $playerData["ban_reason"] = $data["reason"];
-                        $playerData["ban_id"] = $data["id"];
+                        $type =($data["type"] == PunishmentReason::BAN) ? "ban" : "mute";
+                        $playerData[$type."_until"] = $untilString;
+                        $playerData[$type."_staff"] = $data["created_by"];
+                        $playerData[$type."_reason"] = $data["reason"];
+                        $playerData[$type."_id"] = $data["id"];
                         break;
                     }
                 }
             }
-
-            //todo: set mute data
 
             $res = $mysqli->query("SELECT * FROM coins WHERE player='$playerName'");
             if($res->num_rows > 0){
@@ -263,7 +267,29 @@ class RyZerPlayer {
                 $playerData["clanElo"] = 1000;
             }
 
+            $lobby = new mysqli($mysqlData['host'], $mysqlData['username'], $mysqlData['password'], 'Lobby');
+            $result = $lobby->query("SELECT * FROM `Status` WHERE playername='$playerName'");
+            if($result->num_rows > 0) {
+                while($data = $result->fetch_assoc()) {
+                    $status = $data['status'];
+                    if($status == "false") {
+                        $playerData['status'] = null;
+                    }else {
+                        $playerData['status'] = $status;
+                    }
+                }
+            }else {
+                $playerData['status'] = null;
+            }
 
+            $partyRole = PartyProvider::getPlayerRole($mysqli, $playerName, false);
+            if($partyRole === PartyProvider::PARTY_ROLE_LEADER) {
+                $party = PartyProvider::getPartyByPlayer($mysqli, $playerName);
+                if($party !== null) $playerData["party_members"] = PartyProvider::getPartyMembers($mysqli, $party);
+            }
+
+            $lobby->close();
+            $clanDB->close();
             return $playerData;
         }, function(Server $server, array $playerData) use ($playerName): void{
             $player = $server->getPlayer($playerName);
@@ -283,18 +309,33 @@ class RyZerPlayer {
                 return;
             }
 
+            if(isset($playerData["mute_until"])) {
+                $ryzerPlayer->setMute(new DateTime($playerData["mute_until"]));
+                $ryzerPlayer->setMuteId($playerData["mute_id"]);
+                $ryzerPlayer->setMuteReason($playerData["mute_reason"]);
+                return;
+            }
+
             $ryzerPlayer->setCoins($playerData["coins"] ?? 0);
             $ryzerPlayer->gameTimeTicks = $playerData["ticks"] ?? 0;
 
 
             $rank = RankManager::getInstance()->getRank($playerData["rank"] ?? "Player");
             if($rank === null) $rank = RankManager::getInstance()->getBackupRank();
-            $ryzerPlayer->setRank($rank);
+            $ryzerPlayer->setRank($rank, true, false);
 
             $ryzerPlayer->setNetworkLevel(new NetworkLevel($ryzerPlayer, $playerData["network_level"], $playerData["network_level_progress"], $playerData["level_progress_today"], strtotime($playerData["last_level_progress"])));
+            $ryzerPlayer->updateStatus($playerData["status"] ?? null);
 
             if($playerData['clan'] != null && $playerData['clan'] != "null") {
                 $ryzerPlayer->setClan(new Clan($playerData["clan"], $playerData["clanColor"].$playerData["clanTag"], (int)$playerData["clanElo"], $playerData["owner"]));
+            }
+
+            if(isset($playerData["party_members"]) && stripos(CloudProvider::getServer(), "CWBW") === false) {
+                $pk = new PlayerMoveServerPacket();
+                $pk->addData("playerNames", implode(":", $playerData["party_members"]));
+                $pk->addData("serverName", CloudProvider::getServer());
+                CloudBridge::getInstance()->getClient()->getPacketHandler()->writePacket($pk);
             }
 
             $ev = new RyZerPlayerAuthEvent($ryzerPlayer);
@@ -450,5 +491,22 @@ class RyZerPlayer {
      */
     public function setMuteId(string $id): void{
         $this->id = $id;
+    }
+
+    /**
+     * @param string|null $status
+     */
+    public function updateStatus(?string $status): void{
+        $player = $this->getPlayer();
+
+        if($this->getPlayerSettings()->isRankToggled()){
+            $nametag = str_replace("{player_name}", $player->getName(), RankManager::getInstance()->getBackupRank()->getNameTag()); //PLAYER = DEFAULT
+        }else{
+            $nametag = str_replace("{player_name}", $player->getName(), $this->getRank()->getNameTag());
+        }
+        $nametag = str_replace("&", TextFormat::ESCAPE, $nametag);
+
+        $player->setNameTag($nametag.TextFormat::BLACK." [".$this->getNetworkLevel()->getLevelColor().$this->getNetworkLevel()->getLevel().TextFormat::BLACK."]"."\n".TextFormat::YELLOW.(($status !== null ? "✎ ".$status : TextFormat::YELLOW.$this->getLoginPlayerData()->getDeviceOsName())));
+        $player->setDisplayName($nametag);
     }
 }

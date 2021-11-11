@@ -21,6 +21,7 @@ use ryzerbe\core\command\JoinMeCommand;
 use ryzerbe\core\command\KickCommand;
 use ryzerbe\core\command\LanguageCommand;
 use ryzerbe\core\command\LoginCommand;
+use ryzerbe\core\command\PartyCommand;
 use ryzerbe\core\command\PunishHistoryCommand;
 use ryzerbe\core\command\RankCommand;
 use ryzerbe\core\command\SettingsCommand;
@@ -121,7 +122,8 @@ class RyZerBE extends PluginBase {
             new PunishHistoryCommand(),
             new KickCommand(),
             new JoinMeCommand(),
-            new LoginCommand()
+            new LoginCommand(),
+            new PartyCommand()
         ]);
     }
 
