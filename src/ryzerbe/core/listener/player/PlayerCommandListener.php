@@ -1,6 +1,6 @@
 <?php
 
-namespace ryzerbe\core\listener;
+namespace ryzerbe\core\listener\player;
 
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerCommandPreprocessEvent;
@@ -9,10 +9,7 @@ use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\RyZerBE;
 
 class PlayerCommandListener implements Listener {
-    /**
-     * @param PlayerCommandPreprocessEvent $event
-     */
-    public function onCommandExec(PlayerCommandPreprocessEvent $event){
+    public function onCommandExec(PlayerCommandPreprocessEvent $event): void{
         $command = $event->getMessage();
         if($command[0] == "/"){
             //todo: send in discord channel

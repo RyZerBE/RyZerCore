@@ -3,56 +3,32 @@
 namespace ryzerbe\core\util\query;
 
 class ServerQuery {
-
-    /** @var string  */
     private string $address;
-    /** @var int  */
     private int $port;
 
-    /** @var int  */
     private int $timeout = 4;
 
-    /**
-     * ServerQuery constructor.
-     * @param string $address
-     * @param int $port
-     */
     public function __construct(string $address, int $port){
         $this->address = $address;
         $this->port = $port;
     }
 
-    /**
-     * @return int
-     */
     public function getTimeout(): int{
         return $this->timeout;
     }
 
-    /**
-     * @return string
-     */
     public function getAddress(): string{
         return $this->address;
     }
 
-    /**
-     * @return int
-     */
     public function getPort(): int{
         return $this->port;
     }
 
-    /**
-     * @param int $timeout
-     */
     public function setTimeout(int $timeout): void{
         $this->timeout = $timeout;
     }
 
-    /**
-     * @return ServerQueryResult|null
-     */
     public function run(): ?ServerQueryResult {
         $socket = @fsockopen('udp://'.$this->address, $this->port, $errno, $errstr, $this->getTimeout());
         if($errno && $socket !== false){

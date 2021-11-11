@@ -7,41 +7,31 @@ use Exception;
 use mysqli;
 
 class PartyProvider implements RyZerProvider {
+    public const PARTY_OPEN = 0;
+    public const PARTY_CLOSED = 1;
 
-    const PARTY_OPEN = 0;
-    const PARTY_CLOSED = 1;
+    public const PARTY_ROLE_MEMBER = 0;
+    public const PARTY_ROLE_MODERATOR = 1;
+    public const PARTY_ROLE_LEADER = 2;
 
-    const PARTY_ROLE_MEMBER = 0;
-    const PARTY_ROLE_MODERATOR = 1;
-    const PARTY_ROLE_LEADER = 2;
+    public const SUCCESS = 0;
+    public const NO_PERMISSION = 1;
+    public const NO_PARTY = 2;
+    public const NO_PARTY_PLAYER = 2;
+    public const NO_REQUEST = 7;
+    public const ALREADY_IN_PARTY = 3;
+    public const ALREADY_REQUEST = 4;
+    public const ALREADY_BANNED = 8;
+    public const ALREADY_UNBANNED = 9;
+    public const PARTY_CLOSE = 6;
+    public const PARTY_DOESNT_EXIST = 5;
+    public const PLAYER_DOESNT_EXIST = 10;
 
-    const SUCCESS = 0;
-    const NO_PERMISSION = 1;
-    const NO_PARTY = 2;
-    const NO_PARTY_PLAYER = 2;
-    const NO_REQUEST = 7;
-    const ALREADY_IN_PARTY = 3;
-    const ALREADY_REQUEST = 4;
-    const ALREADY_BANNED = 8;
-    const ALREADY_UNBANNED = 9;
-    const PARTY_CLOSE = 6;
-    const PARTY_DOESNT_EXIST = 5;
-    const PLAYER_DOESNT_EXIST = 10;
-
-    /**
-     * @param mysqli $mysqli
-     * @param string $player
-     * @return bool
-     */
     public static function validPlayer(mysqli $mysqli, string $player): bool{
        $res = $mysqli->query("SELECT * FROM coins WHERE player='$player'");
        return $res->num_rows > 0;
     }
 
-    /**
-     * @param int $id
-     * @return string
-     */
     public static function getRoleNameById(int $id): string{
         return match ($id) {
             self::PARTY_ROLE_MEMBER => "Member",
@@ -51,20 +41,11 @@ class PartyProvider implements RyZerProvider {
         };
     }
 
-    /**
-     * @param mysqli $mysqli
-     * @param string $owner
-     * @param int $open
-     */
     public static function createParty(mysqli $mysqli, string $owner, int $open = self::PARTY_CLOSED): void{
         $mysqli->query("INSERT INTO `party`(`owner`, `open`) VALUES ('$owner', '$open')");
         self::joinParty($mysqli, $owner, $owner, self::PARTY_ROLE_LEADER);
     }
 
-    /**
-     * @param mysqli $mysqli
-     * @param string $owner
-     */
     public static function deleteParty(mysqli $mysqli, string $owner): void{
         $mysqli->query("DELETE FROM `party` WHERE owner='$owner'");
         foreach(self::getPartyMembers($mysqli, $owner) as $member) {
@@ -72,21 +53,11 @@ class PartyProvider implements RyZerProvider {
         }
     }
 
-    /**
-     * @param mysqli $mysqli
-     * @param string $owner
-     * @param bool $open
-     */
     public static function openParty(mysqli $mysqli, string $owner, bool $open = true){
         $open = ($open === true) ? self::PARTY_OPEN : self::PARTY_CLOSED;
         $mysqli->query("UPDATE `party` SET open='$open' WHERE owner='$owner'");
     }
 
-    /**
-     * @param mysqli $mysqli
-     * @param string $owner
-     * @return bool
-     */
     public static function isPartyOpen(mysqli $mysqli, string $owner): bool{
         $res = $mysqli->query("SELECT * FROM party WHERE owner='$owner'");
         if($data = $res->fetch_assoc()) {
@@ -96,30 +67,14 @@ class PartyProvider implements RyZerProvider {
         return false;
     }
 
-    /**
-     * @param mysqli $mysqli
-     * @param string $owner
-     * @param string $player
-     */
     public static function addRequest(mysqli $mysqli, string $owner, string $player){
         $mysqli->query("INSERT INTO `partyrequest`(`player`, `party`) VALUES ('$player', '$owner')");
     }
 
-    /**
-     * @param mysqli $mysqli
-     * @param string $owner
-     * @param string $player
-     */
     public static function removeRequest(mysqli $mysqli, string $owner, string $player){
         $mysqli->query("DELETE FROM `partyrequest` WHERE player='$player' AND party='$owner'");
     }
 
-    /**
-     * @param mysqli $mysqli
-     * @param string $player
-     * @return array
-     * @throws Exception
-     */
     public static function getRequests(mysqli $mysqli, string $player): array{
         $res = $mysqli->query("SELECT * FROM partyrequest WHERE player='$player'");
         if($res->num_rows <= 0) return [];
@@ -136,43 +91,19 @@ class PartyProvider implements RyZerProvider {
         return $members;
     }
 
-    /**
-     * @param mysqli $mysqli
-     * @param string $owner
-     * @param string $player
-     * @return bool
-     */
     public static function hasRequest(mysqli $mysqli, string $owner, string $player): bool{
         $res = $mysqli->query("SELECT * FROM partyrequest WHERE player='$player' AND party='$owner'");
         return $res->num_rows > 0;
     }
 
-    /**
-     * @param mysqli $mysqli
-     * @param string $player
-     * @param string $owner
-     * @param int $role
-     */
     public static function joinParty(mysqli $mysqli, string $player, string $owner, int $role = self::PARTY_ROLE_MEMBER){
         $mysqli->query("INSERT INTO `partymember`(`player`, `party`, `role`) VALUES ('$player', '$owner', '$role')");
     }
 
-    /**
-     * @param mysqli $mysqli
-     * @param string $player
-     * @param string $owner
-     */
     public static function leaveParty(mysqli $mysqli, string $player, string $owner){
         $mysqli->query("DELETE FROM `partymember` WHERE player='$player' AND party='$owner'");
     }
 
-    /**
-     * @param mysqli $mysqli
-     * @param string $party
-     * @param string $sender
-     * @param string $player
-     * @return bool
-     */
     public static function banPlayerFromParty(mysqli $mysqli, string $party, string $sender, string $player): bool{
         $playerRole = self::getPlayerRole($mysqli, $player, false);
         if($playerRole === null){
@@ -186,13 +117,6 @@ class PartyProvider implements RyZerProvider {
         return true;
     }
 
-    /**
-     * @param mysqli $mysqli
-     * @param string $owner
-     * @param string $player
-     * @param string $sender
-     * @return bool
-     */
     public static function unbanFromParty(mysqli $mysqli, string $owner, string $player, string $sender): bool{
         $playerRole = self::getPlayerRole($mysqli, $sender, false);
         if($playerRole === null) return false;
@@ -202,32 +126,15 @@ class PartyProvider implements RyZerProvider {
         return true;
     }
 
-    /**
-     * @param mysqli $mysqli
-     * @param string $owner
-     * @param string $player
-     * @return bool
-     */
     public static function isBannedFromParty(mysqli $mysqli, string $owner, string $player): bool{
         $res = $mysqli->query("SELECT * FROM partyban WHERE party='$owner' AND player='$player'");
         return $res->num_rows > 0;
     }
 
-    /**
-     * @param mysqli $mysqli
-     * @param string $player
-     * @param string $owner
-     * @param int $role
-     */
     public static function updateRole(mysqli $mysqli, string $player, string $owner, int $role){
         $mysqli->query("UPDATE `partymember` SET role='$role' WHERE player='$player' AND party='$owner'");
     }
 
-    /**
-     * @param mysqli $mysqli
-     * @param string $owner
-     * @return array
-     */
     public static function getPartyMembers(mysqli $mysqli, string $owner): array{
         $res = $mysqli->query("SELECT * FROM partymember WHERE party='$owner'");
         if($res->num_rows <= 0) return [];
@@ -240,11 +147,6 @@ class PartyProvider implements RyZerProvider {
         return $members;
     }
 
-    /**
-     * @param mysqli $mysqli
-     * @param string $player
-     * @return string|null
-     */
     public static function getPartyByPlayer(mysqli $mysqli, string $player): ?string{
         $res = $mysqli->query("SELECT * FROM partymember WHERE player='$player'");
         if($res->num_rows <= 0) return null;
@@ -252,12 +154,6 @@ class PartyProvider implements RyZerProvider {
         return $res->fetch_assoc()["party"] ?? null;
     }
 
-    /**
-     * @param mysqli $mysqli
-     * @param string $player
-     * @param bool $asName
-     * @return int|null|string
-     */
     public static function getPlayerRole(mysqli $mysqli, string $player, bool $asName): int|string|null{
         $res = $mysqli->query("SELECT * FROM partymember WHERE player='$player'");
         if($res->num_rows <= 0) return null;

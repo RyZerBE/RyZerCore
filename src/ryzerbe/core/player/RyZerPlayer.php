@@ -24,7 +24,7 @@ use ryzerbe\core\rank\Rank;
 use ryzerbe\core\rank\RankManager;
 use ryzerbe\core\RyZerBE;
 use ryzerbe\core\util\async\AsyncExecutor;
-use ryzerbe\core\util\Clan;
+use ryzerbe\core\clan\Clan;
 use ryzerbe\core\util\punishment\PunishmentReason;
 use ryzerbe\core\util\Settings;
 use ryzerbe\core\util\time\TimeAPI;
@@ -33,42 +33,24 @@ use function str_replace;
 use function stripos;
 
 class RyZerPlayer {
-
-    /** @var LoginPlayerData  */
     private LoginPlayerData $loginPlayerData;
-
-    /** @var Player  */
     private Player $player;
 
-    /** @var NetworkLevel|null  */
     private ?NetworkLevel $networkLevel;
 
-    /** @var string  */
     private string $languageName = "English";
 
-    /** @var int  */
     private int $coins = 0;
-    /** @var int  */
     public int $gameTimeTicks = 0;
 
-    /** @var Rank  */
     private Rank $rank;
 
-    /** @var Clan|null  */
     private ?Clan $clan;
-    /** @var PlayerSettings  */
     private PlayerSettings $playerSettings;
-    /** @var DateTime|null  */
     private ?DateTime $mute = null;
-    /** @var string  */
     private string $muteReason = "???";
-    /** @var string */
     private string $id = "???";
 
-    /**
-     * @param Player $player
-     * @param LoginPlayerData $playerData
-     */
     public function __construct(Player $player, LoginPlayerData $playerData){
         $this->player = $player;
         $this->loginPlayerData = $playerData;
@@ -76,33 +58,18 @@ class RyZerPlayer {
         $this->playerSettings = new PlayerSettings();
     }
 
-    /**
-     * @return Player
-     */
     public function getPlayer(): Player{
         return $this->player;
     }
 
-    /**
-     * @return PlayerSettings
-     */
     public function getPlayerSettings(): PlayerSettings{
         return $this->playerSettings;
     }
 
-    /**
-     * @return Rank
-     */
     public function getRank(): Rank{
         return $this->rank;
     }
 
-    /**
-     * @param Rank $rank
-     * @param bool $pushPermissions
-     * @param bool $changePrefix
-     * @param bool $mysql
-     */
     public function setRank(Rank $rank, bool $pushPermissions = true, bool $changePrefix = true, bool $mysql = false): void{
         $this->rank = $rank;
 
@@ -114,56 +81,33 @@ class RyZerPlayer {
         if($mysql) RankManager::getInstance()->setRank($this->getPlayer()->getName(), $rank);
     }
 
-    /**
-     * @param int $coins
-     * @param bool $mysql
-     */
     public function addCoins(int $coins, bool $mysql = false){
         $this->coins += $coins;
         if($mysql) CoinProvider::addCoins($this->getPlayer()->getName(), $coins);
     }
 
-    /**
-     * @param int $coins
-     * @param bool $mysql
-     */
     public function removeCoins(int $coins, bool $mysql = false){
         $this->coins -= $coins;
         if($mysql) CoinProvider::removeCoins($this->getPlayer()->getName(), $coins);
     }
-    /**
-     * @param int $coins
-     * @param bool $mysql
-     */
+
     public function setCoins(int $coins, bool $mysql = false){
         $this->coins = $coins;
         if($mysql) CoinProvider::setCoins($this->getPlayer()->getName(), $coins);
     }
 
-    /**
-     * @return int
-     */
     public function getCoins(): int{
         return $this->coins;
     }
 
-    /**
-     * @return LoginPlayerData
-     */
     public function getLoginPlayerData(): LoginPlayerData{
         return $this->loginPlayerData;
     }
 
-    /**
-     * @return NetworkLevel|null
-     */
     public function getNetworkLevel(): ?NetworkLevel{
         return $this->networkLevel;
     }
 
-    /**
-     * @param NetworkLevel|null $networkLevel
-     */
     public function setNetworkLevel(?NetworkLevel $networkLevel): void{
         $this->networkLevel = $networkLevel;
     }
@@ -247,7 +191,7 @@ class RyZerPlayer {
             }
 
             $clanName = $playerData['clan'];
-            if($clanName != null && $clanName != "") {
+            if($clanName !== null && $clanName !== "") {
                 $result = $clanDB->query("SELECT * FROM Clans WHERE clan_name='$clanName'");
                 if($result->num_rows > 0) {
                     while($data = $result->fetch_assoc()) {
@@ -327,7 +271,7 @@ class RyZerPlayer {
             $ryzerPlayer->setNetworkLevel(new NetworkLevel($ryzerPlayer, $playerData["network_level"], $playerData["network_level_progress"], $playerData["level_progress_today"], strtotime($playerData["last_level_progress"])));
             $ryzerPlayer->updateStatus($playerData["status"] ?? null);
 
-            if($playerData['clan'] != null && $playerData['clan'] != "null") {
+            if($playerData['clan'] !== null && $playerData['clan'] !== "null") {
                 $ryzerPlayer->setClan(new Clan($playerData["clan"], $playerData["clanColor"].$playerData["clanTag"], (int)$playerData["clanElo"], $playerData["owner"]));
             }
 
@@ -352,10 +296,6 @@ class RyZerPlayer {
         });
     }
 
-    /**
-     * @param string $languageName
-     * @param bool $mysql
-     */
     public function setLanguage(string $languageName, bool $mysql = false): void{
         $this->languageName = $languageName;
         if($mysql) {
@@ -366,44 +306,26 @@ class RyZerPlayer {
         } //todo: save settings
     }
 
-    /**
-     * @return string
-     */
     public function getLanguageName(): string{
         return $this->languageName;
     }
 
-    /**
-     * @return int
-     */
     public function getGameTimeTicks(): int{
         return $this->gameTimeTicks;
     }
 
-    /**
-     * @return string
-     */
     public function getOnlineTime(): string{
         return TimeAPI::convert($this->gameTimeTicks)->asShortString();
     }
 
-    /**
-     * @return Clan|null
-     */
     public function getClan(): ?Clan{
         return $this->clan;
     }
 
-    /**
-     * @param Clan|null $clan
-     */
     public function setClan(?Clan $clan): void{
         $this->clan = $clan;
     }
 
-    /**
-     * @param string $reason
-     */
     public function kick(string $reason){
         $pk = new PlayerDisconnectPacket();
         $pk->addData("playerName", $this->getPlayer()->getName());
@@ -411,9 +333,6 @@ class RyZerPlayer {
         CloudBridge::getInstance()->getClient()->getPacketHandler()->writePacket($pk);
     }
 
-    /**
-     * @param string $serverName
-     */
     public function connectServer(string $serverName){
         $pk = new PlayerMoveServerPacket();
         $pk->addData("playerNames", $this->getPlayer()->getName());
@@ -425,77 +344,44 @@ class RyZerPlayer {
         CloudBridge::getCloudProvider()->dispatchProxyCommand($this->getPlayer()->getName(), "hub");
     }
 
-    /**
-     * @param PunishmentReason $reason
-     * @param string $staff
-     */
     public function punish(PunishmentReason $reason, string $staff){
         try {
             PunishmentProvider::punishPlayer($this->getPlayer()->getName(), $staff, $reason);
         }catch(Exception $e) {}
     }
 
-    /**
-     * @param string $reason
-     * @param string $staff
-     * @param int $type
-     */
     public function unpunish(string $reason, string $staff, int $type = PunishmentReason::MUTE){
         PunishmentProvider::unpunishPlayer($this->getPlayer()->getName(), $staff, $reason, $type);
     }
 
-    /**
-     * @return DateTime|null
-     */
     public function getMuteTime(): ?DateTime{
         return $this->mute;
     }
 
-    /**
-     * @return string
-     */
     public function getMuteId(): string{
         return $this->id;
     }
 
-    /**
-     * @return DateTime|null
-     */
     public function getMute(): ?DateTime{
         return $this->mute;
     }
 
-    /**
-     * @return string
-     */
     public function getMuteReason(): string{
         return $this->muteReason;
     }
 
-    /**
-     * @param string $muteReason
-     */
     public function setMuteReason(string $muteReason): void{
         $this->muteReason = $muteReason;
     }
 
-    /**
-     * @param DateTime|null $mute
-     */
     public function setMute(?DateTime $mute): void{
         $this->mute = $mute;
     }
 
-    /**
-     * @param string $id
-     */
     public function setMuteId(string $id): void{
         $this->id = $id;
     }
 
-    /**
-     * @param string|null $status
-     */
     public function updateStatus(?string $status): void{
         $player = $this->getPlayer();
 

@@ -6,11 +6,6 @@ use pocketmine\level\Location;
 use pocketmine\Server;
 
 class LocationUtils {
-
-    /**
-     * @param Location $location
-     * @return string
-     */
     public static function toString(Location $location): string {
         return implode(":", [
             $location->x,
@@ -22,10 +17,6 @@ class LocationUtils {
         ]);
     }
 
-    /**
-     * @param string $location
-     * @return Location
-     */
     public static function fromString(string $location): Location {
         $location = explode(":", $location);
         return new Location(

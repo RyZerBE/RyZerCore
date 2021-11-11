@@ -1,6 +1,6 @@
 <?php
 
-namespace ryzerbe\core\listener;
+namespace ryzerbe\core\listener\server;
 
 use pocketmine\event\Listener;
 use pocketmine\event\server\DataPacketReceiveEvent;
@@ -10,12 +10,8 @@ use ryzerbe\core\player\RyZerPlayerProvider;
 use function var_dump;
 
 class DataPacketReceiveListener implements Listener {
-    /**
-     * @param DataPacketReceiveEvent $event
-     */
     public function receive(DataPacketReceiveEvent $event){
         $packet = $event->getPacket();
-        $player = $event->getPlayer();
         if($packet instanceof LoginPacket) {
             RyZerPlayerProvider::$loginData[$packet->username] = new LoginPlayerData($packet);
         }

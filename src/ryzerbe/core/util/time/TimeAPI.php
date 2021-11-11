@@ -3,11 +3,6 @@
 namespace ryzerbe\core\util\time;
 
 class TimeAPI {
-
-    /**
-     * @param int $time
-     * @return TimeFormat
-     */
     public static function convert(int $time): TimeFormat{
         $years = floor($time / 31104000);
         $months = floor($time % 31104000 / 2592000);
@@ -18,44 +13,43 @@ class TimeAPI {
         return new TimeFormat($years, $months, $days, $hours, $minutes, $seconds);
     }
 
-    /**
-     * @param array $times
-     * @return TimeFormat
-     */
-    public static function getTimeFromArray(array $times): TimeFormat
-    {
-        $years = 0; $months = 0; $days = 0; $hours = 0; $minutes = 0; $seconds = 0;
-        foreach ($times as $time) {
-            if ($time != ($result = str_replace("Y", "", $time))) {
+    public static function getTimeFromArray(array $times): TimeFormat{
+        $years = 0;
+        $months = 0;
+        $days = 0;
+        $hours = 0;
+        $minutes = 0;
+        $seconds = 0;
+        foreach($times as $time){
+            if($time !== ($result = str_replace("Y", "", $time))){
                 $years = $result;
-            } elseif ($time != ($result = str_replace("M", "", $time))) {
+            }
+            elseif($time !== ($result = str_replace("M", "", $time))){
                 $months = $result;
-            } elseif ($time != ($result = str_replace("d", "", $time))) {
+            }
+            elseif($time !== ($result = str_replace("d", "", $time))){
                 $days = $result;
-            } elseif ($time != ($result = str_replace("h", "", $time))) {
+            }
+            elseif($time !== ($result = str_replace("h", "", $time))){
                 $hours = $result;
-            } elseif ($time != ($result = str_replace("m", "", $time))) {
+            }
+            elseif($time !== ($result = str_replace("m", "", $time))){
                 $minutes = $result;
-            } elseif ($time != ($result = str_replace("s", "", $time))) {
+            }
+            elseif($time !== ($result = str_replace("s", "", $time))){
                 $seconds = $result;
             }
         }
         return new TimeFormat(intval($years), intval($months), intval($days), intval($hours), intval($minutes), intval($seconds));
     }
 
-    /**
-     * @param int $time
-     * @return bool
-     */
-    public static function isTimeValid(int $time)
-    {
-        if ($time != 0) {
+    public static function isTimeValid(int $time): bool{
+        if($time !== 0){
             $c = $time - time();
-            if ($c <= 0) {
+            if($c <= 0){
                 return false;
             }
         }
-
         return true;
     }
 }

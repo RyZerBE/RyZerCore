@@ -15,10 +15,8 @@ use function mysqli_connect;
 use function uniqid;
 
 class AsyncExecutor {
-
     use SingletonTrait;
 
-    /** @var array  */
     public array $syncClosures = [];
 
     public static function submitMySQLAsyncTask(string $database, Closure $function, Closure $completeFunction = null): void{
@@ -69,8 +67,7 @@ class AsyncExecutor {
             });
     }
 
-    public static function submitClosureTask(int $ticks, Closure $closure)
-    {
+    public static function submitClosureTask(int $ticks, Closure $closure): void{
         RyZerBE::getPlugin()->getScheduler()->scheduleDelayedTask(new ClosureTask($closure), $ticks);
     }
 }

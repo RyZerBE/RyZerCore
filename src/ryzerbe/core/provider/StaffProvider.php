@@ -11,20 +11,16 @@ use function array_search;
 use function in_array;
 
 class StaffProvider implements RyZerProvider {
-
-    /** @var array  */
-    public static array $loggedIn = [];
+    /** @var string[]  */
+    private static array $loggedIn = [];
 
     /**
-     * @return array
+     * @return string[]
      */
     public static function getLoggedIn(): array{
         return self::$loggedIn;
     }
 
-    /**
-     * @param RyZerPlayer|Player|string $player
-     */
     public static function login(RyZerPlayer|Player|string $player): void{
         if(self::loggedIn($player)) return;
 
@@ -37,10 +33,6 @@ class StaffProvider implements RyZerProvider {
         });
     }
 
-    /**
-     * @param RyZerPlayer|Player|string $player
-     * @return bool
-     */
     public static function loggedIn(RyZerPlayer|Player|string $player): bool{
         if($player instanceof RyZerPlayer) $player = $player->getPlayer()->getName();
         if($player instanceof Player) $player = $player->getName();
@@ -48,9 +40,6 @@ class StaffProvider implements RyZerProvider {
         return in_array($player, self::$loggedIn);
     }
 
-    /**
-     * @param RyZerPlayer|Player|string $player
-     */
     public static function logout(RyZerPlayer|Player|string $player): void{
         if(!self::loggedIn($player)) return;
         if($player instanceof RyZerPlayer) $player = $player->getPlayer()->getName();

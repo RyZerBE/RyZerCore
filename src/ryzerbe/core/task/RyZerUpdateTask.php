@@ -14,19 +14,15 @@ use ryzerbe\core\util\TaskUtils;
 use function array_rand;
 
 class RyZerUpdateTask extends Task {
-
-
-    /**
-     * @param int $currentTick
-     */
     public function onRun(int $currentTick){
         Server::getInstance()->getNetwork()->unblockAddress("5.181.151.61");
 
         if(($currentTick % 20) === 0){
             foreach(VanishProvider::$vanishedPlayer as $playerName){
-                if(($player = Server::getInstance()->getPlayerExact($playerName)) != null){
-                    if(($ryzerPlayer = RyzerPlayerProvider::getRyzerPlayer($player->getName())) != null)
+                if(($player = Server::getInstance()->getPlayerExact($playerName)) !== null){
+                    if(($ryzerPlayer = RyzerPlayerProvider::getRyzerPlayer($player->getName())) !== null){
                         VanishProvider::vanishPlayer($ryzerPlayer, true);
+                    }
                 }
             }
 

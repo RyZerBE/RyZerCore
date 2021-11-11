@@ -12,7 +12,7 @@ use function str_replace;
 
 class RankManager {
     use SingletonTrait;
-    /** @var Rank  */
+
     public Rank $backupRank;
 
     /** @var Rank[] */
@@ -22,9 +22,6 @@ class RankManager {
         $this->backupRank = new Rank("Player", "§f{player_name}", "§fS §8× §7{player_name} §8» §7{MSG}", "§f", 0, []);
     }
 
-    /**
-     * @return Rank
-     */
     public function getBackupRank(): Rank{
         return $this->backupRank;
     }
@@ -36,20 +33,10 @@ class RankManager {
         return $this->ranks;
     }
 
-    /**
-     * @param Rank $rank
-     */
     public function addRank(Rank $rank){
         $this->ranks[$rank->getRankName()] = $rank;
     }
 
-    /**
-     * @param string $rankName
-     * @param string $nameTag
-     * @param string $chatPrefix
-     * @param string $color
-     * @param int $joinPower
-     */
     public function createRank(string $rankName, string $nameTag, string $chatPrefix, string $color, int $joinPower): void{
         AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($rankName, $joinPower, $chatPrefix, $nameTag, $color){ //&f$rankName &8× &7{player_name} &8» &7{MSG}
             $mysqli->query("INSERT INTO `ranks`(`rankname`, `nametag`, `chatprefix`, `color`, `joinpower`, `permissions`) VALUES ('$rankName', '$nameTag', '$chatPrefix', '$color', '$joinPower', '') ON DUPLICATE KEY UPDATE nametag='$nameTag',chatprefix='$chatPrefix',color='$color',joinpower='$joinPower'");
@@ -86,18 +73,10 @@ class RankManager {
         });
     }
 
-    /**
-     * @param string $rankName
-     * @return Rank|null
-     */
     public function getRank(string $rankName): ?Rank{
         return $this->ranks[$rankName] ?? null;
     }
 
-    /**
-     * @param string $playerName
-     * @param Rank $rank
-     */
     public function setRank(string $playerName, Rank $rank){
         $rankName = $rank->getRankName();
         AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use($rank, $playerName, $rankName): void{
@@ -105,10 +84,6 @@ class RankManager {
         });
     }
 
-    /**
-     * @param array $permissions
-     * @return array
-     */
     public function convertPermFormat(array $permissions): array{
         $perms = [];
         foreach ($permissions as $perm) {

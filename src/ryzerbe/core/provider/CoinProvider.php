@@ -12,11 +12,6 @@ use ryzerbe\core\RyZerBE;
 use ryzerbe\core\util\async\AsyncExecutor;
 
 class CoinProvider implements RyZerProvider {
-
-    /**
-     * @param string $playerName
-     * @param int $coins
-     */
     public static function addCoins(string $playerName, int $coins){
         AsyncExecutor::submitMySQLAsyncTask("RyzerCore", function(mysqli $mysqli) use ($playerName, $coins){
             $mysqli->query("UPDATE Coins SET coins=coins+'$coins' WHERE playername='$playerName'");
@@ -31,10 +26,6 @@ class CoinProvider implements RyZerProvider {
         });
     }
 
-    /**
-     * @param string $playerName
-     * @param int $coins
-     */
     public static function removeCoins(string $playerName, int $coins){
         AsyncExecutor::submitMySQLAsyncTask("RyzerCore", function(mysqli $mysqli) use ($playerName, $coins){
             $mysqli->query("UPDATE Coins SET coins=coins-'$coins' WHERE playername='$playerName'");
@@ -49,10 +40,6 @@ class CoinProvider implements RyZerProvider {
         });
     }
 
-    /**
-     * @param string $playerName
-     * @param int $coins
-     */
     public static function setCoins(string $playerName, int $coins){
         AsyncExecutor::submitMySQLAsyncTask("RyzerCore", function(mysqli $mysqli) use ($playerName, $coins){
             $mysqli->query("UPDATE Coins SET coins='$coins' WHERE playername='$playerName'");

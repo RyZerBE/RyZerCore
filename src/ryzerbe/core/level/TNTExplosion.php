@@ -1,8 +1,7 @@
 <?php
 
 
-namespace ryzerbe\core\util;
-
+namespace ryzerbe\core\level;
 
 use InvalidArgumentException;
 use pocketmine\block\Block;
@@ -27,32 +26,19 @@ use pocketmine\tile\Container;
 use pocketmine\tile\Tile;
 use ryzerbe\core\block\TNTBlock;
 
-class TNTExplosion
-{
-    /** @var int */
+class TNTExplosion {
     private int $rays = 16;
-    /** @var Level */
     public Level $level;
-    /** @var Position */
     public Position $source;
-    /** @var float */
     public float $size;
 
     /** @var Block[] */
     public array $affectedBlocks = [];
-    /** @var float */
     public float $stepLen = 0.3;
-    /** @var Entity|Block|null */
     private Entity|null|Block $what;
 
-    /** @var SubChunkIteratorManager */
     private SubChunkIteratorManager $subChunkHandler;
 
-    /**
-     * @param Position $center
-     * @param float $size
-     * @param Block|Entity|null $what
-     */
     public function __construct(Position $center, float $size, Entity|Block $what = null){
         if(!$center->isValid()){
             throw new InvalidArgumentException("Position does not have a valid world");
@@ -69,10 +55,6 @@ class TNTExplosion
         $this->subChunkHandler = new SubChunkIteratorManager($this->level, false);
     }
 
-    /**
-     * Calculates which blocks will be destroyed by this explosion. If explodeB() is called without calling this, no blocks
-     * will be destroyed.
-     */
     public function explodeA() : bool{
         if($this->size < 0.1){
             return false;
@@ -130,9 +112,6 @@ class TNTExplosion
         return true;
     }
 
-    /**
-     * @return bool
-     */
     public function explodeB() : bool{
         $updateBlocks = [];
 

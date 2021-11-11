@@ -7,9 +7,7 @@ use pocketmine\event\entity\ProjectileHitEvent;
 use pocketmine\level\sound\EndermanTeleportSound;
 use pocketmine\network\mcpe\protocol\LevelEventPacket;
 
-class EnderPearl extends Throwable
-
-{
+class EnderPearl extends Throwable {
     public const NETWORK_ID = self::ENDER_PEARL;
 
     protected function onHit(ProjectileHitEvent $event) : void{

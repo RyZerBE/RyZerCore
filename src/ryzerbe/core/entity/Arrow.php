@@ -17,8 +17,7 @@ use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
 use pocketmine\network\mcpe\protocol\TakeItemActorPacket;
 use pocketmine\Player;
 
-class Arrow extends Projectile
-{
+class Arrow extends Projectile {
 
     public const NETWORK_ID = self::ARROW;
 

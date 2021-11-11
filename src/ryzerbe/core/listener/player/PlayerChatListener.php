@@ -1,6 +1,6 @@
 <?php
 
-namespace ryzerbe\core\listener;
+namespace ryzerbe\core\listener\player;
 
 use DateTime;
 use pocketmine\event\Listener;
@@ -11,9 +11,7 @@ use ryzerbe\core\provider\PunishmentProvider;
 use function str_replace;
 
 class PlayerChatListener implements Listener {
-
-
-    public function chat(PlayerChatEvent $event){
+    public function chat(PlayerChatEvent $event): void{
         $player = $event->getPlayer();
         $rbePlayer = RyZerPlayerProvider::getRyzerPlayer($player);
         if($rbePlayer === null) return;

@@ -5,21 +5,14 @@ namespace ryzerbe\core\form\types\party;
 use jojoe77777\FormAPI\SimpleForm;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
-use ryzerbe\core\form\Form;
 use ryzerbe\core\form\types\ConfirmationForm;
 use ryzerbe\core\language\LanguageProvider;
 
-class PartyRequestForm extends Form {
-
-    /**
-     * @param Player $player
-     * @param array $extraData
-     */
+class PartyRequestForm {
     public static function onOpen(Player $player, array $extraData = []): void{
         $form = new SimpleForm(function(Player $player, $data): void{
             if($data === null) return;
-
-            if($data === "back") {
+            if($data === "back"){
                 PartyMainForm::onOpen($player);
                 return;
             }
@@ -27,11 +20,10 @@ class PartyRequestForm extends Form {
                 $player->getServer()->dispatchCommand($player, "p accept $data");
             });
         });
-
-        $form->setTitle(TextFormat::LIGHT_PURPLE."Party");
-        $form->addButton(TextFormat::RED."Back", 0, "textures/ui/back_button_default.png", "back");
-        foreach($extraData["requests"] as $request) {
-            $form->addButton(TextFormat::DARK_PURPLE.$request, 0, "textures/ui/invite_base.png", $request);
+        $form->setTitle(TextFormat::LIGHT_PURPLE . "Party");
+        $form->addButton(TextFormat::RED . "Back", 0, "textures/ui/back_button_default.png", "back");
+        foreach($extraData["requests"] as $request){
+            $form->addButton(TextFormat::DARK_PURPLE . $request, 0, "textures/ui/invite_base.png", $request);
         }
         $form->sendToPlayer($player);
     }

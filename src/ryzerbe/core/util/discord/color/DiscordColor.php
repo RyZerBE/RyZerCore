@@ -3,7 +3,6 @@
 namespace ryzerbe\core\util\discord\color;
 
 final class DiscordColor {
-
     public const DEFAULT = 0;
     public const AQUA = 1752220;
     public const GREEN = 3066993;

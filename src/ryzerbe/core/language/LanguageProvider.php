@@ -9,21 +9,13 @@ use ryzerbe\core\player\RyZerPlayerProvider;
 use ryzerbe\core\util\async\AsyncExecutor;
 
 class LanguageProvider {
-
     /** @var Language[]  */
     public static array $languages = [];
 
-    /**
-     * @param Language $language
-     */
     public static function addLanguage(Language $language){
         self::$languages[$language->getLanguageName()] = $language;
     }
 
-    /**
-     * @param string $languageName
-     * @return Language|null
-     */
     public static function getLanguage(string $languageName): ?Language{
         return self::$languages[$languageName] ?? null;
     }
@@ -44,12 +36,6 @@ class LanguageProvider {
         });
     }
 
-    /**
-     * @param string $key
-     * @param string|Player $player
-     * @param array $replaces
-     * @return string
-     */
     public static function getMessageContainer(string $key, string|Player $player, array $replaces = []): string{
         if($player instanceof Player) $player = $player->getName();
         $ryzerPlayer = RyZerPlayerProvider::getRyzerPlayer($player);
@@ -61,16 +47,9 @@ class LanguageProvider {
         return $language->getTranslation($key, $replaces);
     }
 
-    /**
-     * @param string $key
-     * @param string $languageName
-     * @param array $replaces
-     * @return string
-     */
     public static function getMessage(string $key, string $languageName, array $replaces = []){
         $language = self::getLanguage($languageName);
         if($language === null) return $key;
-
         return $language->getMessage($key, $replaces, true);
     }
 }

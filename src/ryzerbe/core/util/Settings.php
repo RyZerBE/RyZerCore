@@ -12,14 +12,22 @@ use function var_dump;
 class Settings {
     use SingletonTrait;
 
-    /** @var bool  */
     public static bool $reduce = false;
-    /** @var array  */
     public static array $mysqlLoginData = [];
-    /** @var array|string[]  */
-    public static array $ips = ["5.181.151.61", "127.0.0.1"];
-    /** @var array|string[]  */
-    public static array $autoMessages = ["automessage-1", "automessage-2", "automessage-3", "automessage-4", "automessage-5", "automessage-6"];
+
+    public static array $ips = [
+        "5.181.151.61",
+        "127.0.0.1"
+    ];
+
+    public static array $autoMessages = [
+        "automessage-1",
+        "automessage-2",
+        "automessage-3",
+        "automessage-4",
+        "automessage-5",
+        "automessage-6"
+    ];
 
     public function initMySQL(): void{
         if(!file_exists("/root/RyzerCloud/data/mysql.json")) {

@@ -6,8 +6,6 @@ use pocketmine\event\player\PlayerEvent;
 use pocketmine\Player;
 
 class PlayerCoinsRemoveEvent extends PlayerEvent {
-
-    /** @var int */
     private int $coins;
 
     public function __construct(Player $player, int $coins){
@@ -15,9 +13,6 @@ class PlayerCoinsRemoveEvent extends PlayerEvent {
         $this->coins = $coins;
     }
 
-    /**
-     * @return int
-     */
     public function getRemovedCoins(): int{
         return $this->coins;
     }

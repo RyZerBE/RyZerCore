@@ -1,6 +1,6 @@
 <?php
 
-namespace ryzerbe\core\listener;
+namespace ryzerbe\core\listener\entity;
 
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
@@ -14,15 +14,12 @@ use ryzerbe\core\player\PMMPPlayer;
 use ryzerbe\core\util\Settings;
 
 class EntityDamageByEntityListener implements Listener {
-
-    /** @var array     */
     private array $delay = [];
 
     /**
-     * @param EntityDamageByEntityEvent $event
      * @priority HIGH
      */
-    public function entityDamage(EntityDamageByEntityEvent $event){
+    public function entityDamage(EntityDamageByEntityEvent $event): void{
         $player = $event->getDamager();
         $entity = $event->getEntity();
         if(!$player instanceof PMMPPlayer){
@@ -62,12 +59,7 @@ class EntityDamageByEntityListener implements Listener {
         }
     }
 
-    /**
-     * @param PMMPPlayer $entity
-     * @param PMMPPlayer $attacker
-     * @param int $level
-     */
-    public function knockback(PMMPPlayer $entity, PMMPPlayer $attacker, int $level = 1){
+    public function knockback(PMMPPlayer $entity, PMMPPlayer $attacker, int $level = 1): void{
         if($level === 0) return;
         $motion = clone $entity->getMotion();
         $motion->y /= 2;

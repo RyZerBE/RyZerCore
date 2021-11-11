@@ -13,16 +13,15 @@ use ryzerbe\core\RyZerBE;
 use ryzerbe\core\util\async\AsyncExecutor;
 use ryzerbe\core\util\discord\color\DiscordColor;
 use ryzerbe\core\util\discord\DiscordMessage;
-use ryzerbe\core\util\discord\WebhookLinks;
 use ryzerbe\core\util\discord\embed\DiscordEmbed;
 use ryzerbe\core\util\discord\embed\options\EmbedField;
+use ryzerbe\core\util\discord\WebhookLinks;
 use ryzerbe\core\util\punishment\PunishmentReason;
 use ryzerbe\core\util\Settings;
 use function array_search;
 
 class PunishmentProvider implements RyZerProvider {
-
-    /** @var PunishmentReason[]  */
+    /** @var PunishmentReason[] */
     public static array $punishmentReasons = [];
 
     /**
@@ -32,10 +31,6 @@ class PunishmentProvider implements RyZerProvider {
         return self::$punishmentReasons;
     }
 
-    /**
-     * @param int $id
-     * @return PunishmentReason|null
-     */
     public static function getPunishmentReasonById(int $id): ?PunishmentReason{
         return self::$punishmentReasons[$id - 1] ?? null;
     }
@@ -44,55 +39,47 @@ class PunishmentProvider implements RyZerProvider {
         AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli): array{
             $res = $mysqli->query("SELECT * FROM punishids");
             $punishData = [];
-            if($res->num_rows > 0) {
-                while($data = $res->fetch_assoc()) {
-                    $punishData[$data["reason"]] = ["days" => $data["days"], "hours" => $data["hours"], "type" => $data["type"]];
+            if($res->num_rows > 0){
+                while($data = $res->fetch_assoc()){
+                    $punishData[$data["reason"]] = [
+                        "days" => $data["days"],
+                        "hours" => $data["hours"],
+                        "type" => $data["type"],
+                    ];
                 }
             }
-
             return $punishData;
         }, function(Server $server, array $punishData): void{
-            foreach($punishData as $name => $data) {
+            foreach($punishData as $name => $data){
                 PunishmentProvider::addReason(new PunishmentReason($name, $data["days"], $data["hours"], $data["type"]));
             }
         });
     }
 
-    /**
-     * @param PunishmentReason $punishmentReason
-     */
     public static function addReason(PunishmentReason $punishmentReason): void{
         self::$punishmentReasons[] = $punishmentReason;
     }
 
-    /**
-     * @param PunishmentReason $punishmentReason
-     */
     public static function removeReason(PunishmentReason $punishmentReason): void{
-
         unset(self::$punishmentReasons[array_search($punishmentReason, self::$punishmentReasons)]);
     }
 
     /**
-     * @param string $playerName
-     * @param string $staff
-     * @param PunishmentReason $reason
      * @throws Exception
      */
     public static function punishPlayer(string $playerName, string $staff, PunishmentReason $reason){
         $reasonName = $reason->getReasonName();
         $type = $reason->getType();
-
         $unbanFormat = $reason->toPunishmentTime();
-        if($unbanFormat instanceof DateTime)
+        if($unbanFormat instanceof DateTime){
             $unbanFormat = $unbanFormat->format("Y-m-d H:i:s");
+        }
         AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($playerName, $staff, $unbanFormat, $type, $reasonName): void{
             $mysqli->query("INSERT INTO `punishments`(`player`, `created_by`, `until`, `type`, `reason`) VALUES ('$playerName', '$staff', '$unbanFormat', '$type', '$reasonName')");
         }, function(Server $server, $result) use ($type, $reasonName, $playerName, $staff, $unbanFormat): void{
-
             $discordMessage = new DiscordMessage(WebhookLinks::PUNISHMENT_LOG);
             $discordEmbed = new DiscordEmbed();
-            $discordEmbed->setTitle(($type === PunishmentReason::BAN) ? $playerName." wurde gebannt" : $playerName." wurde gemutet");
+            $discordEmbed->setTitle(($type === PunishmentReason::BAN) ? $playerName . " wurde gebannt" : $playerName . " wurde gemutet");
             $discordEmbed->setColor(DiscordColor::RED);
             $discordEmbed->setFooter("RyZerBE Moderation", "https://media.discordapp.net/attachments/602115215307309066/907944961037729792/rbe_logo_new.png?width=702&height=702");
             $discordEmbed->setThumbnail("https://media.discordapp.net/attachments/602115215307309066/907946777951502336/unknown.png?width=720&height=486");
@@ -103,26 +90,18 @@ class PunishmentProvider implements RyZerProvider {
             $discordEmbed->setDateTime(new DateTime());
             $discordMessage->addEmbed($discordEmbed);
             $discordMessage->send();
-
-            if($type === PunishmentReason::BAN) {
+            if($type === PunishmentReason::BAN){
                 $pk = new PlayerDisconnectPacket();
                 $pk->addData("playerName", $playerName);
-                $pk->addData("message", TextFormat::RED."You have been banned from our network!");
+                $pk->addData("message", TextFormat::RED . "You have been banned from our network!");
                 CloudBridge::getInstance()->getClient()->getPacketHandler()->writePacket($pk);
             }
-
             $player = $server->getPlayerExact($staff);
             if($player === null) return;
-            $player->sendMessage(RyZerBE::PREFIX.TextFormat::GRAY."Der Spieler ".TextFormat::GOLD.$playerName.TextFormat::GRAY." wurde für ".TextFormat::GOLD.$reasonName.TextFormat::GREEN.(($type === PunishmentReason::BAN) ? " gebannt" : " gemutet"));
+            $player->sendMessage(RyZerBE::PREFIX . TextFormat::GRAY . "Der Spieler " . TextFormat::GOLD . $playerName . TextFormat::GRAY . " wurde für " . TextFormat::GOLD . $reasonName . TextFormat::GREEN . (($type === PunishmentReason::BAN) ? " gebannt" : " gemutet"));
         });
     }
 
-    /**
-     * @param string $playerName
-     * @param string $staff
-     * @param string $reason
-     * @param int $type
-     */
     public static function unpunishPlayer(string $playerName, string $staff, string $reason, int $type){
         AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($playerName, $reason, $staff, $type): void{
             $mysqli->query("UPDATE `punishments` SET until='unban#$staff#$reason' WHERE player='$playerName' AND type='$type' AND until not like 'unban%'");
@@ -130,7 +109,7 @@ class PunishmentProvider implements RyZerProvider {
             $typeString = $type === PunishmentReason::BAN ? "entbannt" : "entmutet";
             $discordMessage = new DiscordMessage(WebhookLinks::PUNISHMENT_LOG);
             $discordEmbed = new DiscordEmbed();
-            $discordEmbed->setTitle($playerName." wurde ".$typeString);
+            $discordEmbed->setTitle($playerName . " wurde " . $typeString);
             $discordEmbed->setColor(DiscordColor::RED);
             $discordEmbed->setFooter("RyZerBE Moderation", "https://media.discordapp.net/attachments/602115215307309066/907944961037729792/rbe_logo_new.png?width=702&height=702");
             $discordEmbed->setThumbnail("https://media.discordapp.net/attachments/602115215307309066/907945456137555988/7191_unban_hammer.png?width=200&height=200");
@@ -140,82 +119,65 @@ class PunishmentProvider implements RyZerProvider {
             $discordEmbed->setDateTime(new DateTime());
             $discordMessage->addEmbed($discordEmbed);
             $discordMessage->send();
-
             $player = $server->getPlayerExact($staff);
             if($player === null) return;
-            $player->sendMessage(RyZerBE::PREFIX.TextFormat::GRAY."Der Spieler ".TextFormat::GOLD.$playerName.TextFormat::GRAY." wurde für den Grund ".TextFormat::GOLD.$reason.TextFormat::GREEN." ".$typeString);
+            $player->sendMessage(RyZerBE::PREFIX . TextFormat::GRAY . "Der Spieler " . TextFormat::GOLD . $playerName . TextFormat::GRAY . " wurde für den Grund " . TextFormat::GOLD . $reason . TextFormat::GREEN . " " . $typeString);
         });
     }
 
     /**
-     * @param $datetime
      * @throws Exception
-     * @return bool
      */
-    public static function activatePunishment($datetime): bool
-    {
+    public static function activatePunishment($datetime): bool{
         if($datetime == "0") return true; //PERMANENT
-        if(!$datetime instanceof DateTime) {
+        if(!$datetime instanceof DateTime){
             if(stripos($datetime, "unban") !== false) return false;
             $datetime = new DateTime($datetime);
         }
-
         $now = new DateTime();
         if($now > $datetime) return false;
-
         return true;
     }
 
-    /**
-     * @param string $playerName
-     * @return int
-     */
     public static function getSyncBanPoints(string $playerName): int{
         $data = Settings::$mysqlLoginData;
         $mysqli = new mysqli($data["host"], $data["user"], $data["password"], "RyZerCore");
-        $res = $mysqli->query("SELECT * FROM punishments WHERE player='$playerName' AND type='".PunishmentReason::BAN."'");
+        $res = $mysqli->query("SELECT * FROM punishments WHERE player='$playerName' AND type='" . PunishmentReason::BAN . "'");
         $mysqli->close();
         return $res->num_rows;
     }
 
-    /**
-     * @param string $playerName
-     * @return int
-     */
     public static function getSyncMutePoints(string $playerName): int{
         $data = Settings::$mysqlLoginData;
         $mysqli = new mysqli($data["host"], $data["user"], $data["password"], "RyZerCore");
-        $res = $mysqli->query("SELECT * FROM punishments WHERE player='$playerName' AND type='".PunishmentReason::MUTE."'");
+        $res = $mysqli->query("SELECT * FROM punishments WHERE player='$playerName' AND type='" . PunishmentReason::MUTE . "'");
         $mysqli->close();
         return $res->num_rows;
     }
 
     /**
-     * @param string $unbanFormat
      * @throws Exception
-     * @return string
      */
-    public static function getUntilFormat(string $unbanFormat): string
-    {
-        if ($unbanFormat == 0) return "PERMANENT";
-
+    public static function getUntilFormat(string $unbanFormat): string{
+        if($unbanFormat == 0) return "PERMANENT";
         $diff = (new DateTime())->diff(new DateTime($unbanFormat));
         $month = $diff->m;
         $days = $diff->d;
         $hours = $diff->h;
         $minutes = $diff->i;
-
         $until = [];
-
-        if ($month > 0)
+        if($month > 0){
             $until[] = "&c" . $month . "&a" . " Months";
-        if ($days > 0)
+        }
+        if($days > 0){
             $until[] = "&c" . $days . "&a" . " Days";
-        if ($hours > 0)
+        }
+        if($hours > 0){
             $until[] = "&c" . $hours . "&a" . " Hours";
-        if ($minutes > 0)
+        }
+        if($minutes > 0){
             $until[] = "&c" . $minutes . "&a" . " Minutes";
-
+        }
         return implode(", ", $until);
     }
 }

@@ -11,16 +11,9 @@ use function count;
 use function str_replace;
 
 class Language {
-
-    /** @var string */
     private string $languageName;
-    /** @var array  */
     private array $translations;
 
-    /**
-     * @param string $languageName
-     * @param array $translations
-     */
     public function __construct(string $languageName, array $translations = []){
         $this->languageName = $languageName;
         $this->translations = $translations;
@@ -52,25 +45,14 @@ class Language {
         });
     }
 
-    /**
-     * @return string
-     */
     public function getLanguageName(): string{
         return $this->languageName;
     }
 
-    /**
-     * @return array
-     */
     public function getTranslations(): array{
         return $this->translations;
     }
 
-    /**
-     * @param string $key
-     * @param string $message
-     * @param bool $mysql
-     */
     public function addTranslation(string $key, string $message, bool $mysql = false){
         $this->translations[$key] = $message;
         if($mysql) {
@@ -81,10 +63,6 @@ class Language {
         }
     }
 
-    /**
-     * @param string $key
-     * @param bool $mysql
-     */
     public function removeTranslation(string $key, bool $mysql = false){
         unset($this->translations[$key]);
         if($mysql) {
@@ -95,20 +73,10 @@ class Language {
         }
     }
 
-    /**
-     * @param string $key
-     * @return String|null
-     */
     public function getMessageByKey(string $key): ?String{
         return $this->translations[$key] ?? null;
     }
 
-    /**
-     * @param string $key
-     * @param array $replaces
-     * @param bool $noEscape
-     * @return string
-     */
     public function getMessage(string $key, array $replaces = [], bool $noEscape = false): string{
         $message = $this->getMessageByKey($key);
         if($message === null) {
@@ -124,11 +92,6 @@ class Language {
         return $message;
     }
 
-    /**
-     * @param string $key
-     * @param array $replaces
-     * @return string
-     */
     public function getTranslation(string $key, array $replaces = []): string{
         $message = $this->getMessageByKey($key);
         if($message === null) {

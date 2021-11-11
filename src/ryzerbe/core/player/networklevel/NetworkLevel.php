@@ -10,27 +10,13 @@ use ryzerbe\core\player\RyZerPlayer;
 use ryzerbe\core\RyZerBE;
 
 class NetworkLevel {
-
-    /** @var RyZerPlayer  */
     private RyZerPlayer $player;
 
-    /** @var int  */
     private int $level;
-    /** @var int  */
     private int $progress;
-    /** @var int  */
     private int $progress_today;
-    /** @var int  */
     private int $last_progress;
 
-    /**
-     * NetworkLevel constructor.
-     * @param RyZerPlayer $player
-     * @param int $level
-     * @param int $progress
-     * @param int $progress_today
-     * @param int $last_progress
-     */
     public function __construct(RyZerPlayer $player, int $level, int $progress, int $progress_today, int $last_progress){
         $this->player = $player;
         $this->level = $level;
@@ -39,38 +25,22 @@ class NetworkLevel {
         $this->last_progress = $last_progress;
     }
 
-    /**
-     * @return RyzerPlayer
-     */
     public function getPlayer(): RyZerPlayer{
         return $this->player;
     }
 
-    /**
-     * @return int
-     */
     public function getLevel(): int{
         return $this->level;
     }
 
-    /**
-     * @return int
-     */
     public function getProgress(): int{
         return $this->progress;
     }
 
-    /**
-     * @return int
-     */
     public function getProgressToday(): int{
         return $this->progress_today;
     }
 
-    /**
-     * @param int|null $level
-     * @return int
-     */
     public function getProgressToLevelUp(?int $level = null): int {
         $level = ($level ?? $this->getLevel());
         return match (true) {
@@ -83,10 +53,6 @@ class NetworkLevel {
         };
     }
 
-    /**
-     * @param int|null $level
-     * @return string
-     */
     public function getLevelColor(int $level = null): string{
         $level = ($level ?? $this->getLevel());
         return match (true) {
@@ -99,17 +65,10 @@ class NetworkLevel {
         };
     }
 
-    /**
-     * @return int
-     */
     public function getProgressPercentage(): int {
         return (100 / $this->getProgressToLevelUp()) * $this->getProgress();
     }
 
-    /**
-     * @param int $level
-     * @param Closure|null $closure
-     */
     public function addLevel(int $level = 1, ?Closure $closure = null): void {
         $this->level += $level;
         NetworkLevelProvider::addLevel($this->getPlayer()->getPlayer()->getName(), $level, $closure);
@@ -117,9 +76,6 @@ class NetworkLevel {
         $this->initLevelUp();
     }
 
-    /**
-     * @return float|int
-     */
     public function getMultiplier(): float|int{
         $progress_today = $this->getProgressToday();
         return match (true) {
@@ -129,10 +85,6 @@ class NetworkLevel {
         };
     }
 
-    /**
-     * @param int $progress
-     * @param Closure|null $closure
-     */
     public function addProgress(int $progress, ?Closure $closure = null): void {
         if(ceil($this->last_progress / 86400) !== ceil(time() / 86400)) $this->progress_today = 0;
         $multiplier = $this->getMultiplier();
@@ -146,32 +98,20 @@ class NetworkLevel {
         NetworkLevelProvider::addLevelProgress($this->getPlayer()->getPlayer()->getName(), $progress, $this->progress_today, $closure);
         $this->getPlayer()->getPlayer()->sendMessage(TextFormat::DARK_GRAY."[".TextFormat::BLUE."XP".TextFormat::DARK_GRAY."] ".TextFormat::GREEN."+ $progress XP");
         while($this->checkLevelUp()){
-            //Nothing
+            //TODO: This should be fixed. Otherwise Matze will kill the server again
         }
         (new PlayerLevelProgressEvent($this->getPlayer()->getPlayer(), $progress))->call();
     }
 
-    /**
-     * @param int $xp
-     * @param Closure|null $closure
-     */
     public function addXP(int $xp, ?Closure $closure){
         $this->addProgress($xp, $closure);
     }
 
-    /**
-     * @param int $level
-     * @param Closure|null $closure
-     */
     public function setLevel(int $level, ?Closure $closure = null): void{
         $this->level = $level;
         NetworkLevelProvider::setLevel($this->getPlayer()->getPlayer()->getName(), $level, $closure);
     }
 
-    /**
-     * @param int $progress
-     * @param Closure|null $closure
-     */
     public function setProgress(int $progress, ?Closure $closure = null): void{
         $this->progress = $progress;
         NetworkLevelProvider::setLevelProgress($this->getPlayer()->getPlayer()->getName(), $progress, $closure);

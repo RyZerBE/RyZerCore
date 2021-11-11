@@ -5,11 +5,6 @@ namespace ryzerbe\core\util;
 use pocketmine\math\Vector3;
 
 class Vector3Utils {
-
-    /**
-     * @param Vector3 $vector3
-     * @return string
-     */
     public static function toString(Vector3 $vector3): string {
         return implode(":", [
             $vector3->x,
@@ -18,10 +13,6 @@ class Vector3Utils {
         ]);
     }
 
-    /**
-     * @param string $vector3
-     * @return Vector3
-     */
     public static function fromString(string $vector3): Vector3 {
         $vector3 = explode(":", $vector3);
         return new Vector3(
@@ -31,24 +22,12 @@ class Vector3Utils {
         );
     }
 
-    /**
-     * @param Vector3 $pos1
-     * @param Vector3 $pos2
-     * @param Vector3 $vector3
-     * @return bool
-     */
     public static function inArea(Vector3 $pos1, Vector3 $pos2, Vector3 $vector3): bool {
         if($vector3->x <= min($pos1->x, $pos2->x) or $vector3->x >= max($pos1->x, $pos2->x)) return false;
         if($vector3->y <= min($pos1->y, $pos2->y) or $vector3->y >= max($pos1->y, $pos2->y)) return false;
         return $vector3->z > min($pos1->z, $pos2->z) and $vector3->z < max($pos1->z, $pos2->z);
     }
 
-    /**
-     * @param Vector3 $pos1
-     * @param Vector3 $pos2
-     * @param Vector3 $vector3
-     * @return Vector3
-     */
     public static function getNearestVector(Vector3 $pos1, Vector3 $pos2, Vector3 $vector3): Vector3 {
         $nearestVector = null;
         for ($x = min($pos1->x, $pos2->x); $x <= max($pos1->x, $pos2->x); $x++) {

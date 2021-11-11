@@ -10,66 +10,41 @@ use pocketmine\Server;
 use ryzerbe\core\player\RyZerPlayer;
 use ryzerbe\core\player\RyZerPlayerProvider;
 
-class VanishProvider implements RyZerProvider{
-
-    /** @var array  */
+class VanishProvider implements RyZerProvider {
     public static array $vanishedPlayer = [];
 
-    /**
-     * @param RyzerPlayer $player
-     * @param bool $vanish
-     */
-    public static function vanishPlayer(RyZerPlayer $player, bool $vanish)
-    {
-        if($vanish) {
-            if(!in_array($player->getPlayer()->getName(), self::$vanishedPlayer)) {
+    public static function vanishPlayer(RyZerPlayer $player, bool $vanish){
+        if($vanish){
+            if(!in_array($player->getPlayer()->getName(), self::$vanishedPlayer)){
                 self::$vanishedPlayer[] = $player->getPlayer()->getName();
                 self::removePlayerFromTab($player->getPlayer());
             }
-
-            foreach (RyzerPlayerProvider::getRyzerPlayers() as $ryzerPlayer) {
+            foreach(RyzerPlayerProvider::getRyzerPlayers() as $ryzerPlayer){
                 if($ryzerPlayer->getRank()->getJoinPower() > $player->getRank()->getJoinPower()) continue;
-
                 $player->getPlayer()->despawnFrom($ryzerPlayer->getPlayer());
             }
-        } else {
+        }
+        else{
             self::addPlayerToTab($player->getPlayer());
             $player->getPlayer()->spawnToAll();
             unset(self::$vanishedPlayer[array_search($player->getPlayer()->getName(), self::$vanishedPlayer)]);
         }
     }
 
-    /**
-     * @param string $playerName
-     * @return bool
-     */
-    public static function isVanished(string $playerName): bool
-    {
-        return in_array($playerName, self::$vanishedPlayer);
-    }
-
-    /**
-     * @param Player $player
-     */
-    public static function removePlayerFromTab(Player $player): void
-    {
+    public static function removePlayerFromTab(Player $player): void{
         $entry = new PlayerListEntry();
         $pk = new PlayerListPacket();
         $uuid = $player->getUniqueId();
         $entry->uuid = $uuid;
         $pk->entries[] = $entry;
         $pk->type = PlayerListPacket::TYPE_REMOVE;
-        foreach(Server::getInstance()->getOnlinePlayers() as $players) {
+        foreach(Server::getInstance()->getOnlinePlayers() as $players){
             $players->sendDataPacket($pk);
         }
     }
 
-    /**
-     * @param Player $player
-     */
-    public static function addPlayerToTab(Player $player): void
-    {
-        $player->setNameTagVisible(TRUE);
+    public static function addPlayerToTab(Player $player): void{
+        $player->setNameTagVisible(true);
         $entry = new PlayerListEntry();
         $entry->uuid = $player->getUniqueId();
         $entry->entityUniqueId = $player->getId();
@@ -82,5 +57,9 @@ class VanishProvider implements RyZerProvider{
         foreach(Server::getInstance()->getOnlinePlayers() as $players){
             $players->sendDataPacket($pk);
         }
+    }
+
+    public static function isVanished(string $playerName): bool{
+        return in_array($playerName, self::$vanishedPlayer);
     }
 }

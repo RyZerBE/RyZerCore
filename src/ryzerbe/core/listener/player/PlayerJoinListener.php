@@ -1,6 +1,6 @@
 <?php
 
-namespace ryzerbe\core\listener;
+namespace ryzerbe\core\listener\player;
 
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
@@ -12,11 +12,7 @@ use ryzerbe\core\util\Settings;
 use function in_array;
 
 class PlayerJoinListener implements Listener {
-
-    /**
-     * @param PlayerJoinEvent $event
-     */
-    public function join(PlayerJoinEvent $event){
+    public function join(PlayerJoinEvent $event): void{
         $player = $event->getPlayer();
         if(!$player instanceof PMMPPlayer) return;
         if(!in_array($player->getAddress(), Settings::$ips)) {

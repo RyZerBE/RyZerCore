@@ -56,10 +56,6 @@ use UnexpectedValueException;
 use pocketmine\Player as PMPlayer;
 
 class PMMPPlayer extends PMPlayer {
-
-    /**
-     * @param string $reason
-     */
     public function kickFromProxy(string $reason): void{
         $pk = new PlayerDisconnectPacket();
         $pk->addData("playerName", $this->getPlayer()->getName());
@@ -67,9 +63,6 @@ class PMMPPlayer extends PMPlayer {
         CloudBridge::getInstance()->getClient()->getPacketHandler()->writePacket($pk);
     }
 
-    /**
-     * @param string $serverName
-     */
     public function connectServer(string $serverName){
         $pk = new PlayerMoveServerPacket();
         $pk->addData("playerNames", $this->getPlayer()->getName());
@@ -81,15 +74,11 @@ class PMMPPlayer extends PMPlayer {
         CloudBridge::getCloudProvider()->dispatchProxyCommand($this->getPlayer()->getName(), "hub");
     }
 
-    /**
-     * @return RyZerPlayer|null
-     */
     public function getRyZerPlayer(): ?RyZerPlayer{
         return RyZerPlayerProvider::getRyzerPlayer($this);
     }
 
-    public function handleInventoryTransaction(InventoryTransactionPacket $packet): bool
-    {
+    public function handleInventoryTransaction(InventoryTransactionPacket $packet): bool{
         if (!$this->spawned or !$this->isAlive()) {
             return false;
         }
@@ -472,8 +461,7 @@ class PMMPPlayer extends PMPlayer {
     }
 
 
-    public function knockBack(Entity $attacker, float $damage, float $x, float $z, float $base = 0.4): void
-    {
+    public function knockBack(Entity $attacker, float $damage, float $x, float $z, float $base = 0.4): void{
         $f = sqrt($x * $x + $z * $z);
         if($f <= 0){
             return;
@@ -619,15 +607,7 @@ class PMMPPlayer extends PMPlayer {
         return $handled;
     }
 
-    /**
-     * @param Position $source
-     * @param Item $item
-     * @param Vector3|null $motion
-     * @param int $delay
-     * @return Entity|null
-     */
-    public function dropItemForPlayer(Position $source, Item $item, Vector3 $motion = null, int $delay = 10)
-    {
+    public function dropItemForPlayer(Position $source, Item $item, Vector3 $motion = null, int $delay = 10): ?ItemEntity{
         $motion = $motion ?? new Vector3(lcg_value() * 0.2 - 0.1, 0.2, lcg_value() * 0.2 - 0.1);
         $itemTag = $item->nbtSerialize();
         $itemTag->setName("Item");
@@ -648,16 +628,14 @@ class PMMPPlayer extends PMPlayer {
         return null;
     }
 
-    public function applyDamageModifiers(EntityDamageEvent $source): void
-    {
+    public function applyDamageModifiers(EntityDamageEvent $source): void{
         if($this->getPlayer() == null) return;
         if($this->getPlayer()->isClosed()) return;
 
         parent::applyDamageModifiers($source);
     }
 
-    public function useLadder(): bool
-    {
+    public function useLadder(): bool{
         foreach ($this->getBlocksAround() as $block) {
             if($block->getId() === BlockIds::LADDER) return true;
         }

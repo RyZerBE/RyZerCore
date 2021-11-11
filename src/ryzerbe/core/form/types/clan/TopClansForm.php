@@ -7,24 +7,17 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class TopClansForm {
-
-    /**
-     * @param Player $player
-     * @param array $extraData
-     */
     public static function open(Player $player, array $extraData = []){
         $form = new SimpleForm(function(Player $player, $data) use ($extraData): void{
             if($data === null) return;
-
             SearchClanForm::sendFormAfterLoad($player->getName(), $data);
         });
-
         $i = 0;
-        foreach($extraData["top"] as $topClanName => $elo) {
+        foreach($extraData["top"] as $topClanName => $elo){
             $i++;
-            $form->addButton(TextFormat::RED.$i.". ".TextFormat::GOLD."$topClanName"."\n".TextFormat::YELLOW.$elo." Elo", -1, "", $topClanName);
+            $form->addButton(TextFormat::RED . $i . ". " . TextFormat::GOLD . "$topClanName" . "\n" . TextFormat::YELLOW . $elo . " Elo", -1, "", $topClanName);
         }
-        $form->setTitle(TextFormat::GOLD.TextFormat::BOLD."Clans");
+        $form->setTitle(TextFormat::GOLD . TextFormat::BOLD . "Clans");
         $form->sendToPlayer($player);
     }
 }

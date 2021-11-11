@@ -14,10 +14,6 @@ class SkinUtils {
     public const DEFAULT_GEOMETRY_NAME = "geometry.humanoid.custom";
     public const DEFAULT_GEOMETRY_SLIM_NAME = "geometry.humanoid.customSlim";
 
-    /**
-     * @param string $filePath
-     * @return string
-     */
     public static function fromImage(string $filePath): string{
         if(!is_file($filePath)) return "";
         $image = @imagecreatefrompng($filePath);

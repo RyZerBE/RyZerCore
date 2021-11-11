@@ -1,17 +1,14 @@
 <?php
 
-namespace ryzerbe\core\listener;
+namespace ryzerbe\core\listener\entity;
 
 use pocketmine\event\entity\ExplosionPrimeEvent;
 use pocketmine\event\Listener;
 use pocketmine\level\Position;
-use ryzerbe\core\util\TNTExplosion;
+use ryzerbe\core\level\TNTExplosion;
 
 class ExplosionPrimeListener implements Listener {
-    /**
-     * @param ExplosionPrimeEvent $ev
-     */
-    public function explosion(ExplosionPrimeEvent $ev){
+    public function explosion(ExplosionPrimeEvent $ev): void{
         $ev->setCancelled();
 
         $tnt = $ev->getEntity();

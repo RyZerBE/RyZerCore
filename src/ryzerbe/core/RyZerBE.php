@@ -38,20 +38,23 @@ use ryzerbe\core\provider\PunishmentProvider;
 use ryzerbe\core\provider\StaffProvider;
 use ryzerbe\core\rank\RankManager;
 use ryzerbe\core\task\RyZerUpdateTask;
+use ryzerbe\core\util\loader\ListenerDirectoryLoader;
 use ryzerbe\core\util\Settings;
 use function var_dump;
 
 class RyZerBE extends PluginBase {
+    public const PREFIX = TextFormat::WHITE.TextFormat::BOLD."RyZer".TextFormat::RED."BE ".TextFormat::RESET;
 
-    /** @var RyZerBE  */
     public static RyZerBE $plugin;
 
-    const PREFIX = TextFormat::WHITE.TextFormat::BOLD."RyZer".TextFormat::RED."BE ".TextFormat::RESET;
-
-    public function onEnable(){
+    /**
+     * @throws ReflectionException
+     */
+    public function onEnable(): void{
         self::$plugin = $this;
 
-        $this->initListener(__DIR__."/listener/");
+        ListenerDirectoryLoader::load($this, __DIR__ . "/listener/");
+
         $this->initCommands();
         $this->initBlocks();
         $this->initEntities();
@@ -62,7 +65,7 @@ class RyZerBE extends PluginBase {
         $this->boot();
     }
 
-    public function boot(){
+    public function boot(): void{
         LanguageProvider::fetchLanguages();
         NetworkLevelProvider::initRewards();
         RankManager::getInstance()->fetchRanks();
@@ -70,27 +73,6 @@ class RyZerBE extends PluginBase {
         PunishmentProvider::loadReasons();
 
         $this->getScheduler()->scheduleRepeatingTask(new RyZerUpdateTask(), 1);
-    }
-
-    /**
-     * @param string $directory
-     * @throws ReflectionException
-     */
-    private function initListener(string $directory): void{
-        foreach(scandir($directory) as $listener){
-            if($listener === "." || $listener === "..") continue;
-            if(is_dir($directory.$listener)){
-                $this->initListener($directory.$listener."/");
-                continue;
-            }
-            $dir = str_replace([$this->getFile()."src/", "/"], ["", "\\"], $directory);
-            $refClass = new ReflectionClass($dir.str_replace(".php", "", $listener));
-            $class = new ($refClass->getName());
-            if($class instanceof Listener){
-                $this->getServer()->getPluginManager()->registerEvents($class, $this);
-                $this->getLogger()->debug("Registered ".$refClass->getShortName()." listener");
-            }
-        }
     }
 
     private function initCommands(): void{
@@ -136,9 +118,6 @@ class RyZerBE extends PluginBase {
         BlockFactory::registerBlock(new TNTBlock(), true); //TEAM TNT
     }
 
-    /**
-     * @return RyZerBE
-     */
     public static function getPlugin(): RyZerBE{
         return self::$plugin;
     }
