@@ -53,7 +53,7 @@ class RyZerBE extends PluginBase {
     public function onEnable(): void{
         self::$plugin = $this;
 
-        ListenerDirectoryLoader::load($this, __DIR__ . "/listener/");
+        ListenerDirectoryLoader::load($this, $this->getFile(), __DIR__ . "/listener/");
 
         $this->initCommands();
         $this->initBlocks();
