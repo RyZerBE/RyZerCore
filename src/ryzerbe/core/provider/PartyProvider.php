@@ -81,7 +81,7 @@ class PartyProvider implements RyZerProvider {
 
         $members = [];
         while($data = $res->fetch_assoc()) {
-            if((new DateTime($data["time"]))->diff(new DateTime())->m >= 1){
+            if((new DateTime($data["time"]))->diff(new DateTime())->i >= 1){
                 self::removeRequest($mysqli, $data["party"], $player);
                 continue;
             }

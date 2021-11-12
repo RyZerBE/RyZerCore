@@ -29,12 +29,13 @@ class VerifyCommand extends Command {
                 for($i = 0; $i < 5; $i++){
                     $token .= $characters[rand(0, $charactersLength - 1)];
                 }
-                $mysqli->query("INSERT INTO `verify`(`player`, `token`, `verified`) VALUES ('$playerName', '$token', '')");
+                $mysqli->query("INSERT INTO `verify`(`player`, `token`, `verified`) VALUES ('$playerName', '$token', 'false')");
                 return ["token" => $token, "verified" => false];
             }
+            $data = $res->fetch_assoc();
             return [
-                "token" => $res->fetch_assoc()["token"] ?? "???",
-                "verified" => $res->fetch_assoc()["verified"] !== "false",
+                "token" => $data["token"] ?? "???",
+                "verified" => $data["verified"] !== "false",
             ];
         }, function(Server $server, array $result) use ($playerName): void{
             $player = $server->getPlayerExact($playerName);

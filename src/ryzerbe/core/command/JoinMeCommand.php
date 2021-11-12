@@ -36,7 +36,7 @@ class JoinMeCommand extends Command {
             $joinMe = [];
             if($res->num_rows > 0){
                 while($data = $res->fetch_assoc()){
-                    if((new DateTime($data["time"]))->diff(new DateTime())->m >= 1){
+                    if((new DateTime($data["time"]))->diff(new DateTime())->i >= 1){
                         $mysqli->query("DELETE FROM joinme WHERE player='" . $data["player"] . "'");
                         continue;
                     }
