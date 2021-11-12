@@ -5,6 +5,7 @@ namespace ryzerbe\core\command;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\utils\TextFormat;
+use ryzerbe\core\form\types\punishment\PunishmentMainForm;
 use ryzerbe\core\player\PMMPPlayer;
 use ryzerbe\core\provider\PunishmentProvider;
 use ryzerbe\core\RyZerBE;
@@ -23,15 +24,15 @@ class BanCommand extends Command {
     public function execute(CommandSender $sender, string $commandLabel, array $args): void{
         if(!$this->testPermission($sender)) return;
         if(empty($args[0]) && $sender instanceof PMMPPlayer){
-            //TODO: MAYBE BAN UI?
+            PunishmentMainForm::onOpen($sender);
             $sender->sendMessage(RyZerBE::PREFIX . TextFormat::YELLOW . "/ban <PlayerName> <BanId>");
             return;
         }
         $playerName = $args[0];
-        /*if(in_array($playerName, self::CANNOT_BANNED)) {
+        if(in_array($playerName, self::CANNOT_BANNED)) {
             $sender->sendMessage(RyZerBE::PREFIX.TextFormat::RED."Dieser Spieler ist geschützt und kann daher nicht gebannt werden!");
             return;
-        }*/ //TODO: ADD IF TEST IS OVER!
+        }
         if(empty($args[1])){
             $i = 0;
             foreach(PunishmentProvider::getPunishmentReasons() as $banReason){

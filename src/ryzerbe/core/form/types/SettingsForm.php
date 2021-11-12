@@ -8,6 +8,7 @@ use pocketmine\utils\TextFormat;
 use ryzerbe\core\player\RyZerPlayerProvider;
 
 class SettingsForm {
+
     public static function onOpen(Player $player): void{
         $ryzerPlayer = RyZerPlayerProvider::getRyzerPlayer($player);
         if($ryzerPlayer === null) return;

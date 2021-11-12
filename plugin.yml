@@ -38,6 +38,8 @@ permissions:
     default: op
   ryzer.banentryreset:
     default: op
+  ryzer.ban.edit.reasons:
+    default: op
   ryzer.kick:
     default: op
   ryzer.joinme:

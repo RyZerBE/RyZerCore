@@ -7,6 +7,7 @@ use BauboLP\Cloud\Packets\PlayerDisconnectPacket;
 use DateTime;
 use Exception;
 use mysqli;
+use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\RyZerBE;
@@ -56,12 +57,30 @@ class PunishmentProvider implements RyZerProvider {
         });
     }
 
-    public static function addReason(PunishmentReason $punishmentReason): void{
+    public static function addReason(PunishmentReason $punishmentReason, bool $mysql = false): void{
         self::$punishmentReasons[] = $punishmentReason;
+        if($mysql) {
+            $name = $punishmentReason->getReasonName();
+            $days = $punishmentReason->getDays();
+            $hours = $punishmentReason->getHours();
+            $type = $punishmentReason->getType();
+            AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($name, $type, $hours, $days): void{
+                $mysqli->query("INSERT INTO `punishids`(`reason`, `hours`, `days`, `type`) VALUES ('$name', '$hours', '$days', '$type')");
+            });
+        }
     }
 
-    public static function removeReason(PunishmentReason $punishmentReason): void{
+    public static function removeReason(PunishmentReason $punishmentReason, bool $mysql = false): void{
         unset(self::$punishmentReasons[array_search($punishmentReason, self::$punishmentReasons)]);
+        $name = $punishmentReason->getReasonName();
+        $days = $punishmentReason->getDays();
+        $hours = $punishmentReason->getHours();
+        $type = $punishmentReason->getType();
+        if($mysql) {
+            AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($name, $type, $hours, $days): void{
+                $mysqli->query("DELETE FROM `punishids` WHERE reason='$name' AND type='$type' AND hours='$hours' AND days='$days'");
+            });
+        }
     }
 
     /**
