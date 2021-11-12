@@ -151,10 +151,8 @@ class RyZerPlayer {
 
             $res = $mysqli->query("SELECT * FROM playerranks WHERE player='$playerName'");
             if($res->num_rows > 0){
-                $playerData["rank"] = $res->fetch_assoc()["rank"] ?? "Player";
+                $playerData["rank"] = $res->fetch_assoc()["rankname"] ?? "Player";
                 $playerData["permissions"] = $res->fetch_assoc()["permissions"] ?? "";
-            }else{
-                $mysqli->query("INSERT INTO `playerranks`(`player`) VALUES ('$playerName')");
             }
 
             $res = $mysqli->query("SELECT * FROM gametime WHERE player='$playerName'");

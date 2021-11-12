@@ -24,7 +24,7 @@ class UnbanCommand extends Command {
         }
         $playerName = $args[0];
         $type = strtolower($args[1]);
-        $reason = $args[2];
+        $reason = $args[2] ?? "";
         if($type !== "mute" && $type !== "ban"){
             $sender->sendMessage(RyZerBE::PREFIX . TextFormat::RED . "Bitte nutze einen validen Type. (Ban|Mute)");
             return;
