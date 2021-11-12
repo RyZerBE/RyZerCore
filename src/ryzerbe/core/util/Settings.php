@@ -7,7 +7,6 @@ use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
 use ryzerbe\core\util\async\AsyncExecutor;
 use function file_exists;
-use function var_dump;
 
 class Settings {
     use SingletonTrait;
@@ -55,6 +54,7 @@ class Settings {
             $mysqli->query("CREATE TABLE IF NOT EXISTS `gametime` (`player` VARCHAR(32) KEY NOT NULL, `ticks` INT NOT NULL DEFAULT '0') ENGINE = InnoDB");
             $mysqli->query("CREATE TABLE IF NOT EXISTS `verify` ( `player` VARCHAR(32) NOT NULL , `token` VARCHAR(8) NOT NULL , `verified` TEXT NOT NULL ) ENGINE = InnoDB;");
             $mysqli->query("CREATE TABLE IF NOT EXISTS `joinme` (`player` VARCHAR(32) KEY NOT NULL, `server` VARCHAR(8) NOT NULL, time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP) ENGINE = InnoDB");
+            $mysqli->query("CREATE TABLE IF NOT EXISTS `proofs` (`id` INT KEY NOT NULL, `message_id` TEXT NOT NULL) ENGINE = InnoDB");
             $mysqli->query("CREATE TABLE IF NOT EXISTS `vanish` (`player` VARCHAR(32) KEY NOT NULL) ENGINE = InnoDB");
             $mysqli->query("CREATE TABLE IF NOT EXISTS `staffs` (`player` VARCHAR(32) KEY NOT NULL) ENGINE = InnoDB");
             $mysqli->query("CREATE TABLE IF NOT EXISTS `playerranks` (`player` VARCHAR(32) NOT NULL, `rankname` VARCHAR(16) NOT NULL DEFAULT 'Player', `permissions` TEXT NOT NULL) ENGINE = InnoDB");

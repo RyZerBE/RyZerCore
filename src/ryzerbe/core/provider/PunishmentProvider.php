@@ -76,6 +76,12 @@ class PunishmentProvider implements RyZerProvider {
         }
         AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($playerName, $staff, $unbanFormat, $type, $reasonName): void{
             $mysqli->query("INSERT INTO `punishments`(`player`, `created_by`, `until`, `type`, `reason`) VALUES ('$playerName', '$staff', '$unbanFormat', '$type', '$reasonName')");
+
+            $res = $mysqli->query("SELECT id FROM `punishments` WHERE player='$playerName' AND type='$type' AND until='$unbanFormat'");
+            if($res->num_rows <= 0) return;
+            $id = $res->fetch_assoc()["id"] ?? null;
+            if($id === null) return;
+            $mysqli->query("INSERT INTO `proofs`(`id`, `message_id`) VALUES ('$id', '')");
         }, function(Server $server, $result) use ($type, $reasonName, $playerName, $staff, $unbanFormat): void{
             $discordMessage = new DiscordMessage(WebhookLinks::PUNISHMENT_LOG);
             $discordEmbed = new DiscordEmbed();
