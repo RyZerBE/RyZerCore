@@ -230,6 +230,17 @@ class RyZerPlayer {
                 if($party !== null) $playerData["party_members"] = PartyProvider::getPartyMembers($mysqli, $party);
             }
 
+            $res = $mysqli->query("SELECT * FROM player_settings WHERE player='$playerName'");
+            if($res->num_rows > 0) {
+                while ($data = $res->fetch_assoc()) {
+                    $playerData["msg_toggle"] = $data["msg_toggle"];
+                    $playerData["party_requests"] = $data["party_requests"];
+                    $playerData["friend_requests"] = $data["friend_requests"];
+                    $playerData["toggle_rank"] = $data["toggle_rank"];
+                    $playerData["more_particle"] = $data["more_particle"];
+                }
+            }
+
             $lobby->close();
             $clanDB->close();
             return $playerData;
@@ -273,6 +284,15 @@ class RyZerPlayer {
                 $ryzerPlayer->setClan(new Clan($playerData["clan"], $playerData["clanColor"].$playerData["clanTag"], (int)$playerData["clanElo"], $playerData["owner"]));
             }
 
+
+            if(isset($playerData["more_particle"])) {
+                $ryzerPlayer->getPlayerSettings()->setMoreParticle($playerData["more_particle"]);
+                $ryzerPlayer->getPlayerSettings()->setToggleRank($playerData["toggle_rank"]);
+                $ryzerPlayer->getPlayerSettings()->setFriendRequestsEnabled($playerData["friend_requests"]);
+                $ryzerPlayer->getPlayerSettings()->setPartyInvitesEnabled($playerData["party_requests"]);
+                $ryzerPlayer->getPlayerSettings()->setMsgEnabled($playerData["msg_toggle"]);
+            }
+
             if(isset($playerData["party_members"]) && stripos(CloudProvider::getServer(), "CWBW") === false) {
                 $pk = new PlayerMoveServerPacket();
                 $pk->addData("playerNames", implode(":", $playerData["party_members"]));
@@ -288,9 +308,17 @@ class RyZerPlayer {
     public function saveData(): void{
         $gameTimeTicks = $this->getGameTimeTicks();
         $playerName = $this->getPlayer()->getName();
+        
+        $settings = $this->getPlayerSettings();
+        $more_particle = $settings->isMoreParticleActivated();
+        $party_invites = $settings->isPartyInvitesEnabled();
+        $friend_requests = $settings->isFriendRequestsEnabled();
+        $msg_toggle = $settings->isMsgEnabled();
+        $toggleRank = $settings->isRankToggled();
 
-        AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($gameTimeTicks, $playerName): void{
+        AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($gameTimeTicks, $playerName, $more_particle, $party_invites, $friend_requests, $msg_toggle, $toggleRank): void{
             $mysqli->query("UPDATE gametime SET ticks='$gameTimeTicks' WHERE player='$playerName'");
+            $mysqli->query("INSERT INTO `player_settings`(`player`, `more_particle`, `party_requests`, `friend_requests`, `msg_toggle`, `toggle_rank`) VALUES ('$playerName', '$more_particle', '$party_invites', '$friend_requests', '$msg_toggle', '$toggleRank') ON DUPLICATE KEY UPDATE more_particle='$more_particle','party_requests'='$party_invites',`friend_requests`='$friend_requests',`msg_toggle`='$msg_toggle',`toggle_rank`='$toggleRank'");
         });
     }
 
@@ -301,7 +329,7 @@ class RyZerPlayer {
             AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($languageName, $playerName): void{
                 $mysqli->query("UPDATE playerlanguage SET language='$languageName' WHERE player='$playerName'");
             });
-        } //todo: save settings
+        }
     }
 
     public function getLanguageName(): string{
