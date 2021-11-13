@@ -37,6 +37,7 @@ use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\player\networklevel\NetworkLevelProvider;
 use ryzerbe\core\provider\PunishmentProvider;
 use ryzerbe\core\provider\StaffProvider;
+use ryzerbe\core\provider\VIPJoinProvider;
 use ryzerbe\core\rank\RankManager;
 use ryzerbe\core\task\RyZerUpdateTask;
 use ryzerbe\core\util\loader\ListenerDirectoryLoader;
@@ -73,6 +74,7 @@ class RyZerBE extends PluginBase {
         StaffProvider::refresh();
         PunishmentProvider::loadReasons();
 
+        $this->getServer()->getPluginManager()->registerEvents(new VIPJoinProvider(), $this);
         $this->getScheduler()->scheduleRepeatingTask(new RyZerUpdateTask(), 1);
     }
 
