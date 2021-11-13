@@ -115,7 +115,16 @@ class RyZerPlayer {
     public function loadData(): void{
         $playerName = $this->getPlayer()->getName();
         $mysqlData = Settings::$mysqlLoginData;
-        AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($playerName, $mysqlData): array{
+        $loginPlayerData = $this->getLoginPlayerData();
+        $address = $loginPlayerData->getAddress();
+        $mc_id = $loginPlayerData->getMinecraftId();
+        $device_id = $loginPlayerData->getDeviceId();
+        $device_os = $loginPlayerData->getDeviceOs();
+        $device_input = $loginPlayerData->getCurrentInputMode();
+        $server = CloudProvider::getServer();
+        $nowFormat = (new DateTime())->format("Y-m-d H:i");
+
+        AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($playerName, $mysqlData, $address, $device_os, $device_id, $device_input, $mc_id, $server, $nowFormat): array{
             $playerData = [];
             $res = $mysqli->query("SELECT * FROM playerlanguage WHERE player='$playerName'");
             if($res->num_rows > 0){
@@ -140,6 +149,8 @@ class RyZerPlayer {
                     }
                 }
             }
+
+            $mysqli->query("INSERT INTO `playerdata`(`player`, `ip_address`, `device_id`, `device_os`, `device_input`, `server`, `last_join`, `minecraft_id`) VALUES ('$playerName', '$address', '$device_id', '$device_os', '$device_input', '$server', '$nowFormat', '$mc_id') ON DUPLICATE KEY UPDATE device_id='$device_id',device_os='$device_os',device_input='$device_input',server='$server',last_join='$nowFormat',minecraft_id='$mc_id'");
 
             $res = $mysqli->query("SELECT * FROM coins WHERE player='$playerName'");
             if($res->num_rows > 0){

@@ -33,6 +33,7 @@ use ryzerbe\core\command\VerifyCommand;
 use ryzerbe\core\command\YouTubeCommand;
 use ryzerbe\core\entity\Arrow;
 use ryzerbe\core\entity\EnderPearl;
+use ryzerbe\core\form\types\PlayerSettingsForm;
 use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\player\networklevel\NetworkLevelProvider;
 use ryzerbe\core\provider\PunishmentProvider;
@@ -109,7 +110,8 @@ class RyZerBE extends PluginBase {
             new JoinMeCommand(),
             new LoginCommand(),
             new PartyCommand(),
-            new NetworkLevelCommand()
+            new NetworkLevelCommand(),
+            new PlayerSettingsForm()
         ]);
     }
 

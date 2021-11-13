@@ -45,6 +45,7 @@ class LoginPlayerData {
     private string $skin_id;
     private int $ui_profile;
     private string $address;
+    private string $minecraft_id;
 
     /** @var string[] */
     private array $deviceOSValues = [
@@ -94,6 +95,7 @@ class LoginPlayerData {
         $this->skin_id = $data["SkinId"] ?? 1;
         $this->ui_profile = $data["UIProfile"] ?? 1;
         $this->address = $data['Waterdog_IP'] ?? "0.0.0.0";
+        $this->minecraft_id = $data["PlayFabId"];
         if(trim($this->getDeviceModel()) == ''){
             switch($this->getDeviceOs()){
                 case self::ANDROID:
@@ -194,5 +196,12 @@ class LoginPlayerData {
 
     public function getCurrentInputMode(): int{
         return $this->current_input_mode;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMinecraftId(): string{
+        return $this->minecraft_id;
     }
 }
