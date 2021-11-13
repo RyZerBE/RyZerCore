@@ -44,3 +44,5 @@ permissions:
     default: op
   ryzer.joinme:
     default: op
+  ryzer.togglerank:
+    default: op

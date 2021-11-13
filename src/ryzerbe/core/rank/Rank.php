@@ -57,7 +57,7 @@ class Rank {
         $this->permissions[] = $permission;
         if(!$mysql) return;
 
-        $permString = implode(";", $this->permissions);
+        $permString = implode(":", $this->permissions);
         $rankName = $this->rankName;
         AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($permString, $rankName): void{
             $mysqli->query("UPDATE `ranks` SET permissions='$permString' WHERE rankname='$rankName'");

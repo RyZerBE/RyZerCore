@@ -30,7 +30,7 @@ class PlayerSettingsForm {
             $party_invites = $data["party_invites"];
             $friend_requests = $data["friend_requests"];
             $msg_toggle = $data["msg_toggle"];
-            $rankToggle = $data["rank_toggle"];
+            $rankToggle = $data["rank_toggle"] ?? false;
 
             $rbePlayer->getPlayerSettings()->setMoreParticle($more_particle);
             $rbePlayer->getPlayerSettings()->setPartyInvitesEnabled($party_invites);

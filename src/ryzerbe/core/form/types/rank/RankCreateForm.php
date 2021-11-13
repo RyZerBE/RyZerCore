@@ -24,7 +24,7 @@ class RankCreateForm {
         $backupRank = RankManager::getInstance()->getBackupRank();
         $form->addInput(TextFormat::RED . "Name of the rank", $backupRank->getRankName(), "", "name");
         $form->addInput(TextFormat::RED . "Nametag of rank", "", str_replace("§", "&", $backupRank->getNameTag()), "nametag");
-        $form->addInput(TextFormat::RED . "Chatprefix of rank", "", str_replace("§", "&", $backupRank->getChatPrefix()), "chatperfix");
+        $form->addInput(TextFormat::RED . "Chatprefix of rank", "", str_replace("§", "&", $backupRank->getChatPrefix()), "chatprefix");
         $form->addDropdown(TextFormat::RED . "Color of rank", [
             "&1",
             "&2",
@@ -41,6 +41,7 @@ class RankCreateForm {
             "&g",
             "&a",
             "&d",
+            "&b"
         ], null, "color");
         $form->addInput(TextFormat::RED . "JoinPower of rank", "", "0", "joinpower");
         $form->sendToPlayer($player);

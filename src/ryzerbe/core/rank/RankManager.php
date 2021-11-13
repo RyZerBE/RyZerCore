@@ -8,6 +8,7 @@ use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\util\async\AsyncExecutor;
+use function explode;
 use function str_replace;
 
 class RankManager {
@@ -60,14 +61,14 @@ class RankManager {
             $ranks = [];
             if($result->num_rows > 0){
                 while($data = $result->fetch_assoc()){
-                    $ranks[$data['rankname']] = ['nametag' => $data['nametag'], 'chatprefix' => $data['chatprefix'], 'permissions' => explode(":", $data['permissions']), 'joinPower' => $data['joinpower'], "color" => $data["color"]];
+                    $ranks[$data['rankname']] = ['nametag' => $data['nametag'], 'chatprefix' => $data['chatprefix'], 'permissions' => $data['permissions'], 'joinPower' => $data['joinpower'], "color" => $data["color"]];
                 }
             }
 
             return $ranks;
         }, function(Server $server, array $rankResult){
             foreach($rankResult as $rankName => $data){
-                $rank = new Rank($rankName, str_replace("&", TextFormat::ESCAPE, $data["nametag"]), str_replace("&", TextFormat::ESCAPE, $data["chatprefix"]), str_replace("&", TextFormat::ESCAPE, $data["color"]), $data["joinPower"], $data["permissions"]);
+                $rank = new Rank($rankName, str_replace("&", TextFormat::ESCAPE, $data["nametag"]), str_replace("&", TextFormat::ESCAPE, $data["chatprefix"]), str_replace("&", TextFormat::ESCAPE, $data["color"]), $data["joinPower"], explode(":", $data["permissions"]));
                 RankManager::getInstance()->addRank($rank);
             }
         });
