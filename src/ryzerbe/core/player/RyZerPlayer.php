@@ -321,15 +321,15 @@ class RyZerPlayer {
         $playerName = $this->getPlayer()->getName();
         
         $settings = $this->getPlayerSettings();
-        $more_particle = $settings->isMoreParticleActivated();
-        $party_invites = $settings->isPartyInvitesEnabled();
-        $friend_requests = $settings->isFriendRequestsEnabled();
-        $msg_toggle = $settings->isMsgEnabled();
-        $toggleRank = $settings->isRankToggled();
+        $more_particle = (int)$settings->isMoreParticleActivated();
+        $party_invites = (int)$settings->isPartyInvitesEnabled();
+        $friend_requests = (int)$settings->isFriendRequestsEnabled();
+        $msg_toggle = (int)$settings->isMsgEnabled();
+        $toggleRank = (int)$settings->isRankToggled();
 
         AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($gameTimeTicks, $playerName, $more_particle, $party_invites, $friend_requests, $msg_toggle, $toggleRank): void{
             $mysqli->query("UPDATE gametime SET ticks='$gameTimeTicks' WHERE player='$playerName'");
-            $mysqli->query("INSERT INTO `player_settings`(`player`, `more_particle`, `party_requests`, `friend_requests`, `msg_toggle`, `toggle_rank`) VALUES ('$playerName', '$more_particle', '$party_invites', '$friend_requests', '$msg_toggle', '$toggleRank') ON DUPLICATE KEY UPDATE more_particle='$more_particle','party_requests'='$party_invites',`friend_requests`='$friend_requests',`msg_toggle`='$msg_toggle',`toggle_rank`='$toggleRank'");
+            $mysqli->query("INSERT INTO `player_settings`(`player`, `more_particle`, `party_requests`, `friend_requests`, `msg_toggle`, `toggle_rank`) VALUES ('$playerName', '$more_particle', '$party_invites', '$friend_requests', '$msg_toggle', '$toggleRank') ON DUPLICATE KEY UPDATE more_particle='$more_particle',party_requests='$party_invites',friend_requests='$friend_requests',msg_toggle='$msg_toggle',toggle_rank='$toggleRank'");
         });
     }
 

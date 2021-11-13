@@ -4,10 +4,8 @@ namespace ryzerbe\core;
 
 use pocketmine\block\BlockFactory;
 use pocketmine\entity\Entity;
-use pocketmine\event\Listener;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\TextFormat;
-use ReflectionClass;
 use ReflectionException;
 use ryzerbe\core\block\TNTBlock;
 use ryzerbe\core\command\BanCommand;
@@ -23,9 +21,9 @@ use ryzerbe\core\command\LanguageCommand;
 use ryzerbe\core\command\LoginCommand;
 use ryzerbe\core\command\NetworkLevelCommand;
 use ryzerbe\core\command\PartyCommand;
+use ryzerbe\core\command\PlayerSettingsCommand;
 use ryzerbe\core\command\PunishHistoryCommand;
 use ryzerbe\core\command\RankCommand;
-use ryzerbe\core\command\SettingsCommand;
 use ryzerbe\core\command\TeamchatCommand;
 use ryzerbe\core\command\UnbanCommand;
 use ryzerbe\core\command\VanishCommand;
@@ -33,7 +31,6 @@ use ryzerbe\core\command\VerifyCommand;
 use ryzerbe\core\command\YouTubeCommand;
 use ryzerbe\core\entity\Arrow;
 use ryzerbe\core\entity\EnderPearl;
-use ryzerbe\core\form\types\PlayerSettingsForm;
 use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\player\networklevel\NetworkLevelProvider;
 use ryzerbe\core\provider\PunishmentProvider;
@@ -43,7 +40,6 @@ use ryzerbe\core\rank\RankManager;
 use ryzerbe\core\task\RyZerUpdateTask;
 use ryzerbe\core\util\loader\ListenerDirectoryLoader;
 use ryzerbe\core\util\Settings;
-use function var_dump;
 
 class RyZerBE extends PluginBase {
     public const PREFIX = TextFormat::WHITE.TextFormat::BOLD."RyZer".TextFormat::RED."BE ".TextFormat::RESET;
@@ -99,7 +95,6 @@ class RyZerBE extends PluginBase {
             new ClanUiCommand(),
             new CoinCommand(),
             new GamemodeCommand(),
-            new SettingsCommand(),
             new TeamchatCommand(),
             new YouTubeCommand(),
             new BanCommand(),
@@ -111,7 +106,7 @@ class RyZerBE extends PluginBase {
             new LoginCommand(),
             new PartyCommand(),
             new NetworkLevelCommand(),
-            new PlayerSettingsForm()
+            new PlayerSettingsCommand()
         ]);
     }
 
