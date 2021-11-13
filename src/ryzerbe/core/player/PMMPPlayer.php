@@ -54,8 +54,29 @@ use pocketmine\utils\TextFormat;
 use ryzerbe\core\util\Settings;
 use UnexpectedValueException;
 use pocketmine\Player as PMPlayer;
+use function microtime;
 
 class PMMPPlayer extends PMPlayer {
+    /** @var array  */
+    private array $delay = [];
+
+    public function addDelay(string $id, int|float $seconds){
+        $this->delay[$id] = microtime(true) + $seconds;
+    }
+
+    /**
+     * @param string $id
+     */
+    public function removeDelay(string $id){
+        unset($this->delay[$id]);
+    }
+
+    public function hasDelay(string $id): bool{
+        if(empty($this->delay[$id])) return false;
+
+        return $this->delay[$id] > microtime(true);
+    }
+
     public function kickFromProxy(string $reason): void{
         $pk = new PlayerDisconnectPacket();
         $pk->addData("playerName", $this->getPlayer()->getName());
