@@ -48,7 +48,7 @@ class LoginPlayerData {
     private string $minecraft_id;
 
     /** @var string[] */
-    private array $deviceOSValues = [
+    public static array $deviceOSValues = [
         self::ANDROID => 'Android',
         self::IOS => 'iOS',
         self::OSX => 'OSX',
@@ -66,7 +66,7 @@ class LoginPlayerData {
     ];
 
     /** @var string[] */
-    private array $inputValues = [
+    public static array $inputValues = [
         self::KEYBOARD => 'Keyboard',
         self::TOUCH => 'Touch',
         self::CONTROLLER => 'Controller',
@@ -187,11 +187,11 @@ class LoginPlayerData {
     }
 
     public function getDeviceOsName(): string{
-        return $this->deviceOSValues[$this->getDeviceOs()] ?? "???";
+        return self::$deviceOSValues[$this->getDeviceOs()] ?? "???";
     }
 
     public function getOsInputName(): string{
-        return $this->inputValues[$this->getCurrentInputMode()] ?? "???";
+        return self::$inputValues[$this->getCurrentInputMode()] ?? "???";
     }
 
     public function getCurrentInputMode(): int{

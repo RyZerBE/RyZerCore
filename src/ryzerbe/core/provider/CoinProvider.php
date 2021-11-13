@@ -20,7 +20,7 @@ class CoinProvider implements RyZerProvider {
             if($ryzerPlayer === null) return;
 
             $ryzerPlayer->addCoins($coins);
-            $ryzerPlayer->getPlayer()->sendMessage(Ryzer::PREFIX.LanguageProvider::getMessageContainer('added-coins', $ryzerPlayer->getPlayer()->getName(), ['#coins' => $coins." Coins"]));
+            $ryzerPlayer->getPlayer()->sendMessage(RyZerBE::PREFIX.LanguageProvider::getMessageContainer('added-coins', $ryzerPlayer->getPlayer()->getName(), ['#coins' => $coins." Coins"]));
             $ev = new PlayerCoinsAddEvent($ryzerPlayer->getPlayer(), $coins);
             $ev->call();
         });

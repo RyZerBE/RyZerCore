@@ -46,3 +46,5 @@ permissions:
     default: op
   ryzer.togglerank:
     default: op
+  ryzer.userinfo:
+    default: op

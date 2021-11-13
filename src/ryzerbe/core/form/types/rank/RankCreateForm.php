@@ -13,10 +13,28 @@ class RankCreateForm {
     public static function onOpen(Player $player): void{
         $form = new CustomForm(function(Player $player, $data): void{
             if($data === null) return;
+            $colors = [
+                "&1",
+                "&2",
+                "&3",
+                "&4",
+                "&5",
+                "&6",
+                "&7",
+                "&8",
+                "&9",
+                "&f",
+                "&c",
+                "&e",
+                "&g",
+                "&a",
+                "&d",
+                "&b"
+            ];
             $rankName = $data["name"];
             $nameTag = $data["nametag"];
             $chatPrefix = $data["chatprefix"];
-            $color = "&" . $data["color"] + 1;
+            $color = $colors[$data["color"]];
             $joinPower = (int)$data["joinpower"];
             RankManager::getInstance()->createRank($rankName, $nameTag, $chatPrefix, $color, $joinPower);
             $player->sendMessage(RyZerBE::PREFIX . TextFormat::GRAY . "Der Rang " . (str_replace("&", TextFormat::ESCAPE, $color)) . $rankName . TextFormat::RESET . TextFormat::GRAY . " wurde " . TextFormat::GREEN . "erstellt.");

@@ -20,7 +20,7 @@ class RankManager {
     public array $ranks = [];
 
     public function __construct(){
-        $this->backupRank = new Rank("Player", "§f{player_name}", "§fS §8× §7{player_name} §8» §7{MSG}", "§f", 0, []);
+        $this->backupRank = new Rank("Player", "§f{player_name}", "§fS §8× §7{player_name} §8» §8{MSG}", "§f", 0, []);
     }
 
     public function getBackupRank(): Rank{

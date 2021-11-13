@@ -64,8 +64,10 @@ class PartyMainForm {
                         $form->addButton(TextFormat::RED . "Leave Party", 0, "textures/ui/crossout.png", "leave");
                         break;
                     case PartyProvider::PARTY_ROLE_MODERATOR:
+                        $form->addButton(TextFormat::GREEN . "Invite player", 0, "textures/ui/anvil-plus.png", "invite");
                         break;
                     case PartyProvider::PARTY_ROLE_LEADER:
+                        $form->addButton(TextFormat::GREEN . "Invite player", 0, "textures/ui/anvil-plus.png", "invite");
                         break;
                 }
                 $form->addButton(TextFormat::RED . "Leave Party", 0, "textures/ui/crossout.png", "leave");

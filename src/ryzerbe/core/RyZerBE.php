@@ -27,6 +27,7 @@ use ryzerbe\core\command\PunishHistoryCommand;
 use ryzerbe\core\command\RankCommand;
 use ryzerbe\core\command\TeamchatCommand;
 use ryzerbe\core\command\UnbanCommand;
+use ryzerbe\core\command\UserInfoCommand;
 use ryzerbe\core\command\VanishCommand;
 use ryzerbe\core\command\VerifyCommand;
 use ryzerbe\core\command\YouTubeCommand;
@@ -108,7 +109,8 @@ class RyZerBE extends PluginBase {
             new PartyCommand(),
             new NetworkLevelCommand(),
             new PlayerSettingsCommand(),
-            new ChunkFixCommand()
+            new ChunkFixCommand(),
+            new UserInfoCommand()
         ]);
     }
 

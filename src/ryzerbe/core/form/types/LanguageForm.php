@@ -77,11 +77,12 @@ class LanguageForm {
                                                 });
                                                 $form->setContent("Folgende Keys sind in der Sprache " . $language . " noch nicht übersetzt.");
                                                 $german = LanguageProvider::getLanguage("Deutsch");
+                                                $language = LanguageProvider::getLanguage($language);
                                                 foreach($german->getTranslations() as $key => $translation){
-                                                    if($german->getMessageByKey($key) !== null) continue;
+                                                    if($language->getMessageByKey($key) !== null) continue;
                                                     $form->addButton($key, -1, "", $key);
                                                 }
-                                                $form->setTitle(TextFormat::GOLD . $language);
+                                                $form->setTitle(TextFormat::GOLD . $language->getLanguageName());
                                                 $form->sendToPlayer($player);
                                                 break;
                                         }

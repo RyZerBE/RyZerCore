@@ -23,6 +23,8 @@ class PlayerQuitNetworkListener implements Listener {
            }else {
                PartyProvider::leaveParty($mysqli, $playerName, $party);
            }
+
+           $mysqli->query("UPDATE `playerdata` SET server='?' WHERE player='$playerName'");
        });
     }
 }

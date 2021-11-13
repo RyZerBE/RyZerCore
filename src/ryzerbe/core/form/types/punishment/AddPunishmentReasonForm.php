@@ -26,7 +26,7 @@ class AddPunishmentReasonForm {
             $days = (int)$data["days"];
             $hours = (int)$data["hours"];
             $type = (int)$data["type"];
-            PunishmentProvider::addReason(new PunishmentReason($reasonName, $days, $hours, $type));
+            PunishmentProvider::addReason(new PunishmentReason($reasonName, $days, $hours, $type), true);
             $player->sendMessage(RyZerBE::PREFIX.TextFormat::GRAY."Der Grund ".TextFormat::GOLD.$reasonName.TextFormat::GRAY." wurde ".TextFormat::GREEN."hinzugefügt");
         });
         $form->setTitle(TextFormat::RED . "Punishment");
