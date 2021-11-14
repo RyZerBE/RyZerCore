@@ -7,7 +7,6 @@ use BauboLP\Cloud\Packets\PlayerDisconnectPacket;
 use DateTime;
 use Exception;
 use mysqli;
-use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\RyZerBE;
@@ -86,7 +85,9 @@ class PunishmentProvider implements RyZerProvider {
     /**
      * @throws Exception
      */
-    public static function punishPlayer(string $playerName, string $staff, PunishmentReason $reason){
+    public static function punishPlayer(string $playerName, string $staff, PunishmentReason|int $reason){
+        if(!$reason instanceof PunishmentReason) $reason = self::getPunishmentReasonById($reason);
+
         $reasonName = $reason->getReasonName();
         $type = $reason->getType();
         $unbanFormat = $reason->toPunishmentTime();
@@ -115,12 +116,18 @@ class PunishmentProvider implements RyZerProvider {
             $discordEmbed->setDateTime(new DateTime());
             $discordMessage->addEmbed($discordEmbed);
             $discordMessage->send();
+
             if($type === PunishmentReason::BAN){
                 $pk = new PlayerDisconnectPacket();
                 $pk->addData("playerName", $playerName);
                 $pk->addData("message", TextFormat::RED . "You have been banned from our network!");
                 CloudBridge::getInstance()->getClient()->getPacketHandler()->writePacket($pk);
             }
+
+            StaffProvider::sendMessageToStaffs(RyZerBE::PREFIX.(($type === PunishmentReason::BAN) ? TextFormat::GOLD.$playerName . TextFormat::RED." wurde gebannt"
+                : TextFormat::GOLD. $playerName . TextFormat::RED." wurde gemutet")
+                ."\n".TextFormat::GRAY."Grund: ".TextFormat::GOLD.$reasonName
+                ."\n".TextFormat::GRAY."Bestraft von: ".TextFormat::GOLD.$staff, true);
             $player = $server->getPlayerExact($staff);
             if($player === null) return;
             $player->sendMessage(RyZerBE::PREFIX . TextFormat::GRAY . "Der Spieler " . TextFormat::GOLD . $playerName . TextFormat::GRAY . " wurde für " . TextFormat::GOLD . $reasonName . TextFormat::GREEN . (($type === PunishmentReason::BAN) ? " gebannt" : " gemutet"));
@@ -144,6 +151,10 @@ class PunishmentProvider implements RyZerProvider {
             $discordEmbed->setDateTime(new DateTime());
             $discordMessage->addEmbed($discordEmbed);
             $discordMessage->send();
+            StaffProvider::sendMessageToStaffs(RyZerBE::PREFIX.(($type === PunishmentReason::BAN) ? TextFormat::GOLD.$playerName . TextFormat::GRAY." wurde entbannt"
+                    : TextFormat::GOLD. $playerName . TextFormat::GRAY." wurde entmutet")
+                ."\n".TextFormat::GRAY."Grund: ".TextFormat::GOLD.$reason
+                ."\n".TextFormat::GRAY."Aufgehoben von: ".TextFormat::GOLD.$staff, true);
             $player = $server->getPlayerExact($staff);
             if($player === null) return;
             $player->sendMessage(RyZerBE::PREFIX . TextFormat::GRAY . "Der Spieler " . TextFormat::GOLD . $playerName . TextFormat::GRAY . " wurde für den Grund " . TextFormat::GOLD . $reason . TextFormat::GREEN . " " . $typeString);
@@ -186,11 +197,16 @@ class PunishmentProvider implements RyZerProvider {
     public static function getUntilFormat(string $unbanFormat): string{
         if($unbanFormat == 0) return "PERMANENT";
         $diff = (new DateTime())->diff(new DateTime($unbanFormat));
+        $years = $diff->y;
         $month = $diff->m;
         $days = $diff->d;
         $hours = $diff->h;
         $minutes = $diff->i;
         $until = [];
+
+        if($years > 0){
+            $until[] = "&c" . $years . "&a" . " Years";
+        }
         if($month > 0){
             $until[] = "&c" . $month . "&a" . " Months";
         }

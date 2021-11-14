@@ -58,6 +58,7 @@ class Settings {
             $mysqli->query("CREATE TABLE IF NOT EXISTS `proofs` (`id` INT KEY NOT NULL, `message_id` TEXT NOT NULL) ENGINE = InnoDB");
             $mysqli->query("CREATE TABLE IF NOT EXISTS `vanish` (`player` VARCHAR(32) KEY NOT NULL) ENGINE = InnoDB");
             $mysqli->query("CREATE TABLE IF NOT EXISTS `staffs` (`player` VARCHAR(32) KEY NOT NULL) ENGINE = InnoDB");
+            $mysqli->query("CREATE TABLE IF NOT EXISTS `second_accounts` (`player` VARCHAR(32) KEY NOT NULL, `accounts` TEXT NOT NULL) ENGINE = InnoDB");
             $mysqli->query("CREATE TABLE IF NOT EXISTS `playerdata` (`player` VARCHAR(32) KEY NOT NULL, `ip_address` varchar(16) NOT NULL, `device_id` TEXT NOT NULL, `device_os` INT NOT NULL, `device_input` INT NOT NULL, `server` TEXT NOT NULL, `first_join` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, `last_join` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, `minecraft_id` TEXT NOT NULL) ENGINE = InnoDB");
             $mysqli->query("CREATE TABLE IF NOT EXISTS `playerranks` (`player` VARCHAR(32) KEY NOT NULL, `rankname` VARCHAR(16) NOT NULL DEFAULT 'Player', `permissions` TEXT NOT NULL) ENGINE = InnoDB");
             $mysqli->query("CREATE TABLE IF NOT EXISTS `punishids` (`reason` VARCHAR(32) NOT NULL, `days` INT NOT NULL, `hours` INT NOT NULL, `type` INT NOT NULL) ENGINE = InnoDB");

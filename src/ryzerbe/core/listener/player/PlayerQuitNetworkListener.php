@@ -16,6 +16,8 @@ class PlayerQuitNetworkListener implements Listener {
     public function quit(PlayerQuitNetworkEvent $event){
         $playerName = $event->getPlayerName();
        AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($playerName): void{
+           $mysqli->query("UPDATE `playerdata` SET server='?' WHERE player='$playerName'");
+
            $party = PartyProvider::getPartyByPlayer($mysqli, $playerName);
            if($party === null) return;
            if($party === $playerName) {
@@ -23,8 +25,6 @@ class PlayerQuitNetworkListener implements Listener {
            }else {
                PartyProvider::leaveParty($mysqli, $playerName, $party);
            }
-
-           $mysqli->query("UPDATE `playerdata` SET server='?' WHERE player='$playerName'");
        });
     }
 }

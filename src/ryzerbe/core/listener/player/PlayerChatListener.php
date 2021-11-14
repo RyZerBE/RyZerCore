@@ -23,7 +23,7 @@ class PlayerChatListener implements Listener {
         if($rbePlayer->getMuteTime() !== null){
             if($rbePlayer->getMuteTime() > new DateTime("now")){
                 $event->setCancelled();
-                $player->sendMessage(LanguageProvider::getMessageContainer("mute-screen", $player->getName(), ["#reason" => $rbePlayer->getMuteReason(), "#until" => PunishmentProvider::getUntilFormat($rbePlayer->getMuteTime()->format("Y-m-d H:i:s")), "#id" => $rbePlayer->getMuteId()]));
+                $player->sendMessage(LanguageProvider::getMessageContainer("mute-screen", $player->getName(), ["#reason" => $rbePlayer->getMuteReason(), "#until" => str_replace("&", TextFormat::ESCAPE, PunishmentProvider::getUntilFormat($rbePlayer->getMuteTime()->format("Y-m-d H:i:s"))), "#id" => $rbePlayer->getMuteId()]));
             }
             return;
         }

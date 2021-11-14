@@ -44,7 +44,7 @@ class PunishmentReason {
             $now->add(new DateInterval("P" . $this->days . "D"));
         }
         if($this->hours > 0){
-            $now->add(new DateInterval("PT" . $this->days . "H"));
+            $now->add(new DateInterval("PT" . $this->hours . "H"));
         }
         return $now;
     }

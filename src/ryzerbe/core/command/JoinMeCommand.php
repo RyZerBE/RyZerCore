@@ -21,6 +21,7 @@ use ryzerbe\core\RyZerBE;
 use ryzerbe\core\util\async\AsyncExecutor;
 use function count;
 use function time;
+use function var_dump;
 
 class JoinMeCommand extends Command {
     public function __construct(){
@@ -36,7 +37,9 @@ class JoinMeCommand extends Command {
             $joinMe = [];
             if($res->num_rows > 0){
                 while($data = $res->fetch_assoc()){
-                    if((new DateTime($data["time"]))->diff(new DateTime())->i >= 1){
+                    $diff = (new DateTime())->diff(new DateTime($data["time"]));
+                    var_dump($diff);
+                    if($diff->i >= 1){
                         $mysqli->query("DELETE FROM joinme WHERE player='" . $data["player"] . "'");
                         continue;
                     }

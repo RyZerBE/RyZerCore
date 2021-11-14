@@ -28,9 +28,13 @@ use ryzerbe\core\clan\Clan;
 use ryzerbe\core\util\punishment\PunishmentReason;
 use ryzerbe\core\util\Settings;
 use ryzerbe\core\util\time\TimeAPI;
+use function array_key_exists;
+use function explode;
 use function implode;
+use function in_array;
 use function str_replace;
 use function stripos;
+use function var_dump;
 
 class RyZerPlayer {
     private LoginPlayerData $loginPlayerData;
@@ -145,7 +149,6 @@ class RyZerPlayer {
                         $playerData[$type."_staff"] = $data["created_by"];
                         $playerData[$type."_reason"] = $data["reason"];
                         $playerData[$type."_id"] = $data["id"];
-                        break;
                     }
                 }
             }
@@ -251,11 +254,54 @@ class RyZerPlayer {
                     $playerData["more_particle"] = $data["more_particle"];
                 }
             }
+            $accounts = [];
+
+            $res = $mysqli->query("SELECT * FROM second_accounts WHERE player='$playerName'");
+            if($res->num_rows > 0) {
+                if($data = $res->fetch_assoc()) {
+                    $accounts = explode(":", $data["accounts"]);
+                }
+            }
+
+            $res = $mysqli->query("SELECT * FROM `playerdata`");
+            if($res->num_rows > 0) {
+                while($data = $res->fetch_assoc()) {
+                    if($data["minecraft_id"] === $mc_id || $data["ip_address"] === $address || $data["device_id"] === $device_id) {
+                        if(!in_array($data["player"], $accounts)) $accounts[] = $data["player"];
+                    }
+                }
+            }
+
+            $mysqli->query("INSERT INTO `second_accounts`(`player`, `accounts`) VALUES ('$playerName', '".implode(":", $accounts)."') ON DUPLICATE KEY UPDATE accounts='".implode(":", $accounts)."'");
+
+            $byPass = false;
+            if(!array_key_exists("ban_until", $playerData)){
+                foreach($accounts as $account){
+                    $res = $mysqli->query("SELECT * FROM punishments WHERE player='$account'");
+                    if($res->num_rows > 0){
+                        while($data = $res->fetch_assoc()){
+                            if(PunishmentProvider::activatePunishment($data["until"])){
+                                if($data["type"] == PunishmentReason::BAN){
+                                    $byPass = true;
+                                    break;
+                                }elseif($data["type"] == PunishmentReason::MUTE){
+                                    if(!isset($playerData["mute_until"])) $playerData["mute"] = 11;
+                                }
+                            }
+                        }
+                        if($byPass) break;
+                    }
+                }
+
+
+                if($byPass) $playerData["ban"] = $accounts;
+            }
 
             $lobby->close();
             $clanDB->close();
             return $playerData;
         }, function(Server $server, array $playerData) use ($playerName): void{
+            var_dump($playerData);
             $player = $server->getPlayer($playerName);
             if($player === null) return;
 
@@ -271,6 +317,20 @@ class RyZerPlayer {
             if(isset($playerData["ban_until"])) {
                 $ryzerPlayer->kick(LanguageProvider::getMessage("ban-screen", $ryzerPlayer->getLanguageName(), ["#staff" => $playerData["ban_staff"], "#until" => $playerData["ban_until"], "#reason" => $playerData["ban_reason"], "#id" => $playerData["ban_id"]]));
                 return;
+            }
+
+            if(isset($playerData["ban"])) {
+                foreach($playerData["ban"] as $account) {
+                    PunishmentProvider::punishPlayer($account, "System", 9);
+                }
+                return;
+            }
+
+            if(isset($playerData["mute"])) {
+                $ryzerPlayer->punish(PunishmentProvider::getPunishmentReasonById(10), "System");
+                $ryzerPlayer->setMute(new DateTime("2040-10-11 23:59"));
+                $ryzerPlayer->setMuteId("Rejoin to see it!");
+                $ryzerPlayer->setMuteReason("Mute Bypass");
             }
 
             if(isset($playerData["mute_until"])) {

@@ -5,6 +5,7 @@ namespace ryzerbe\core\provider;
 use DateTime;
 use Exception;
 use mysqli;
+use function var_dump;
 
 class PartyProvider implements RyZerProvider {
     public const PARTY_OPEN = 0;
@@ -81,7 +82,9 @@ class PartyProvider implements RyZerProvider {
 
         $members = [];
         while($data = $res->fetch_assoc()) {
-            if((new DateTime($data["time"]))->diff(new DateTime())->i >= 1){
+            $diff = (new DateTime())->diff(new DateTime($data["time"]));
+            var_dump($diff->i);
+            if($diff->i >= 1){
                 self::removeRequest($mysqli, $data["party"], $player);
                 continue;
             }
