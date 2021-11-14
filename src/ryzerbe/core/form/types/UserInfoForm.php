@@ -32,6 +32,10 @@ class UserInfoForm {
                 $data = $fetchedData;
             }
 
+            $res = $mysqli->query("SELECT accounts FROM second_accounts WHERE player='$playerName'");
+            if($res->num_rows <= 0) $data["accounts"] = [TextFormat::RED."Keine registrierten Zweitaccounts!"];
+            else if($fetchedData = $res->fetch_assoc()) $data["accounts"] = explode(":", $fetchedData["accounts"]);
+
             $res = $mysqli->query("SELECT rankname FROM playerranks WHERE player='$playerName'");
             if($res->num_rows > 0) {
                 $data["rank"] = $res->fetch_assoc()["rankname"];
@@ -99,6 +103,8 @@ class UserInfoForm {
             $content[] = TextFormat::GOLD."Chatsperre: ".((isset($data["mute_reason"]) === true) ? TextFormat::GREEN."POSITIV".TextFormat::GRAY."(".TextFormat::AQUA.$data["mute_reason"].TextFormat::GRAY.")" : TextFormat::RED."NEGATIV");
             $content[] = TextFormat::GOLD."Banpunkte: ".TextFormat::WHITE.$data["ban_points"];
             $content[] = TextFormat::GOLD."Mutepunkte: ".TextFormat::WHITE.$data["mute_points"];
+            $content[] = "\n";
+            $content[] = TextFormat::GOLD."Verbundene Accounts: \n".TextFormat::DARK_GRAY."-> ".TextFormat::RED.implode("\n".TextFormat::DARK_GRAY."-> ".TextFormat::RED, $data["accounts"]);
 
             $form = new SimpleForm(function(Player $player, $data): void{
                 $player->sendMessage("\n\n".RyZerBE::PREFIX.TextFormat::RED.TextFormat::BOLD."Bitte behandel diese Daten vertraulich! Stell dir vor, es wären deine Daten..\n\n");
