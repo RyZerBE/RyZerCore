@@ -39,11 +39,8 @@ class UserInfoForm {
             $res = $mysqli->query("SELECT rankname FROM playerranks WHERE player='$playerName'");
             if($res->num_rows > 0) {
                 $data["rank"] = $res->fetch_assoc()["rankname"];
-            }
-
-            $res = $mysqli->query("SELECT coins FROM coins WHERE player='$playerName'");
-            if($res->num_rows > 0) {
-                $data["coins"] = $res->fetch_assoc()["coins"];
+            }else {
+                $data["rank"] = "Player";
             }
 
             $res = $mysqli->query("SELECT coins FROM coins WHERE player='$playerName'");
