@@ -19,7 +19,7 @@ class CoinProvider implements RyZerProvider {
             $ryzerPlayer = RyZerPlayerProvider::getRyzerPlayer($playerName);
             if($ryzerPlayer === null) return;
 
-            $ryzerPlayer->addCoins($coins);
+            $ryzerPlayer->addCoins($coins, true);
             $ryzerPlayer->getPlayer()->sendMessage(RyZerBE::PREFIX.LanguageProvider::getMessageContainer('added-coins', $ryzerPlayer->getPlayer()->getName(), ['#coins' => $coins." Coins"]));
             $ev = new PlayerCoinsAddEvent($ryzerPlayer->getPlayer(), $coins);
             $ev->call();
@@ -33,7 +33,7 @@ class CoinProvider implements RyZerProvider {
             $ryzerPlayer = RyZerPlayerProvider::getRyzerPlayer($playerName);
             if($ryzerPlayer === null) return;
 
-            $ryzerPlayer->removeCoins($coins);
+            $ryzerPlayer->removeCoins($coins, true);
             $ryzerPlayer->getPlayer()->sendMessage(RyZerBE::PREFIX.LanguageProvider::getMessageContainer('removed-coins', $ryzerPlayer->getPlayer()->getName(), ['#coins' => $coins." Coins"]));
             $ev = new PlayerCoinsRemoveEvent($ryzerPlayer->getPlayer(), $coins);
             $ev->call();
@@ -47,7 +47,7 @@ class CoinProvider implements RyZerProvider {
             $ryzerPlayer = RyZerPlayerProvider::getRyzerPlayer($playerName);
             if($ryzerPlayer === null) return;
 
-            $ryzerPlayer->setCoins($coins);
+            $ryzerPlayer->setCoins($coins, true);
             $ryzerPlayer->getPlayer()->sendMessage(RyZerBE::PREFIX.LanguageProvider::getMessageContainer('set-coins', $ryzerPlayer->getPlayer()->getName(), ['#coins' => $coins." Coins"]));
         });
     }

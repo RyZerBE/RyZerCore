@@ -28,7 +28,7 @@ class PlayerInteractListener implements Listener {
         $item = $event->getItem();
         $action = $event->getAction();
         if(!$player instanceof PMMPPlayer) return;
-        
+
         $customItem = CustomItemManager::getInstance()->getCustomItemByItem($item);
         if($customItem !== null){
             if($customItem->cancelInteract()) $event->setCancelled();
