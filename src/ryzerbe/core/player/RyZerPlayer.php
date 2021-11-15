@@ -389,7 +389,7 @@ class RyZerPlayer {
         $toggleRank = (int)$settings->isRankToggled();
 
         AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($gameTimeTicks, $playerName, $more_particle, $party_invites, $friend_requests, $msg_toggle, $toggleRank): void{
-            $mysqli->query("UPDATE gametime SET ticks='$gameTimeTicks' WHERE player='$playerName'");
+            if($gameTimeTicks > 0) $mysqli->query("UPDATE gametime SET ticks='$gameTimeTicks' WHERE player='$playerName'");
             $mysqli->query("INSERT INTO `player_settings`(`player`, `more_particle`, `party_requests`, `friend_requests`, `msg_toggle`, `toggle_rank`) VALUES ('$playerName', '$more_particle', '$party_invites', '$friend_requests', '$msg_toggle', '$toggleRank') ON DUPLICATE KEY UPDATE more_particle='$more_particle',party_requests='$party_invites',friend_requests='$friend_requests',msg_toggle='$msg_toggle',toggle_rank='$toggleRank'");
         });
     }
