@@ -3,7 +3,6 @@
 namespace ryzerbe\core\provider;
 
 use DateTime;
-use Exception;
 use mysqli;
 use function var_dump;
 

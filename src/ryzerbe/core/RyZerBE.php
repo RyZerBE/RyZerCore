@@ -25,6 +25,7 @@ use ryzerbe\core\command\PartyCommand;
 use ryzerbe\core\command\PlayerSettingsCommand;
 use ryzerbe\core\command\PunishHistoryCommand;
 use ryzerbe\core\command\RankCommand;
+use ryzerbe\core\command\ReportCommand;
 use ryzerbe\core\command\TeamchatCommand;
 use ryzerbe\core\command\UnbanCommand;
 use ryzerbe\core\command\UserInfoCommand;
@@ -110,7 +111,8 @@ class RyZerBE extends PluginBase {
             new NetworkLevelCommand(),
             new PlayerSettingsCommand(),
             new ChunkFixCommand(),
-            new UserInfoCommand()
+            new UserInfoCommand(),
+            new ReportCommand()
         ]);
     }
 

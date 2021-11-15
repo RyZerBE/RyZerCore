@@ -43,6 +43,10 @@ class RyZerPlayer {
     private ?NetworkLevel $networkLevel;
 
     private string $languageName = "English";
+    private string $muteReason = "???";
+    private string $id = "???";
+    /** @var string|null  */
+    private ?string $nick = null;
 
     private int $coins = 0;
     public int $gameTimeTicks = 0;
@@ -52,8 +56,6 @@ class RyZerPlayer {
     private ?Clan $clan;
     private PlayerSettings $playerSettings;
     private ?DateTime $mute = null;
-    private string $muteReason = "???";
-    private string $id = "???";
 
     public function __construct(Player $player, LoginPlayerData $playerData){
         $this->player = $player;
@@ -301,7 +303,7 @@ class RyZerPlayer {
             $clanDB->close();
             return $playerData;
         }, function(Server $server, array $playerData) use ($playerName): void{
-            var_dump($playerData);
+            #var_dump($playerData);
             $player = $server->getPlayer($playerName);
             if($player === null) return;
 
@@ -321,13 +323,13 @@ class RyZerPlayer {
 
             if(isset($playerData["ban"])) {
                 foreach($playerData["ban"] as $account) {
-                    PunishmentProvider::punishPlayer($account, "System", 9);
+                    PunishmentProvider::punishPlayer($account, "System", 8);
                 }
                 return;
             }
 
             if(isset($playerData["mute"])) {
-                $ryzerPlayer->punish(PunishmentProvider::getPunishmentReasonById(10), "System");
+                $ryzerPlayer->punish(PunishmentProvider::getPunishmentReasonById(9), "System");
                 $ryzerPlayer->setMute(new DateTime("2040-10-11 23:59"));
                 $ryzerPlayer->setMuteId("Rejoin to see it!");
                 $ryzerPlayer->setMuteReason("Mute Bypass");
@@ -490,5 +492,20 @@ class RyZerPlayer {
 
         $player->setNameTag($nametag.TextFormat::BLACK." [".$this->getNetworkLevel()->getLevelColor().$this->getNetworkLevel()->getLevel().TextFormat::BLACK."]"."\n".TextFormat::YELLOW.(($status !== null ? "✎ ".$status : TextFormat::YELLOW.$this->getLoginPlayerData()->getDeviceOsName())));
         $player->setDisplayName($nametag);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getNick(): ?string{
+        return $this->nick;
+    }
+
+    /**
+     * @param bool $nick
+     * @return string
+     */
+    public function getName(bool $nick): string{
+        return ($nick === true && $this->nick !== null) ? $this->nick : $this->getPlayer()->getName();
     }
 }
