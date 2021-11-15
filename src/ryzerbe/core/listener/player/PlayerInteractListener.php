@@ -15,6 +15,8 @@ use pocketmine\nbt\tag\FloatTag;
 use pocketmine\nbt\tag\ListTag;
 use pocketmine\Player;
 use ryzerbe\core\entity\EnderPearl;
+use ryzerbe\core\player\PMMPPlayer;
+use ryzerbe\core\util\customItem\CustomItemManager;
 
 class PlayerInteractListener implements Listener {
 
@@ -25,6 +27,16 @@ class PlayerInteractListener implements Listener {
         $player = $event->getPlayer();
         $item = $event->getItem();
         $action = $event->getAction();
+        if(!$player instanceof PMMPPlayer) return;
+        
+        $customItem = CustomItemManager::getInstance()->getCustomItemByItem($item);
+        if($customItem !== null){
+            if($customItem->cancelInteract()) $event->setCancelled();
+            if($player->hasItemCooldown($item)) return;
+            $customItem->onInteract($player, $item);
+            return;
+        }
+
         if($item->getId() == ItemIds::ENDER_PEARL && $action === PlayerInteractEvent::RIGHT_CLICK_AIR) {
             $event->setCancelled();
             $player->getInventory()->removeItem(Item::get(ItemIds::ENDER_PEARL));
