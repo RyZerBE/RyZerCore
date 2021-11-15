@@ -84,8 +84,13 @@ abstract class CustomItem implements Listener {
 
     /**
      * @param PMMPPlayer $player
+     * @param int|null $slot
      */
-    public function giveToPlayer(PMMPPlayer $player): void{
+    public function giveToPlayer(PMMPPlayer $player, ?int $slot = null): void{
+        if($slot !== null) {
+            $player->getInventory()->setItem($slot, $this->getItem());
+            return;
+        }
         $slot = $this->getSlot();
         if($slot === null){
             $player->getInventory()->addItem($this->getItem());
