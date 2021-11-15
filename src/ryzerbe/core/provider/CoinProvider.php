@@ -15,7 +15,7 @@ class CoinProvider implements RyZerProvider {
 
     public static function addCoins(string $playerName, int $coins){
         AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($playerName, $coins){
-            $mysqli->query("UPDATE coins SET coins=coins+'$coins' WHERE playername='$playerName'");
+            $mysqli->query("UPDATE coins SET coins=coins+'$coins' WHERE player='$playerName'");
         }, function(Server $server, $result) use ($playerName, $coins){
             $ryzerPlayer = RyZerPlayerProvider::getRyzerPlayer($playerName);
             if($ryzerPlayer === null) return;
@@ -29,7 +29,7 @@ class CoinProvider implements RyZerProvider {
 
     public static function removeCoins(string $playerName, int $coins){
         AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($playerName, $coins){
-            $mysqli->query("UPDATE coins SET coins=coins-'$coins' WHERE playername='$playerName'");
+            $mysqli->query("UPDATE coins SET coins=coins-'$coins' WHERE player='$playerName'");
         }, function(Server $server, $result) use ($playerName, $coins){
             $ryzerPlayer = RyZerPlayerProvider::getRyzerPlayer($playerName);
             if($ryzerPlayer === null) return;
@@ -43,7 +43,7 @@ class CoinProvider implements RyZerProvider {
 
     public static function setCoins(string $playerName, int $coins){
         AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($playerName, $coins){
-            $mysqli->query("UPDATE coins SET coins='$coins' WHERE playername='$playerName'");
+            $mysqli->query("UPDATE coins SET coins='$coins' WHERE player='$playerName'");
         }, function(Server $server, $result) use ($playerName, $coins){
             $ryzerPlayer = RyZerPlayerProvider::getRyzerPlayer($playerName);
             if($ryzerPlayer === null) return;

@@ -125,6 +125,8 @@ class RyZerBE extends PluginBase {
         BlockFactory::registerBlock(new TNTBlock(), true); //TEAM TNT
     }
 
+
+
     public static function getPlugin(): RyZerBE{
         return self::$plugin;
     }
