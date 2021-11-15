@@ -16,7 +16,7 @@ use pocketmine\nbt\tag\ListTag;
 use pocketmine\Player;
 use ryzerbe\core\entity\EnderPearl;
 use ryzerbe\core\player\PMMPPlayer;
-use ryzerbe\core\util\customItem\CustomItemManager;
+use ryzerbe\core\util\customitem\CustomItemManager;
 
 class PlayerInteractListener implements Listener {
 

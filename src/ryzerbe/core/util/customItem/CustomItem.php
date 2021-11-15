@@ -1,6 +1,6 @@
 <?php
 
-namespace ryzerbe\core\util\customItem;
+namespace ryzerbe\core\util\customitem;
 
 use pocketmine\event\Listener;
 use pocketmine\item\Item;
