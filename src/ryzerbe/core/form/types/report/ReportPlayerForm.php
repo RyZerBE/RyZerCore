@@ -42,14 +42,14 @@ class ReportPlayerForm {
             $badPlayer = $playerNames[$data["bad_player"]];
             $reason = $reasons[$data["reason"]];
             $notice = $data["notice"];
-            $nick = $nicked[$badPlayer] ?? "NO NICK";
+            $nick = $nicked[$badPlayer] ?? $badPlayer;
 
             iF($badPlayer === $player->getName()) {
                 $player->sendMessage(ReportProvider::PREFIX.LanguageProvider::getMessageContainer("cannot-report-self", $player->getName(), ['#playername' => $badPlayer]));
                 return;
             }
 
-            ReportProvider::createReport($badPlayer, $player->getName(), $reason, $notice, $nick);
+            ReportProvider::createReport($nick, $player->getName(), $reason, $notice, ($badPlayer === $nick) ? TextFormat::RED."NO NICK" : $nick);
         });
         $form->setTitle(TextFormat::BLUE."Report a player");
 
