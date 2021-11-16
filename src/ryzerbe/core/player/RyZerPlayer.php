@@ -9,6 +9,7 @@ use BauboLP\Cloud\Provider\CloudProvider;
 use DateTime;
 use Exception;
 use mysqli;
+use pocketmine\entity\Skin;
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
@@ -18,6 +19,7 @@ use ryzerbe\core\player\data\LoginPlayerData;
 use ryzerbe\core\player\networklevel\NetworkLevel;
 use ryzerbe\core\player\setting\PlayerSettings;
 use ryzerbe\core\provider\CoinProvider;
+use ryzerbe\core\provider\NickProvider;
 use ryzerbe\core\provider\PartyProvider;
 use ryzerbe\core\provider\PunishmentProvider;
 use ryzerbe\core\rank\Rank;
@@ -57,10 +59,14 @@ class RyZerPlayer {
     private PlayerSettings $playerSettings;
     private ?DateTime $mute = null;
 
+    /** @var Skin  */
+    private Skin $skin;
+
     public function __construct(Player $player, LoginPlayerData $playerData){
         $this->player = $player;
         $this->loginPlayerData = $playerData;
         $this->rank = RankManager::getInstance()->getBackupRank();
+        $this->skin = $player->getSkin();
         $this->playerSettings = new PlayerSettings();
     }
 
@@ -299,6 +305,9 @@ class RyZerPlayer {
                 if($byPass) $playerData["ban"] = $accounts;
             }
 
+            $activeNicks = NickProvider::getActiveNicks($mysqli, true);
+            if(isset($activeNicks[$playerName])) $playerData["nick"] = $activeNicks[$playerName];
+
             $lobby->close();
             $clanDB->close();
             return $playerData;
@@ -339,6 +348,12 @@ class RyZerPlayer {
                 $ryzerPlayer->setMute(new DateTime(($playerData["mute_until"] === "PERMANENT") ? "2040-10-11 23:59" : $playerData["mute_until"]));
                 $ryzerPlayer->setMuteId($playerData["mute_id"]);
                 $ryzerPlayer->setMuteReason($playerData["mute_reason"]);
+            }
+
+            if(isset($playerData["nick"])) {
+                $ryzerPlayer->setNick($playerData["nick"]["nickName"]);
+                $ryzerPlayer->getPlayer()->setSkin(NickProvider::getNickSkinByName($playerData["nick"]["skin"]) ?? $ryzerPlayer->getJoinSkin());
+                $ryzerPlayer->getPlayer()->sendMessage(RyZerBE::PREFIX.LanguageProvider::getMessageContainer("nick-active", $ryzerPlayer->getPlayer()));
             }
 
             $ryzerPlayer->setCoins($playerData["coins"] ?? 0);
@@ -483,10 +498,10 @@ class RyZerPlayer {
     public function updateStatus(?string $status): void{
         $player = $this->getPlayer();
 
-        if($this->getPlayerSettings()->isRankToggled()){
-            $nametag = str_replace("{player_name}", $player->getName(), RankManager::getInstance()->getBackupRank()->getNameTag()); //PLAYER = DEFAULT
+        if($this->getPlayerSettings()->isRankToggled() || $this->getNick() !== null){
+            $nametag = str_replace("{player_name}", $this->getName(true), RankManager::getInstance()->getBackupRank()->getNameTag()); //PLAYER = DEFAULT
         }else{
-            $nametag = str_replace("{player_name}", $player->getName(), $this->getRank()->getNameTag());
+            $nametag = str_replace("{player_name}", $this->getName(true), $this->getRank()->getNameTag());
         }
         $nametag = str_replace("&", TextFormat::ESCAPE, $nametag);
 
@@ -499,6 +514,20 @@ class RyZerPlayer {
      */
     public function getNick(): ?string{
         return $this->nick;
+    }
+
+    /**
+     * @param string|null $nick
+     */
+    public function setNick(?string $nick): void{
+        $this->nick = $nick;
+    }
+
+    /**
+     * @return Skin
+     */
+    public function getJoinSkin(): Skin{
+        return $this->skin;
     }
 
     /**

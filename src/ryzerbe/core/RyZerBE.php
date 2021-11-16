@@ -21,6 +21,7 @@ use ryzerbe\core\command\KickCommand;
 use ryzerbe\core\command\LanguageCommand;
 use ryzerbe\core\command\LoginCommand;
 use ryzerbe\core\command\NetworkLevelCommand;
+use ryzerbe\core\command\NickCommand;
 use ryzerbe\core\command\PartyCommand;
 use ryzerbe\core\command\PlayerSettingsCommand;
 use ryzerbe\core\command\PunishHistoryCommand;
@@ -36,6 +37,7 @@ use ryzerbe\core\entity\Arrow;
 use ryzerbe\core\entity\EnderPearl;
 use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\player\networklevel\NetworkLevelProvider;
+use ryzerbe\core\provider\NickProvider;
 use ryzerbe\core\provider\PunishmentProvider;
 use ryzerbe\core\provider\StaffProvider;
 use ryzerbe\core\provider\VIPJoinProvider;
@@ -73,6 +75,7 @@ class RyZerBE extends PluginBase {
         RankManager::getInstance()->fetchRanks();
         StaffProvider::refresh();
         PunishmentProvider::loadReasons();
+        NickProvider::fetch();
 
         $this->getServer()->getPluginManager()->registerEvents(new VIPJoinProvider(), $this);
         $this->getScheduler()->scheduleRepeatingTask(new RyZerUpdateTask(), 1);
@@ -112,7 +115,8 @@ class RyZerBE extends PluginBase {
             new PlayerSettingsCommand(),
             new ChunkFixCommand(),
             new UserInfoCommand(),
-            new ReportCommand()
+            new ReportCommand(),
+            new NickCommand()
         ]);
     }
 

@@ -50,3 +50,7 @@ permissions:
     default: op
   ryzer.userinfo:
     default: op
+  ryzer.nick:
+    default: op
+  ryzer.nick.list:
+    default: op

@@ -10,6 +10,7 @@ use pocketmine\utils\TextFormat;
 use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\player\RyZerPlayerProvider;
 use ryzerbe\core\provider\PunishmentProvider;
+use ryzerbe\core\rank\RankManager;
 use ryzerbe\core\util\discord\DiscordMessage;
 use ryzerbe\core\util\discord\WebhookLinks;
 use function str_replace;
@@ -28,7 +29,8 @@ class PlayerChatListener implements Listener {
             return;
         }
 
-        $event->setFormat(str_replace("{player_name}", $player->getName(), str_replace("{MSG}", $event->getMessage(), $rbePlayer->getRank()->getChatPrefix())));
+        $clan = ($rbePlayer->getClan() !== null) ? $rbePlayer->getClan()->getClanTag()." " : "";
+        $event->setFormat($clan.str_replace("{player_name}", $rbePlayer->getName(true), str_replace("{MSG}", $event->getMessage(), ($rbePlayer->getNick() !== null) ? RankManager::getInstance()->getBackupRank()->getChatPrefix() : $rbePlayer->getRank()->getChatPrefix())));
         $discordMessage = new DiscordMessage(WebhookLinks::CHAT_LOG);
         $discordMessage->setMessage($player->getName()."[".CloudProvider::getServer()."] ".str_replace("@", "", $event->getMessage()));
         $discordMessage->send();
