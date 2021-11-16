@@ -8,7 +8,6 @@ use pocketmine\utils\TextFormat;
 use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\RyZerBE;
 use ryzerbe\core\util\async\AsyncExecutor;
-use function mysqli_stmt_attr_get;
 
 class ReportProvider implements RyZerProvider {
 

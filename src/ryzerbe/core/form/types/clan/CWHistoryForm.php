@@ -3,7 +3,6 @@
 namespace ryzerbe\core\form\types\clan;
 
 use DateTime;
-use Exception;
 use jojoe77777\FormAPI\SimpleForm;
 use mysqli;
 use pocketmine\Player;

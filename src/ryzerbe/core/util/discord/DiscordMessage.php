@@ -3,8 +3,8 @@
 namespace ryzerbe\core\util\discord;
 
 use pocketmine\Server;
-use ryzerbe\core\util\discord\scheduler\AsyncSendScheduler;
 use ryzerbe\core\util\discord\embed\DiscordEmbed;
+use ryzerbe\core\util\discord\scheduler\AsyncSendScheduler;
 
 class DiscordMessage {
     public const REQUEST_POST = "POST";

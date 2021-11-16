@@ -5,7 +5,6 @@ namespace ryzerbe\core\command;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\network\mcpe\protocol\ChunkRadiusUpdatedPacket;
-use pocketmine\utils\TextFormat;
 use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\player\PMMPPlayer;
 use ryzerbe\core\RyZerBE;

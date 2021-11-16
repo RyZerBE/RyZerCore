@@ -7,7 +7,6 @@ use mysqli;
 use ryzerbe\core\player\RyZerPlayer;
 use ryzerbe\core\provider\CoinProvider;
 use ryzerbe\core\util\async\AsyncExecutor;
-use ryzerbe\core\player\networklevel\LevelUpReward;
 
 class NetworkLevelProvider {
     /** @var LevelUpReward[]  */

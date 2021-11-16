@@ -6,8 +6,8 @@ use BauboLP\Cloud\CloudBridge;
 use jojoe77777\FormAPI\SimpleForm;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
-use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\clan\Clan;
+use ryzerbe\core\language\LanguageProvider;
 
 class ClanInformationForm {
     public static function open(Player $player, ?array $extraData = []){

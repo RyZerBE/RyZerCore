@@ -8,10 +8,10 @@ use mysqli;
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
+use ryzerbe\core\clan\Clan;
 use ryzerbe\core\form\types\ConfirmationForm;
 use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\util\async\AsyncExecutor;
-use ryzerbe\core\clan\Clan;
 
 class ClanMainForm {
     public static function open(Player $player, array $extraData = []){

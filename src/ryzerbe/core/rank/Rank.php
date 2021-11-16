@@ -3,7 +3,6 @@
 namespace ryzerbe\core\rank;
 
 use mysqli;
-use pocketmine\permission\PermissionManager;
 use ryzerbe\core\util\async\AsyncExecutor;
 use function array_search;
 use function implode;

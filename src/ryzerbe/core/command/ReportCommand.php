@@ -4,7 +4,6 @@ namespace ryzerbe\core\command;
 
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\utils\CommandException;
 use ryzerbe\core\form\types\report\ReportPlayerForm;
 use ryzerbe\core\form\types\report\StaffMainForm;
 use ryzerbe\core\player\PMMPPlayer;

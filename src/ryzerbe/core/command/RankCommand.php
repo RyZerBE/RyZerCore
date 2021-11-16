@@ -4,7 +4,6 @@ namespace ryzerbe\core\command;
 
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\form\types\rank\RankMainForm;
 use ryzerbe\core\player\PMMPPlayer;

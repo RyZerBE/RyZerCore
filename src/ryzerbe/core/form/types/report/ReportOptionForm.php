@@ -11,7 +11,6 @@ use pocketmine\utils\TextFormat;
 use ryzerbe\core\provider\CoinProvider;
 use ryzerbe\core\provider\ReportProvider;
 use ryzerbe\core\provider\StaffProvider;
-use ryzerbe\core\RyZerBE;
 use ryzerbe\core\util\async\AsyncExecutor;
 use function implode;
 

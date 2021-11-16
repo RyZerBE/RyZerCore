@@ -9,7 +9,6 @@ use pocketmine\item\enchantment\Enchantment;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\ActorEventPacket;
 use pocketmine\network\mcpe\protocol\AnimatePacket;
-use pocketmine\Player;
 use ryzerbe\core\player\PMMPPlayer;
 use ryzerbe\core\util\Settings;
 

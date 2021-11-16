@@ -11,7 +11,6 @@ use ryzerbe\core\player\PMMPPlayer;
 use ryzerbe\core\provider\PunishmentProvider;
 use ryzerbe\core\provider\ReportProvider;
 use ryzerbe\core\provider\VanishProvider;
-use ryzerbe\core\RyZerBE;
 
 class ReportPlayerForm {
 

@@ -7,7 +7,6 @@ use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\network\mcpe\protocol\LoginPacket;
 use ryzerbe\core\player\data\LoginPlayerData;
 use ryzerbe\core\player\RyZerPlayerProvider;
-use function var_dump;
 
 class DataPacketReceiveListener implements Listener {
     public function receive(DataPacketReceiveEvent $event){

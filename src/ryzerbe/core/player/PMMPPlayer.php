@@ -48,12 +48,12 @@ use pocketmine\network\mcpe\protocol\types\inventory\UseItemTransactionData;
 use pocketmine\network\mcpe\protocol\types\NetworkInventoryAction;
 use pocketmine\network\mcpe\protocol\UpdateBlockPacket;
 use pocketmine\Player;
+use pocketmine\Player as PMPlayer;
 use pocketmine\tile\Spawnable;
 use pocketmine\timings\Timings;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\util\Settings;
 use UnexpectedValueException;
-use pocketmine\Player as PMPlayer;
 use function microtime;
 
 class PMMPPlayer extends PMPlayer {

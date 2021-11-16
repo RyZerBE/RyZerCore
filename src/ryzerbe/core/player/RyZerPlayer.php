@@ -13,7 +13,9 @@ use pocketmine\entity\Skin;
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
+use ryzerbe\core\clan\Clan;
 use ryzerbe\core\event\player\RyZerPlayerAuthEvent;
+use ryzerbe\core\form\types\LanguageForm;
 use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\player\data\LoginPlayerData;
 use ryzerbe\core\player\networklevel\NetworkLevel;
@@ -26,7 +28,6 @@ use ryzerbe\core\rank\Rank;
 use ryzerbe\core\rank\RankManager;
 use ryzerbe\core\RyZerBE;
 use ryzerbe\core\util\async\AsyncExecutor;
-use ryzerbe\core\clan\Clan;
 use ryzerbe\core\util\punishment\PunishmentReason;
 use ryzerbe\core\util\Settings;
 use ryzerbe\core\util\time\TimeAPI;
@@ -36,7 +37,6 @@ use function implode;
 use function in_array;
 use function str_replace;
 use function stripos;
-use function var_dump;
 
 class RyZerPlayer {
     private LoginPlayerData $loginPlayerData;
@@ -320,7 +320,7 @@ class RyZerPlayer {
 
             if($ryzerPlayer === null) return;
             if($playerData["language"] === null) {
-                $player->getServer()->dispatchCommand($player, "lang");
+                LanguageForm::onOpen($sender);
             }else {
                 $ryzerPlayer->setLanguage($playerData["language"] ?? "English");
             }

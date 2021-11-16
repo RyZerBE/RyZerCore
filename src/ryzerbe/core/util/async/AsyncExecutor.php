@@ -2,7 +2,6 @@
 
 namespace ryzerbe\core\util\async;
 
-use ryzerbe\core\RyZerBE;
 use Closure;
 use Exception;
 use mysqli;
@@ -10,8 +9,8 @@ use pocketmine\scheduler\AsyncTask;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
+use ryzerbe\core\RyZerBE;
 use ryzerbe\core\util\Settings;
-use function mysqli_connect;
 use function uniqid;
 
 class AsyncExecutor {

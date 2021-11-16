@@ -18,7 +18,6 @@ use function basename;
 use function count;
 use function file_exists;
 use function glob;
-use function quoted_printable_decode;
 use function uniqid;
 
 class NickProvider implements RyZerProvider {

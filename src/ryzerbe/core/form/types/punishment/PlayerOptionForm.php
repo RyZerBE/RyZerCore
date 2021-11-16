@@ -5,20 +5,11 @@ namespace ryzerbe\core\form\types\punishment;
 use jojoe77777\FormAPI\CustomForm;
 use jojoe77777\FormAPI\SimpleForm;
 use pocketmine\Player;
-use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\form\types\ConfirmationForm;
-use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\provider\MySQLProvider;
-use ryzerbe\core\provider\PartyProvider;
 use ryzerbe\core\provider\PunishmentProvider;
-use ryzerbe\core\RyZerBE;
-use ryzerbe\core\util\async\AsyncExecutor;
 use ryzerbe\core\util\punishment\PunishmentReason;
-use function array_values;
-use function count;
-use function explode;
-use function stripos;
 
 class PlayerOptionForm {
     /**
