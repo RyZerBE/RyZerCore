@@ -66,6 +66,8 @@ class RyZerBE extends PluginBase {
         Settings::getInstance()->initMySQL();
         RankManager::getInstance();
 
+        popen('rm -r '.$this->getServer()->getDataPath()."server.log", 'r');
+        date_default_timezone_set("Europe/Berlin");
         $this->boot();
     }
 
