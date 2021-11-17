@@ -55,7 +55,7 @@ class RyZerPlayer {
 
     private Rank $rank;
 
-    private ?Clan $clan;
+    private ?Clan $clan = null;
     private PlayerSettings $playerSettings;
     private ?DateTime $mute = null;
 
