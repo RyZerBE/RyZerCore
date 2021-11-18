@@ -8,6 +8,10 @@ use pocketmine\level\Position;
 use ryzerbe\core\level\TNTExplosion;
 
 class ExplosionPrimeListener implements Listener {
+    /**
+     * @param ExplosionPrimeEvent $ev
+     * @priority HIGH
+     */
     public function explosion(ExplosionPrimeEvent $ev): void{
         $ev->setCancelled();
 

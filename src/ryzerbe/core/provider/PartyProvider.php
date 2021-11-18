@@ -2,8 +2,13 @@
 
 namespace ryzerbe\core\provider;
 
+use BauboLP\Cloud\CloudBridge;
+use BauboLP\Cloud\Packets\PlayerMessagePacket;
 use DateTime;
+use pocketmine\Server;
 use mysqli;
+use ryzerbe\core\util\async\AsyncExecutor;
+use function implode;
 use function var_dump;
 
 class PartyProvider implements RyZerProvider {
@@ -162,5 +167,20 @@ class PartyProvider implements RyZerProvider {
 
         $role = $res->fetch_assoc()["role"];
         return ($asName === true) ? self::getRoleNameById($role) : (int)$role;
+    }
+
+    /**
+     * @param string $partyOwner
+     * @param string $message
+     */
+    public static function sendPartyMessage(string $partyOwner, string $message): void{
+        AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($partyOwner, $message): array{
+            return PartyProvider::getPartyMembers($mysqli, $partyOwner);
+        }, function(Server $server, array $members) use ($message): void{
+            $pk = new PlayerMessagePacket();
+            $pk->addData("players", implode(":", $members));
+            $pk->addData("message", $message);
+            CloudBridge::getInstance()->getClient()->getPacketHandler()->writePacket($pk);
+        });
     }
 }

@@ -27,7 +27,7 @@ class LanguageForm {
                     break;
                 default:
                     $language = $data;
-                    if($player->hasPermission("language.admin")){
+                    if($player->hasPermission("ryzer.admin")){
                         $form = new SimpleForm(function(Player $player, $data) use ($ryzerPlayer, $language): void{
                             if($data === null) return;
                             switch($data){
@@ -69,7 +69,7 @@ class LanguageForm {
                                                     $form = new CustomForm(function(Player $player, $data) use ($language, $key): void{
                                                         if($data === null) return;
                                                         $language = LanguageProvider::getLanguage($language);
-                                                        $language?->addTranslation($data["key"], $data["translation"], true);
+                                                        $language?->addTranslation($key, $data["translation"], true);
                                                         $player->sendMessage(RyZerBE::PREFIX . TextFormat::GREEN . "Erfolgreich übersetzt.");
                                                     });
                                                     $form->addInput(LanguageProvider::getMessage($data, "Deutsch") . "\n" . "Bitte tippe die Übersetzung für die Sprache " . $language . " ein:", "", "", "translation");
