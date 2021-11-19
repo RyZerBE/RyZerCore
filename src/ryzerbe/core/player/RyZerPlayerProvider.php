@@ -3,6 +3,7 @@
 namespace ryzerbe\core\player;
 
 use pocketmine\Player;
+use ryzerbe\core\anticheat\AntiCheatManager;
 use ryzerbe\core\player\data\LoginPlayerData;
 
 class RyZerPlayerProvider {
@@ -15,6 +16,7 @@ class RyZerPlayerProvider {
         $rbePlayer = new RyZerPlayer($player, self::$loginData[$player->getName()]);
         self::$players[$player->getName()] = $rbePlayer;
         $rbePlayer->loadData();
+        AntiCheatManager::addPlayer($player);
     }
 
     /**

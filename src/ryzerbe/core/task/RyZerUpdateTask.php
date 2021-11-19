@@ -4,6 +4,7 @@ namespace ryzerbe\core\task;
 
 use pocketmine\scheduler\Task;
 use pocketmine\Server;
+use ryzerbe\core\anticheat\AntiCheatManager;
 use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\player\RyZerPlayerProvider;
 use ryzerbe\core\provider\StaffProvider;
@@ -41,5 +42,7 @@ class RyZerUpdateTask extends Task {
         if($currentTick % TaskUtils::minutesToTicks(1) === 0){
             StaffProvider::refresh();
         }
+
+        AntiCheatManager::getInstance()->onUpdate($currentTick);
     }
 }
