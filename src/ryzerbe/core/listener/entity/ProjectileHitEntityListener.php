@@ -4,6 +4,7 @@ namespace ryzerbe\core\listener\entity;
 
 use pocketmine\entity\projectile\Egg;
 use pocketmine\entity\projectile\Snowball;
+use pocketmine\event\entity\ProjectileHitEntityEvent;
 use pocketmine\event\entity\ProjectileHitEvent;
 use pocketmine\event\Listener;
 use ryzerbe\core\entity\Arrow;
@@ -11,7 +12,7 @@ use ryzerbe\core\player\PMMPPlayer;
 
 class ProjectileHitEntityListener implements Listener {
 
-    public function arrowHit(ProjectileHitEvent $event){
+    public function arrowHit(ProjectileHitEntityEvent $event){
         $entity = $event->getEntity();
         $shooter = $entity->getOwningEntity();
 

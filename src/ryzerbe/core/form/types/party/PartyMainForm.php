@@ -60,9 +60,6 @@ class PartyMainForm {
             else{
                 $form->addButton(TextFormat::DARK_AQUA . "Party Member", 0, "textures/items/book_portfolio.png", "member_list");
                 switch((int)$partyData["role"]){
-                    case PartyProvider::PARTY_ROLE_MEMBER:
-                        $form->addButton(TextFormat::RED . "Leave Party", 0, "textures/ui/crossout.png", "leave");
-                        break;
                     case PartyProvider::PARTY_ROLE_MODERATOR:
                         $form->addButton(TextFormat::GREEN . "Invite player", 0, "textures/ui/anvil-plus.png", "invite");
                         break;
