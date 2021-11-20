@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace ryzerbe\core\anticheat;
 
 use pocketmine\Player;
+use ryzerbe\core\player\PMMPPlayer;
+use ryzerbe\core\provider\PunishmentProvider;
+use function array_filter;
 use function array_shift;
 use function array_sum;
 use function count;
@@ -28,6 +31,9 @@ class AntiCheatPlayer {
         $this->player = $player;
     }
 
+    /**
+     * @return PMMPPlayer
+     */
     public function getPlayer(): Player{
         return $this->player;
     }
@@ -44,7 +50,6 @@ class AntiCheatPlayer {
     }
 
     public function getConsistentClicks(int $seconds = 1): int{
-        if(count($this->consistentClicks) <= 0) return 0;
         $currentTime = time();
 
         $consistentClicks = [];
@@ -53,6 +58,7 @@ class AntiCheatPlayer {
                 $consistentClicks[$time] = $clicks;
             }
         }
+        if(count($consistentClicks) <= 0) return 0;
         return (int)round(array_sum($consistentClicks) / count($consistentClicks));
     }
 
@@ -89,12 +95,28 @@ class AntiCheatPlayer {
         $this->consistentClicks = [];
     }
 
-    public function getWarnings(Check $check): int{
-        return $this->warnings[$check::class] ?? 0;
+    public function getWarnings(Check $check, int $seconds = 60): int{
+        $currentTime = time();
+        return count(array_filter($this->warnings[$check::class] ?? [], function(int $time) use ($seconds, $currentTime): bool {
+            return $time > ($currentTime - $seconds);
+        }));
     }
 
     public function addWarning(Check $check): void {
-        $this->warnings[$check::class] = ($this->warnings[$check::class] ?? 0) + 1;
-        $check->sendWarningMessage($this->getPlayer());
+        $this->warnings[$check::class][] = time();
+        if(count($this->warnings[$check::class]) > 500){
+            array_shift($this->warnings[$check::class]);
+        }
+        $warnings = $this->getWarnings($check, 30);
+        $ban = $warnings >= $check->getMaxWarnings();
+        if(
+            ($warnings >= $check->getMinWarningsPerReport() &&
+            !$this->getPlayer()->hasDelay($check::class)) || $ban
+        ){
+            $this->getPlayer()->addDelay($check::class, 10);
+            $check->sendWarningMessage($this->getPlayer(), $ban);
+
+            PunishmentProvider::punishPlayer($this->getPlayer()->getName(), "AntiCheat", 15);
+        }
     }
 }

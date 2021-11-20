@@ -13,6 +13,7 @@ use pocketmine\network\mcpe\protocol\PacketPool;
 use pocketmine\network\mcpe\protocol\PlayerActionPacket;
 use pocketmine\Player;
 use pocketmine\Server;
+use pocketmine\utils\TextFormat;
 use ryzerbe\core\anticheat\AntiCheatManager;
 use ryzerbe\core\anticheat\AntiCheatPlayer;
 use ryzerbe\core\anticheat\Check;
@@ -26,7 +27,7 @@ use function in_array;
 use function strval;
 
 class AutoClicker extends Check {
-    public const CHECK_DELAY = 30;
+    public const CHECK_DELAY = 20;
 
     public function onDataPacketReceive(DataPacketReceiveEvent $event): void {
         $packet = $event->getPacket();
@@ -65,10 +66,7 @@ class AutoClicker extends Check {
                 $player->setClicksPerSecond($player->getClicks());
                 $player->setClicks(0);
 
-                if(
-                    $player->getConsistentClicks() > AntiCheatPlayer::MIN_CLICKS &&
-                    $player->hasConsistentClicks()
-                ){
+                if($player->getConsistentClicks() > AntiCheatPlayer::MIN_CLICKS && $player->hasConsistentClicks()){
                     $player->addWarning($this);
                     $player->resetClicks();
                 }
@@ -77,23 +75,45 @@ class AutoClicker extends Check {
         return true;
     }
 
-    public function sendWarningMessage(Player $player): void{
+    public function getImportance(AntiCheatPlayer $antiCheatPlayer): string {
+        $cps = $antiCheatPlayer->getConsistentClicks(5);
+        $player = $antiCheatPlayer->getPlayer();
+        $device = (RyZerPlayerProvider::getRyzerPlayer($player)?->getLoginPlayerData()->getDeviceOsName()) ?? "Unknown";
+        if (!$antiCheatPlayer->hasConsistentClicks()) {
+            if ($cps >= 40) {
+                return TextFormat::DARK_RED . "3";
+            }else if($device == "Android" || $device == "iOS" && $cps >= 30) {
+                return TextFormat::DARK_RED."3";
+            }if ($cps >= 20) {
+                return TextFormat::RED."2";
+            }
+            return TextFormat::GOLD."1";
+        }
+        if ($cps >= 40) {
+            return TextFormat::DARK_RED."3";
+        } elseif ($cps >= 20) {
+            return TextFormat::DARK_RED."3";
+        }
+        return TextFormat::GOLD."1";
+    }
+
+    public function sendWarningMessage(Player $player, bool $ban = false): void{
         $antiCheatPlayer = AntiCheatManager::getPlayer($player);
         $ryzerPlayer = RyZerPlayerProvider::getRyzerPlayer($player);
         if($antiCheatPlayer === null || $ryzerPlayer === null) return;
-        if($antiCheatPlayer->getWarnings($this) > 3) return;
 
         $discordMessage = new DiscordMessage(WebhookLinks::AUTOCLICKER_LOG);
         $embed = new DiscordEmbed();
-        $embed->setTitle("AutoClicker Detection");
-        $embed->addField(new EmbedField("Player", $player->getName()));
-        $embed->addField(new EmbedField("Device", $ryzerPlayer->getLoginPlayerData()->getDeviceOsName()));
-        $embed->addField(new EmbedField("CPS (Last second)", strval($antiCheatPlayer->getConsistentClicks(1))));
-        $embed->addField(new EmbedField("CPS (Last three seconds)", strval($antiCheatPlayer->getConsistentClicks(3))));
-        $embed->addField(new EmbedField("Importance", "IDK"));//TODO
-        $embed->addField(new EmbedField("Warnings", strval($antiCheatPlayer->getWarnings($this))));
-        $embed->addField(new EmbedField("Server", Server::getInstance()->getMotd()));
-        $embed->addField(new EmbedField("TPS", Server::getInstance()->getTicksPerSecondAverage() . "(" . Server::getInstance()->getTickUsageAverage() . "%)"));
+        $embed->setTitle(($ban ? "[AutoClicker] Player was banned" : "AutoClicker Detection"));
+        $embed->addField(new EmbedField("Player", $player->getName(), true));
+        $embed->addField(new EmbedField("Device", $ryzerPlayer->getLoginPlayerData()->getDeviceOsName(), true));
+        $embed->addField(new EmbedField("Warnings", strval($antiCheatPlayer->getWarnings($this)), true));
+        $embed->addField(new EmbedField("CPS (Last second)", strval($antiCheatPlayer->getConsistentClicks(1)), true));
+        $embed->addField(new EmbedField("CPS (Last three seconds)", strval($antiCheatPlayer->getConsistentClicks(3)), true));
+        $embed->addField(new EmbedField("CPS (Last five seconds)", strval($antiCheatPlayer->getConsistentClicks(5)), true));
+        $embed->addField(new EmbedField("Importance", TextFormat::clean($this->getImportance($antiCheatPlayer)), true));
+        $embed->addField(new EmbedField("Server", Server::getInstance()->getMotd(), true));
+        $embed->addField(new EmbedField("TPS", Server::getInstance()->getTicksPerSecondAverage() . " (" . Server::getInstance()->getTickUsageAverage() . "%)", true));
         $embed->setColor(match ($antiCheatPlayer->getWarnings($this)) {
             1 => DiscordColor::ORANGE,
             2 => DiscordColor::RED,
@@ -102,5 +122,13 @@ class AutoClicker extends Check {
         $embed->setFooter("RyZerBE", "https://images-ext-2.discordapp.net/external/Pvz56xrz36E9uwwoKvZWm-WN2XGFk15m-GmF3ckaP_8/%3Fwidth%3D703%26height%3D703/https/media.discordapp.net/attachments/693494109842833469/730816117311930429/RYZER_Network.png");
         $discordMessage->addEmbed($embed);
         $discordMessage->send();
+    }
+
+    public function getMinWarningsPerReport(): int{
+        return 10;
+    }
+
+    public function getMaxWarnings(): int {
+        return 25;
     }
 }
