@@ -18,6 +18,7 @@ use ryzerbe\core\anticheat\AntiCheatManager;
 use ryzerbe\core\anticheat\AntiCheatPlayer;
 use ryzerbe\core\anticheat\Check;
 use ryzerbe\core\player\RyZerPlayerProvider;
+use ryzerbe\core\provider\StaffProvider;
 use ryzerbe\core\util\discord\color\DiscordColor;
 use ryzerbe\core\util\discord\DiscordMessage;
 use ryzerbe\core\util\discord\embed\DiscordEmbed;
@@ -61,7 +62,7 @@ class AutoClicker extends Check {
     }
 
     public function onUpdate(int $currentTick): bool{
-        if($currentTick % self::CHECK_DELAY === 0) {//The fuck!?
+        if($currentTick % self::CHECK_DELAY === 0) {
             foreach(AntiCheatManager::getPlayers() as $player) {
                 $player->setClicksPerSecond($player->getClicks());
                 $player->setClicks(0);
@@ -80,19 +81,22 @@ class AutoClicker extends Check {
         $player = $antiCheatPlayer->getPlayer();
         $device = (RyZerPlayerProvider::getRyzerPlayer($player)?->getLoginPlayerData()->getDeviceOsName()) ?? "Unknown";
         if (!$antiCheatPlayer->hasConsistentClicks()) {
-            if ($cps >= 40) {
+            if ($cps >= 40 || ($antiCheatPlayer->getConsistentClicks(1) === $antiCheatPlayer->getConsistentClicks(3)
+                    && $antiCheatPlayer->getConsistentClicks(3) === $antiCheatPlayer->getConsistentClicks(5))) {
                 return TextFormat::DARK_RED . "3";
-            }else if($device == "Android" || $device == "iOS" && $cps >= 30) {
+            }else if($device == "Android" || $device == "iOS" && $cps >= 20) {
                 return TextFormat::DARK_RED."3";
             }if ($cps >= 20) {
                 return TextFormat::RED."2";
             }
             return TextFormat::GOLD."1";
         }
-        if ($cps >= 40) {
+
+        if($antiCheatPlayer->getConsistentClicks(1) === $antiCheatPlayer->getConsistentClicks(3)
+            && $antiCheatPlayer->getConsistentClicks(3) === $antiCheatPlayer->getConsistentClicks(5) && $cps >= (AntiCheatPlayer::MIN_CLICKS * 2)) {
             return TextFormat::DARK_RED."3";
-        } elseif ($cps >= 20) {
-            return TextFormat::DARK_RED."3";
+        }else if ($cps >= 20) {
+            return TextFormat::RED."2";
         }
         return TextFormat::GOLD."1";
     }
@@ -122,6 +126,27 @@ class AutoClicker extends Check {
         $embed->setFooter("RyZerBE", "https://images-ext-2.discordapp.net/external/Pvz56xrz36E9uwwoKvZWm-WN2XGFk15m-GmF3ckaP_8/%3Fwidth%3D703%26height%3D703/https/media.discordapp.net/attachments/693494109842833469/730816117311930429/RYZER_Network.png");
         $discordMessage->addEmbed($embed);
         $discordMessage->send();
+
+        $warnings = $antiCheatPlayer->getWarnings($this, 30);
+        $calls = match (true) {
+            $warnings <= 5 => TextFormat::GREEN.":-)",
+            $warnings <= 10 => TextFormat::YELLOW.":|",
+            $warnings <= 15 => TextFormat::RED.":(",
+            $warnings <= 20 => TextFormat::RED."SHORTLY BEFORE BAN",
+        };
+        $content = [];
+        $content[] = "\n";
+        $content[] = TextFormat::DARK_GRAY."» ".TextFormat::RED.TextFormat::BOLD."AntiCheat ".TextFormat::RESET.TextFormat::DARK_GRAY." «";
+        $content[] = TextFormat::DARK_GRAY."» ".TextFormat::GRAY."Module: ".TextFormat::GOLD."AutoClicker";
+        $content[] = TextFormat::DARK_GRAY."» ".TextFormat::GRAY."Device: ".TextFormat::GOLD.$ryzerPlayer->getLoginPlayerData()->getDeviceOsName();
+        $content[] = TextFormat::DARK_GRAY."» ".TextFormat::GRAY."CPS (Last sec): ".TextFormat::GOLD.$antiCheatPlayer->getConsistentClicks(1);
+        $content[] = TextFormat::DARK_GRAY."» ".TextFormat::GRAY."CPS (Last 3 secs): ".TextFormat::GOLD.$antiCheatPlayer->getConsistentClicks(3);
+        $content[] = TextFormat::DARK_GRAY."» ".TextFormat::GRAY."CPS (Last 5 secs): ".TextFormat::GOLD.$antiCheatPlayer->getConsistentClicks(5);
+        $content[] = TextFormat::DARK_GRAY."» ".TextFormat::GRAY."Importance: ".TextFormat::GOLD.$this->getImportance($antiCheatPlayer);
+        $content[] = TextFormat::DARK_GRAY."» ".TextFormat::GRAY."Calls(last 30 sec): ".$calls;
+        $content[] = "\n";
+        StaffProvider::sendMessageToStaffs(implode("\n", $content), false);
+
     }
 
     public function getMinWarningsPerReport(): int{

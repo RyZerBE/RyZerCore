@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ryzerbe\core\anticheat;
 
 use pocketmine\Player;
+use pocketmine\utils\TextFormat;
 use ryzerbe\core\player\PMMPPlayer;
 use ryzerbe\core\provider\PunishmentProvider;
 use function array_filter;
@@ -18,7 +19,7 @@ class AntiCheatPlayer {
     private Player $player;
 
     public const CLICKS_OFFSET = 3;
-    public const MIN_CLICKS = 18;
+    public const MIN_CLICKS = 10;
 
     protected int $clicks = 0;
     protected int $clicksPerSecond = 0;
@@ -86,6 +87,10 @@ class AntiCheatPlayer {
     }
 
     public function addClick(): void {
+        if($this->getClicks() > 120) {
+            $this->getPlayer()->kickFromProxy(TextFormat::RED."Too many batch packets!");
+            return;
+        }
         $this->clicks++;
     }
 
@@ -109,6 +114,11 @@ class AntiCheatPlayer {
         }
         $warnings = $this->getWarnings($check, 30);
         $ban = $warnings >= $check->getMaxWarnings();
+
+        if(!$this->getPlayer()->hasDelay($check::class."_once")) {
+            $check->sendWarningMessage($this->getPlayer(), $ban);
+            $this->getPlayer()->addDelay($check::class."_once", 1);
+        }
         if(
             ($warnings >= $check->getMinWarningsPerReport() &&
             !$this->getPlayer()->hasDelay($check::class)) || $ban
