@@ -365,7 +365,6 @@ class RyZerPlayer {
             $ryzerPlayer->setRank($rank, true, false);
 
             $ryzerPlayer->setNetworkLevel(new NetworkLevel($ryzerPlayer, $playerData["network_level"], $playerData["network_level_progress"], $playerData["level_progress_today"], strtotime($playerData["last_level_progress"])));
-            $ryzerPlayer->updateStatus($playerData["status"] ?? null);
 
             if($playerData['clan'] !== "null" && !empty($playerData['clan'])) {
                 $ryzerPlayer->setClan(new Clan($playerData["clan"], $playerData["clanColor"].$playerData["clanTag"], (int)$playerData["clanElo"], $playerData["owner"]));
@@ -387,6 +386,7 @@ class RyZerPlayer {
                 CloudBridge::getInstance()->getClient()->getPacketHandler()->writePacket($pk);
             }
 
+            $ryzerPlayer->updateStatus($playerData["status"] ?? null);
             $ev = new RyZerPlayerAuthEvent($ryzerPlayer);
             $ev->call();
         });
