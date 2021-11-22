@@ -82,7 +82,7 @@ class RyZerPlayer {
         return $this->rank;
     }
 
-    public function setRank(Rank $rank, bool $pushPermissions = true, bool $changePrefix = true, bool $mysql = false): void{
+    public function setRank(Rank $rank, bool $pushPermissions = true, bool $changePrefix = true, bool $mysql = false, bool|DateTime $permanent = true): void{
         $this->rank = $rank;
 
         if($changePrefix) {
@@ -90,7 +90,7 @@ class RyZerPlayer {
             $this->getPlayer()->setDisplayName(str_replace("{player_name}", $this->getPlayer()->getName(), $rank->getNameTag()));
         }
         if($pushPermissions) $this->getPlayer()->addAttachment(RyZerBE::getPlugin())->setPermissions($rank->getPermissionFormat());
-        if($mysql) RankManager::getInstance()->setRank($this->getPlayer()->getName(), $rank);
+        if($mysql) RankManager::getInstance()->setRank($this->getPlayer()->getName(), $rank, $permanent);
     }
 
     public function addCoins(int $coins, bool $mysql = false){
@@ -173,8 +173,10 @@ class RyZerPlayer {
 
             $res = $mysqli->query("SELECT * FROM playerranks WHERE player='$playerName'");
             if($res->num_rows > 0){
-                $playerData["rank"] = $res->fetch_assoc()["rankname"] ?? "Player";
-                $playerData["permissions"] = $res->fetch_assoc()["permissions"] ?? "";
+                $data = $res->fetch_assoc();
+                $playerData["rank"] = $data["rankname"] ?? "Player";
+                $playerData["permissions"] = $data["permissions"] ?? "";
+                $playerData["rank_duration"] = $data["duration"] ?? 0;
             }
 
             $res = $mysqli->query("SELECT * FROM gametime WHERE player='$playerName'");
@@ -320,7 +322,7 @@ class RyZerPlayer {
 
             if($ryzerPlayer === null) return;
             if($playerData["language"] === null) {
-                LanguageForm::onOpen($sender);
+                LanguageForm::onOpen($player);
             }else {
                 $ryzerPlayer->setLanguage($playerData["language"] ?? "English");
             }
@@ -363,6 +365,18 @@ class RyZerPlayer {
             $rank = RankManager::getInstance()->getRank($playerData["rank"] ?? "Player");
             if($rank === null) $rank = RankManager::getInstance()->getBackupRank();
             $ryzerPlayer->setRank($rank, true, false);
+            if(isset($playerData["rank_duration"])) {
+                if($playerData["rank_duration"] != 0) {
+                    $now = new DateTime();
+                    $duration = new DateTime($playerData["rank_duration"]);
+                    if($now > $duration){
+                        $ryzerPlayer->getPlayer()->sendMessage(RyZerBE::PREFIX.LanguageProvider::getMessageContainer("rank-expired", $player->getName(), ["#rank" => $rank->getColor().$rank->getRankName()]));
+                        $ryzerPlayer->setRank(RankManager::getInstance()->getBackupRank(), true, false, true);
+                    }else {
+                        $ryzerPlayer->getRank()->setDuration($playerData["rank_duration"]);
+                    }
+                }
+            }
 
             $ryzerPlayer->setNetworkLevel(new NetworkLevel($ryzerPlayer, $playerData["network_level"], $playerData["network_level_progress"], $playerData["level_progress_today"], strtotime($playerData["last_level_progress"])));
 
@@ -404,7 +418,7 @@ class RyZerPlayer {
         $toggleRank = (int)$settings->isRankToggled();
 
         AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($gameTimeTicks, $playerName, $more_particle, $party_invites, $friend_requests, $msg_toggle, $toggleRank): void{
-            if($gameTimeTicks > 0) $mysqli->query("UPDATE gametime SET ticks='$gameTimeTicks' WHERE player='$playerName'");
+            if($gameTimeTicks > 60) $mysqli->query("UPDATE gametime SET ticks='$gameTimeTicks' WHERE player='$playerName'");
             $mysqli->query("INSERT INTO `player_settings`(`player`, `more_particle`, `party_requests`, `friend_requests`, `msg_toggle`, `toggle_rank`) VALUES ('$playerName', '$more_particle', '$party_invites', '$friend_requests', '$msg_toggle', '$toggleRank') ON DUPLICATE KEY UPDATE more_particle='$more_particle',party_requests='$party_invites',friend_requests='$friend_requests',msg_toggle='$msg_toggle',toggle_rank='$toggleRank'");
         });
     }

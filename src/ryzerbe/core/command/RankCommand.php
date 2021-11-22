@@ -2,6 +2,7 @@
 
 namespace ryzerbe\core\command;
 
+use DateTime;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\utils\TextFormat;
@@ -23,7 +24,17 @@ class RankCommand extends Command {
             $sender->sendMessage(TextFormat::GRAY."Rank: ".$rbePlayer->getRank()->getColor().$rbePlayer->getRank()->getRankName());
             $sender->sendMessage(TextFormat::GRAY."Power: ".TextFormat::GOLD.$rbePlayer->getRank()->getJoinPower());
             $sender->sendMessage(TextFormat::GRAY."Permissions: ".TextFormat::GOLD.implode(", ", $rbePlayer->getRank()->getPermissions()));
-            $sender->sendMessage(TextFormat::GRAY."Until: ".TextFormat::GOLD."Never");
+            $duration = $rbePlayer->getRank()->getDuration();
+            if($duration === 0) $duration = "Never";
+            else {
+               $diff = (new DateTime())->diff(new DateTime($duration));
+               $duration = "";
+               if($diff->m > 0) $duration .= $diff->m."M ";
+               if($diff->d > 0) $duration .= $diff->d."D ";
+               if($diff->i > 0) $duration .= $diff->i."Min ";
+               if($diff->d <= 0 && $diff->s > 0) $duration .= $diff->s."Sec ";
+            }
+            $sender->sendMessage(TextFormat::GRAY."Until: ".TextFormat::GOLD.$duration);
             return;
         }
         RankMainForm::onOpen($sender);

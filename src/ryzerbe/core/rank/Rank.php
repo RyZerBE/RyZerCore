@@ -14,6 +14,8 @@ class Rank {
     private string $color;
     private int $joinPower;
     private array $permissions;
+    /** @var string|null */
+    private ?string $duration = null;
 
     public function __construct(string $rankName, string $nameTag, string $chatPrefix, string $color, int $joinPower, array $permissions){
         $this->color = $color;
@@ -93,5 +95,19 @@ class Rank {
 
     public function setNameTag(string $nameTag): void{
         $this->nameTag = $nameTag;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDuration(): ?string{
+        return $this->duration;
+    }
+
+    /**
+     * @param string|null $duration
+     */
+    public function setDuration(?string $duration): void{
+        $this->duration = $duration;
     }
 }

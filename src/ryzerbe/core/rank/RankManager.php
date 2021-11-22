@@ -2,6 +2,7 @@
 
 namespace ryzerbe\core\rank;
 
+use DateTime;
 use mysqli;
 use pocketmine\permission\PermissionManager;
 use pocketmine\Server;
@@ -9,6 +10,7 @@ use pocketmine\utils\SingletonTrait;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\util\async\AsyncExecutor;
 use function explode;
+use function is_bool;
 use function str_replace;
 
 class RankManager {
@@ -78,10 +80,17 @@ class RankManager {
         return $this->ranks[$rankName] ?? null;
     }
 
-    public function setRank(string $playerName, Rank $rank){
+    /**
+     * @param string $playerName
+     * @param Rank $rank
+     * @param bool|DateTime $permanent
+     */
+    public function setRank(string $playerName, Rank $rank, bool|DateTime $permanent = true){
         $rankName = $rank->getRankName();
-        AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use($rank, $playerName, $rankName): void{
-            $mysqli->query("INSERT INTO `playerranks`(`player`, `rankname`, `permissions`) VALUES ('$playerName', '$rankName', '') ON DUPLICATE KEY UPDATE rankname='$rankName'");
+        if(is_bool($permanent)) $duration = "0";
+        else $duration = $permanent->format("Y-m-d H:i:s");
+        AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use($rank, $playerName, $rankName, $duration): void{
+            $mysqli->query("INSERT INTO `playerranks`(`player`, `rankname`, `permissions`, `duration`) VALUES ('$playerName', '$rankName', '', '$duration') ON DUPLICATE KEY UPDATE rankname='$rankName',duration='$duration'");
         });
     }
 
