@@ -8,6 +8,8 @@ use pocketmine\permission\PermissionManager;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\utils\TextFormat;
+use ryzerbe\core\event\player\rank\PlayerRankUpdateEvent;
+use ryzerbe\core\player\RyZerPlayerProvider;
 use ryzerbe\core\util\async\AsyncExecutor;
 use function explode;
 use function is_bool;
@@ -91,6 +93,12 @@ class RankManager {
         else $duration = $permanent->format("Y-m-d H:i:s");
         AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use($rank, $playerName, $rankName, $duration): void{
             $mysqli->query("INSERT INTO `playerranks`(`player`, `rankname`, `permissions`, `duration`) VALUES ('$playerName', '$rankName', '', '$duration') ON DUPLICATE KEY UPDATE rankname='$rankName',duration='$duration'");
+        }, function(Server $server, $result) use ($playerName, $rank): void{
+            $rbePlayer = RyZerPlayerProvider::getRyzerPlayer($playerName);
+            if($rbePlayer === null) return;
+
+            $ev = new PlayerRankUpdateEvent($rbePlayer, $rank);
+            $ev->call();
         });
     }
 
