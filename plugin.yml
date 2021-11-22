@@ -54,3 +54,5 @@ permissions:
     default: op
   ryzer.nick.list:
     default: op
+  ryzer.joinme.tokens.add:
+    default: op

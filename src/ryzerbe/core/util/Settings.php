@@ -55,6 +55,7 @@ class Settings {
             $mysqli->query("CREATE TABLE IF NOT EXISTS `gametime` (`player` VARCHAR(32) KEY NOT NULL, `ticks` INT NOT NULL DEFAULT '0') ENGINE = InnoDB");
             $mysqli->query("CREATE TABLE IF NOT EXISTS `verify` ( `player` VARCHAR(32) NOT NULL , `token` VARCHAR(8) NOT NULL , `verified` TEXT NOT NULL ) ENGINE = InnoDB;");
             $mysqli->query("CREATE TABLE IF NOT EXISTS `joinme` (`player` VARCHAR(32) KEY NOT NULL, `server` VARCHAR(8) NOT NULL, time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP) ENGINE = InnoDB");
+            $mysqli->query("CREATE TABLE IF NOT EXISTS `joinme_tokens` (`player` VARCHAR(32) KEY NOT NULL, `tokens` INT NOT NULL DEFAULT '0') ENGINE = InnoDB");
             $mysqli->query("CREATE TABLE IF NOT EXISTS `proofs` (`id` INT KEY NOT NULL, `message_id` TEXT NOT NULL) ENGINE = InnoDB");
             $mysqli->query("CREATE TABLE IF NOT EXISTS `vanish` (`player` VARCHAR(32) KEY NOT NULL) ENGINE = InnoDB");
             $mysqli->query("CREATE TABLE IF NOT EXISTS `reports` (`id` INTEGER NOT NULL KEY AUTO_INCREMENT, `bad_player` VARCHAR(32) NOT NULL, `created_by` VARCHAR(32) NOT NULL, `reason` VARCHAR(64) NOT NULL , `notice` VARCHAR(64) NOT NULL, `state` INT NOT NULL DEFAULT '0', `result` INT NOT NULL DEFAULT '0', `staff` VARCHAR(32) NOT NULL DEFAULT '', `nick` VARCHAR(32) NOT NULL, `created_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP) ENGINE = InnoDB");
