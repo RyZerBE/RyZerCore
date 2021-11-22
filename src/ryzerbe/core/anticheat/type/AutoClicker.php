@@ -137,6 +137,7 @@ class AutoClicker extends Check {
         $content = [];
         $content[] = "\n";
         $content[] = TextFormat::DARK_GRAY."» ".TextFormat::RED.TextFormat::BOLD."AntiCheat ".TextFormat::RESET.TextFormat::DARK_GRAY." «";
+        $content[] = TextFormat::DARK_GRAY."» ".TextFormat::GRAY."Player: ".TextFormat::RED.$player->getName();
         $content[] = TextFormat::DARK_GRAY."» ".TextFormat::GRAY."Module: ".TextFormat::GOLD."AutoClicker";
         $content[] = TextFormat::DARK_GRAY."» ".TextFormat::GRAY."Device: ".TextFormat::GOLD.$ryzerPlayer->getLoginPlayerData()->getDeviceOsName();
         $content[] = TextFormat::DARK_GRAY."» ".TextFormat::GRAY."CPS (Last sec): ".TextFormat::GOLD.$antiCheatPlayer->getConsistentClicks(1);

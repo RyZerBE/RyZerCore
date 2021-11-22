@@ -19,7 +19,7 @@ class AntiCheatPlayer {
     private Player $player;
 
     public const CLICKS_OFFSET = 3;
-    public const MIN_CLICKS = 10;
+    public const MIN_CLICKS = 15;
 
     protected int $clicks = 0;
     protected int $clicksPerSecond = 0;
@@ -125,8 +125,7 @@ class AntiCheatPlayer {
         ){
             $this->getPlayer()->addDelay($check::class, 10);
             $check->sendWarningMessage($this->getPlayer(), $ban);
-
-            PunishmentProvider::punishPlayer($this->getPlayer()->getName(), "AntiCheat", 15);
+            #PunishmentProvider::punishPlayer($this->getPlayer()->getName(), "AntiCheat", 15);
         }
     }
 }
