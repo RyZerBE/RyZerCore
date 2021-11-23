@@ -11,7 +11,9 @@ use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
 use ryzerbe\core\RyZerBE;
 use ryzerbe\core\util\Settings;
+use function count;
 use function uniqid;
+use function var_dump;
 
 class AsyncExecutor {
     use SingletonTrait;
@@ -25,14 +27,9 @@ class AsyncExecutor {
         AsyncExecutor::getInstance()->syncClosures[$id] = $completeFunction;
         Server::getInstance()->getAsyncPool()->submitTask(
             new class($function, $id, $database) extends AsyncTask {
-                /** @var Closure */
-                /* function (mysqli $mysqli) */
                 private Closure $function;
-                /** @var string */
                 private string $id;
-                /** @var string */
                 private string $database;
-                /** @var array */
                 private array $mysqlData;
 
                 public function __construct(Closure $function, string $id, string $database){
@@ -52,6 +49,39 @@ class AsyncExecutor {
                     if(count($mysqli->error_list) > 0)
                         var_dump($mysqli->error_list);
                     $mysqli->close();
+                }
+
+                public function onCompletion(Server $server){
+                    try{
+                        $completeFunction = AsyncExecutor::getInstance()->syncClosures[$this->id] ?? null;
+                        if($completeFunction === null) return;
+                        $completeFunction($server, $this->getResult());
+                    }catch(Exception $e){
+                        $server->getLogger()->error($e->getMessage()."\n".$e->getTraceAsString());
+                    }
+                }
+            });
+    }
+
+    public static function submitAsyncTask(Closure $function, Closure $completeFunction = null): void{
+        $id = uniqid();
+        AsyncExecutor::getInstance()->syncClosures[$id] = $completeFunction;
+        Server::getInstance()->getAsyncPool()->submitTask(
+            new class($function, $id) extends AsyncTask {
+                private Closure $function;
+                private string $id;
+
+                public function __construct(Closure $function, string $id){
+                    $this->function = $function;
+                    $this->id = $id;
+                }
+
+                /**
+                 * @inheritDoc
+                 */
+                public function onRun(){
+                    $function = $this->function;
+                    $this->setResult($function());
                 }
 
                 public function onCompletion(Server $server){
