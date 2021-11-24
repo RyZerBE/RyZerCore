@@ -21,10 +21,7 @@ class EntityDamageByEntityListener implements Listener {
     public function entityDamage(EntityDamageByEntityEvent $event): void{
         $player = $event->getDamager();
         $entity = $event->getEntity();
-        if(!$player instanceof PMMPPlayer){
-            $event->setCancelled(false); //NO DELAY
-            return;
-        }
+        if(!$player instanceof PMMPPlayer) return;
 
         $ryzerPlayer = $player->getRyZerPlayer();
         if($ryzerPlayer === null) return;
