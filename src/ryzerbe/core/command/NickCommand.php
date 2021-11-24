@@ -32,6 +32,7 @@ class NickCommand extends Command {
      */
     public function execute(CommandSender $sender, string $commandLabel, array $args){
         if(!$sender instanceof PMMPPlayer) return;
+        if(!$this->testPermission($sender)) return;
 
         if($sender->hasPermission("ryzer.nick.list") && isset($args[0])) {
             AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli): array{

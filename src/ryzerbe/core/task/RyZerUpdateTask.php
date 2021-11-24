@@ -10,6 +10,7 @@ use ryzerbe\core\player\RyZerPlayerProvider;
 use ryzerbe\core\provider\StaffProvider;
 use ryzerbe\core\provider\VanishProvider;
 use ryzerbe\core\RyZerBE;
+use ryzerbe\core\util\animation\AnimationManager;
 use ryzerbe\core\util\Settings;
 use ryzerbe\core\util\TaskUtils;
 use function array_rand;
@@ -43,6 +44,9 @@ class RyZerUpdateTask extends Task {
             StaffProvider::refresh();
         }
 
+        foreach(AnimationManager::getInstance()->getActiveAnimations() as $animation) {
+            $animation->tick();
+        }
         AntiCheatManager::getInstance()->onUpdate($currentTick);
     }
 }

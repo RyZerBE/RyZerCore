@@ -25,6 +25,7 @@ class UserInfoCommand extends Command {
      */
     public function execute(CommandSender $sender, string $commandLabel, array $args){
         if(!$sender instanceof PMMPPlayer) return;
+        if(!$this->testPermission($sender)) return;
 
         if(empty($args[0])) {
             $sender->sendMessage(RyZerBE::PREFIX.TextFormat::RED."/userinfo <Spieler>");
