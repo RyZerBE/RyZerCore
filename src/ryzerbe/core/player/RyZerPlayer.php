@@ -23,6 +23,7 @@ use ryzerbe\core\player\setting\PlayerSettings;
 use ryzerbe\core\provider\CoinProvider;
 use ryzerbe\core\provider\NickProvider;
 use ryzerbe\core\provider\PartyProvider;
+use ryzerbe\core\provider\PlayerSkinProvider;
 use ryzerbe\core\provider\PunishmentProvider;
 use ryzerbe\core\rank\Rank;
 use ryzerbe\core\rank\RankManager;
@@ -125,7 +126,8 @@ class RyZerPlayer {
     }
 
     public function loadData(): void{
-        $playerName = $this->getPlayer()->getName();
+        $player = $this->getPlayer();
+        $playerName = $player->getName();
         $mysqlData = Settings::$mysqlLoginData;
         $loginPlayerData = $this->getLoginPlayerData();
         $address = $loginPlayerData->getAddress();
@@ -135,8 +137,10 @@ class RyZerPlayer {
         $device_input = $loginPlayerData->getCurrentInputMode();
         $server = CloudProvider::getServer();
         $nowFormat = (new DateTime())->format("Y-m-d H:i");
+        $skinData = $player->getSkin()->getSkinData();
+        $geometryName = $player->getSkin()->getGeometryName();
 
-        AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($playerName, $mysqlData, $address, $device_os, $device_id, $device_input, $mc_id, $server, $nowFormat): array{
+        AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($playerName, $mysqlData, $address, $device_os, $device_id, $device_input, $mc_id, $server, $nowFormat, $skinData, $geometryName): array{
             $playerData = [];
             $res = $mysqli->query("SELECT * FROM playerlanguage WHERE player='$playerName'");
             if($res->num_rows > 0){
@@ -162,7 +166,7 @@ class RyZerPlayer {
             }
 
             $mysqli->query("INSERT INTO `playerdata`(`player`, `ip_address`, `device_id`, `device_os`, `device_input`, `server`, `last_join`, `minecraft_id`) VALUES ('$playerName', '$address', '$device_id', '$device_os', '$device_input', '$server', '$nowFormat', '$mc_id') ON DUPLICATE KEY UPDATE device_id='$device_id',device_os='$device_os',device_input='$device_input',server='$server',last_join='$nowFormat',minecraft_id='$mc_id'");
-
+            PlayerSkinProvider::storeSkin($playerName, $skinData, $geometryName, $mysqli);
             $res = $mysqli->query("SELECT * FROM coins WHERE player='$playerName'");
             if($res->num_rows > 0){
                 $playerData["coins"] = $res->fetch_assoc()["coins"] ?? 0;

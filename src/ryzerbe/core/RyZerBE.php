@@ -27,6 +27,7 @@ use ryzerbe\core\command\PlayerSettingsCommand;
 use ryzerbe\core\command\PunishHistoryCommand;
 use ryzerbe\core\command\RankCommand;
 use ryzerbe\core\command\ReportCommand;
+use ryzerbe\core\command\SkinDatabaseCommand;
 use ryzerbe\core\command\TeamchatCommand;
 use ryzerbe\core\command\UnbanCommand;
 use ryzerbe\core\command\UserInfoCommand;
@@ -118,7 +119,8 @@ class RyZerBE extends PluginBase {
             new ChunkFixCommand(),
             new UserInfoCommand(),
             new ReportCommand(),
-            new NickCommand()
+            new NickCommand(),
+            new SkinDatabaseCommand()
         ]);
     }
 
