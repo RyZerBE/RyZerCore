@@ -6,6 +6,7 @@ use BauboLP\Cloud\CloudBridge;
 use jojoe77777\FormAPI\SimpleForm;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
+use ryzerbe\core\util\SkinUtils;
 
 class KickClanMemberForm {
     public static function open(Player $player, array $extraData = []){
@@ -20,7 +21,7 @@ class KickClanMemberForm {
             }
         });
         foreach($extraData["players"] as $clanMemberName){
-            $form->addButton(TextFormat::DARK_AQUA . $clanMemberName . "\n" . ((isset($extraData["kick"]) === true) ? TextFormat::RED . TextFormat::BOLD . "✘ Touch to kick" : ""), -1, "", $clanMemberName);
+            $form->addButton(TextFormat::DARK_AQUA . $clanMemberName . "\n" . ((isset($extraData["kick"]) === true) ? TextFormat::RED . TextFormat::BOLD . "✘ Touch to kick" : ""), 1, SkinUtils::getPlayerHeadIcon($clanMemberName), $clanMemberName);
         }
         $form->setTitle(TextFormat::GOLD . TextFormat::BOLD . "Clans");
         $form->sendToPlayer($player);
