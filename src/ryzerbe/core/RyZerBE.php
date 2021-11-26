@@ -29,6 +29,7 @@ use ryzerbe\core\command\RankCommand;
 use ryzerbe\core\command\ReportCommand;
 use ryzerbe\core\command\SkinDatabaseCommand;
 use ryzerbe\core\command\TeamchatCommand;
+use ryzerbe\core\command\TestCommand;
 use ryzerbe\core\command\UnbanCommand;
 use ryzerbe\core\command\UserInfoCommand;
 use ryzerbe\core\command\VanishCommand;
@@ -120,7 +121,8 @@ class RyZerBE extends PluginBase {
             new UserInfoCommand(),
             new ReportCommand(),
             new NickCommand(),
-            new SkinDatabaseCommand()
+            new SkinDatabaseCommand(),
+            new TestCommand()
         ]);
     }
 

@@ -35,7 +35,7 @@ class SkinDatabase {
         }
         $microtime = microtime(true);
         AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($skin, $version): ?array{
-            $query = $mysqli->query("SELECT * FROM skins WHERE skin_name='$skin'" . ($version !== null ? " AND version='$version" : "") . " ORDER BY id DESC");
+            $query = $mysqli->query("SELECT * FROM skins WHERE skin_name='$skin'" . ($version !== null ? " AND version='$version'" : "") . " ORDER BY id DESC");
             if($query->num_rows <= 0) return null;
             $assoc = $query->fetch_assoc();
             return [

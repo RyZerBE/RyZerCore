@@ -2,6 +2,7 @@
 
 namespace ryzerbe\core\util;
 
+use pocketmine\Player;
 use function imagecolorat;
 use function imagecreatefrompng;
 use function imagedestroy;
@@ -30,5 +31,10 @@ class SkinUtils {
         }
         imagedestroy($image);
         return $fileContent;
+    }
+
+    public static function getPlayerHeadIcon(Player|string $player): string{
+        if($player instanceof Player) $player = $player->getName();
+        return "http://ryzer.be/api/skin/head/gethead.php?username=".$player;
     }
 }
