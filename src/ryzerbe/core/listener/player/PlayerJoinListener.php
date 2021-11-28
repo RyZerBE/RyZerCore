@@ -18,6 +18,7 @@ class PlayerJoinListener implements Listener {
         if(!in_array($player->getAddress(), Settings::$ips)) {
             $player->kickFromProxy(TextFormat::RED."Please join about ryzer.be:19132");
             MainLogger::getLogger()->critical($event->getPlayer()->getName()." tried to join with address ".$event->getPlayer()->getAddress());
+            return;
         }
         RyZerPlayerProvider::registerRyzerPlayer($player);
     }
