@@ -39,6 +39,7 @@ use function implode;
 use function in_array;
 use function str_replace;
 use function stripos;
+use function strlen;
 
 class RyZerPlayer {
     private LoginPlayerData $loginPlayerData;
@@ -140,6 +141,14 @@ class RyZerPlayer {
         $nowFormat = (new DateTime())->format("Y-m-d H:i");
         $skinData = $player->getSkin()->getSkinData();
         $geometryName = $player->getSkin()->getGeometryName();
+
+        $correct_size = Skin::ACCEPTED_SKIN_SIZES[2];
+        if(strlen($skinData) > $correct_size) {
+            SkinDatabase::getInstance()->loadSkin("steve", function(bool $success) use ($player): void{
+                if(!$player->isConnected()) return;
+                $player->sendMessage(RyZerBE::PREFIX.TextFormat::RED."Skin aren't allowed!");
+            }, null, $player);
+        }
 
         AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($playerName, $mysqlData, $address, $device_os, $device_id, $device_input, $mc_id, $server, $nowFormat, $skinData, $geometryName): array{
             $playerData = [];
