@@ -12,13 +12,17 @@ use ryzerbe\core\player\PMMPPlayer;
 use ryzerbe\core\player\RyZerPlayer;
 use ryzerbe\core\RyZerBE;
 use ryzerbe\core\util\async\AsyncExecutor;
+use ryzerbe\core\util\skin\SkinDatabase;
 use ryzerbe\core\util\SkinUtils;
 use function array_rand;
+use function base64_decode;
 use function basename;
 use function count;
 use function file_exists;
 use function glob;
+use function popen;
 use function uniqid;
+use function zlib_decode;
 
 class NickProvider implements RyZerProvider {
 
@@ -54,12 +58,11 @@ class NickProvider implements RyZerProvider {
         RyZerBE::getPlugin()->getLogger()->info("loaded ".count(self::$nickNames)." and ".count(self::$nickSkins)." nick skins");
     }
 
-    /**
-     * @param string $name
-     * @return Skin|null
-     */
-    public static function getNickSkinByName(string $name): ?Skin{
-        return self::$nickSkins[$name] ?? null;
+    public static function convertSkinsToSkinDB(): void{
+        foreach(self::$nickSkins as $name => $skin) {
+            SkinDatabase::getInstance()->saveSkin($skin, $name, "nick");
+            popen("rm -r /root/RyzerCloud/data/nick/$name.png", "r");
+        }
     }
 
     /**
@@ -108,14 +111,31 @@ class NickProvider implements RyZerProvider {
         if($rbePlayer->getNick() !== null) return;
         $name = $player->getName();
         $nickName = self::$nickNames[array_rand(self::$nickNames)];
-        $nickSkinName = array_rand(self::$nickSkins);
-        $nickSkin = self::$nickSkins[$nickSkinName];
 
-        AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($name, $nickSkinName, $nickName): void{
+        AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($name, $nickName): ?array{
+            $res = $mysqli->query("SELECT * FROM skins WHERE version='nick'");
+            if($res->num_rows <= 0) return null;
+
+            $skins = [];
+            while($data = $res->fetch_assoc()) {
+                $skins[] = $data["skin_name"];
+            }
+            $nickSkinName = $skins[array_rand($skins)];
+            $query = $mysqli->query("SELECT * FROM skins WHERE skin_name='$nickSkinName' ORDER BY id DESC");
+            if($query->num_rows <= 0) return null;
+            $assoc = $query->fetch_assoc();
+
             $mysqli->query("INSERT INTO `nicks`(`player`, `nick`, `nick_skin`) VALUES ('$name', '$nickName', '$nickSkinName')");
-        }, function(Server $server, $result) use ($rbePlayer, $nickName, $nickSkin): void{
+             return [
+                "skinData" => zlib_decode(base64_decode($assoc["skinData"])),
+                "geometryData" => zlib_decode(base64_decode($assoc["geometryData"])),
+                "geometryName" => $assoc["geometryName"]
+            ];
+        }, function(Server $server, ?array $result) use ($rbePlayer, $nickName): void{
             $player = $rbePlayer->getPlayer();
             if(!$player->isConnected()) return;
+            if($result === null) return;
+            $nickSkin = new Skin(uniqid(), $result["skinData"], "", $result["geometryName"], $result["geometryData"]);
 
             $rbePlayer->setNick($nickName);
             $player->setSkin($nickSkin);

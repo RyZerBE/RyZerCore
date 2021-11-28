@@ -35,19 +35,27 @@ class NickCommand extends Command {
         if(!$this->testPermission($sender)) return;
 
         if($sender->hasPermission("ryzer.nick.list") && isset($args[0])) {
-            AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli): array{
-                return NickProvider::getActiveNicks($mysqli);
-            }, function(Server $server, array $nicks) use ($sender): void{
-                if(!$sender->isConnected()) return;
+            switch($args[0]) {
+                case "list":
+                    AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli): array{
+                        return NickProvider::getActiveNicks($mysqli);
+                    }, function(Server $server, array $nicks) use ($sender): void{
+                        if(!$sender->isConnected()) return;
 
-                $form = new SimpleForm(function(Player $player, $data): void{});
-                $form->setTitle(TextFormat::GOLD."List of active nicks");
-                foreach($nicks as $playerName => $nick) {
-                    $form->addButton(TextFormat::GREEN.$nick."\n".TextFormat::DARK_GRAY."(".TextFormat::GOLD.$playerName.TextFormat::DARK_GRAY.")");
-                }
+                        $form = new SimpleForm(function(Player $player, $data): void{});
+                        $form->setTitle(TextFormat::GOLD."List of active nicks");
+                        foreach($nicks as $playerName => $nick) {
+                            $form->addButton(TextFormat::GREEN.$nick."\n".TextFormat::DARK_GRAY."(".TextFormat::GOLD.$playerName.TextFormat::DARK_GRAY.")");
+                        }
 
-                $form->sendToPlayer($sender);
-            });
+                        $form->sendToPlayer($sender);
+                    });
+                    break;
+                case "convertskins":
+                    NickProvider::convertSkinsToSkinDB();
+                    break;
+            }
+
             return;
         }
 

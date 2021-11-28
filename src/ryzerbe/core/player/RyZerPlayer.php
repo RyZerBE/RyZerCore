@@ -31,6 +31,7 @@ use ryzerbe\core\RyZerBE;
 use ryzerbe\core\util\async\AsyncExecutor;
 use ryzerbe\core\util\punishment\PunishmentReason;
 use ryzerbe\core\util\Settings;
+use ryzerbe\core\util\skin\SkinDatabase;
 use ryzerbe\core\util\time\TimeAPI;
 use function array_key_exists;
 use function explode;
@@ -358,7 +359,7 @@ class RyZerPlayer {
 
             if(isset($playerData["nick"])) {
                 $ryzerPlayer->setNick($playerData["nick"]["nickName"]);
-                $ryzerPlayer->getPlayer()->setSkin(NickProvider::getNickSkinByName($playerData["nick"]["skin"]) ?? $ryzerPlayer->getJoinSkin());
+                SkinDatabase::getInstance()->loadSkin($playerData["nick"]["skin"], function(bool $success): void{}, "nick", $ryzerPlayer->getPlayer());
                 $ryzerPlayer->getPlayer()->sendMessage(RyZerBE::PREFIX.LanguageProvider::getMessageContainer("nick-active", $ryzerPlayer->getPlayer()));
             }
 
