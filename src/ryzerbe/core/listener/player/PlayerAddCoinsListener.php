@@ -30,7 +30,7 @@ class PlayerAddCoinsListener implements Listener {
             $coinBoost->boostCoins($player, $event->getAddedCoins());
         }else {
             AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(\mysqli $mysqli) use ($playerName): void{
-                $mysqli->query("DELETE FROM `coinboosts` WHERE player='$playerName'")
+                $mysqli->query("DELETE FROM `coinboosts` WHERE player='$playerName'");
             });
         }
     }
