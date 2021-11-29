@@ -63,7 +63,7 @@ class RyZerPlayer {
     private ?Clan $clan = null;
     private PlayerSettings $playerSettings;
     private ?DateTime $mute = null;
-    private ?Coinboost $coinboost;
+    private ?Coinboost $coinboost = null;
 
     /** @var array  */
     private array $myPermissions = [];
@@ -79,6 +79,9 @@ class RyZerPlayer {
         $this->playerSettings = new PlayerSettings();
     }
 
+    /**
+     * @return PMMPPlayer
+     */
     public function getPlayer(): Player{
         return $this->player;
     }
@@ -335,7 +338,7 @@ class RyZerPlayer {
                     $playerData["coinboost"] = [
                         "time" => $data["time"],
                         "percent" => $data["percent"],
-                        "forAll" => $data["forAll"]
+                        "forAll" => $data["for_all"]
                     ];
                 }
             }
@@ -630,5 +633,23 @@ class RyZerPlayer {
      */
     public function setCoinboost(?Coinboost $coinboost): void{
         $this->coinboost = $coinboost;
+    }
+
+    /**
+     * @param int $percent
+     * @param DateTime $endTime
+     * @param bool $isForAll
+     * @param bool $mysql
+     */
+    public function giveCoinboost(int $percent, DateTime $endTime, bool $isForAll = false, bool $mysql = false){
+        $this->setCoinboost(new Coinboost($this->getPlayer(), $percent, $endTime, $isForAll));
+
+        if($mysql) {
+            $name = $this->getPlayer()->getName();
+            $endTime = $endTime->format("Y-m-d H:i");
+            AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($name, $isForAll, $percent, $endTime){
+                $mysqli->query("INSERT INTO `coinboosts`(`player`, `time`, `percent`, `for_all`) VALUES ('$name', '$endTime', '$percent', '$isForAll')");
+            });
+        }
     }
 }

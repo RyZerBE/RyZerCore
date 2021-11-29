@@ -13,6 +13,7 @@ use ryzerbe\core\command\BanHistoryDeleteCommand;
 use ryzerbe\core\command\BroadcastCommand;
 use ryzerbe\core\command\ChunkFixCommand;
 use ryzerbe\core\command\ClanUiCommand;
+use ryzerbe\core\command\CoinBoostCommand;
 use ryzerbe\core\command\CoinCommand;
 use ryzerbe\core\command\GamemodeCommand;
 use ryzerbe\core\command\GameTimeCommand;
@@ -124,7 +125,8 @@ class RyZerBE extends PluginBase {
             new NickCommand(),
             new SkinDatabaseCommand(),
             new TestCommand(),
-            new UpdatelogCommand()
+            new UpdatelogCommand(),
+            new CoinBoostCommand()
         ]);
     }
 
