@@ -10,6 +10,7 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\RyZerBE;
 use ryzerbe\core\util\UpdatelogEntry;
+use function array_keys;
 use function implode;
 use function intval;
 use function strval;
@@ -27,9 +28,9 @@ class UpdatelogCommand extends Command {
      */
     protected static function sendForm(Player $player, UpdatelogEntry $entry){
         $types = [
-            "ADD",
-            "REMOVE",
-            "FIX"
+            "ADD" => "+",
+            "REMOVE" => "-",
+            "FIX" => ""
         ];
         $form = new CustomForm(function(Player $player, $data) use ($entry, $types): void{
             if($data === null) {
@@ -52,15 +53,15 @@ class UpdatelogCommand extends Command {
                 return;
             }
 
-            $type = $types[$data["type"]];
-            $change = $data["change"];
+            $type = $types[array_keys($types)[$data["type"]]];
+            $change = $type.$data["change"];
 
             $entry->addChange($change);
             UpdatelogCommand::sendForm($player, $entry);
         });
 
         $form->addInput(TextFormat::GREEN."Change", "", "", "change");
-        $form->addDropdown(TextFormat::GREEN."Type (SOON - Wait of xAroxx)", $types, null, "type");
+        $form->addDropdown(TextFormat::GREEN."Type", array_keys($types), null, "type");
         $form->addLabel(TextFormat::GREEN."Close to finish");
         $form->sendToPlayer($player);
     }
