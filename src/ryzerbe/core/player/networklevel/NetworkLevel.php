@@ -44,6 +44,7 @@ class NetworkLevel {
     public function getProgressToLevelUp(?int $level = null): int {
         $level = ($level ?? $this->getLevel());
         return match (true) {
+            ($level < 2) => 500,
             ($level <= 10) => 1000,
             ($level <= 25) => 2000,
             ($level <= 50) => 5000,
