@@ -13,6 +13,7 @@ use ryzerbe\core\provider\PunishmentProvider;
 use ryzerbe\core\rank\RankManager;
 use ryzerbe\core\util\discord\DiscordMessage;
 use ryzerbe\core\util\discord\WebhookLinks;
+use function rand;
 use function str_replace;
 
 class PlayerChatListener implements Listener {
@@ -29,8 +30,10 @@ class PlayerChatListener implements Listener {
             return;
         }
 
-        $clan = ($rbePlayer->getClan() !== null) ? $rbePlayer->getClan()->getClanTag()." " : "";
-        $event->setFormat($clan.str_replace("{player_name}", $rbePlayer->getName(true), str_replace("{MSG}", $event->getMessage(), ($rbePlayer->getNick() !== null) ? RankManager::getInstance()->getBackupRank()->getChatPrefix() : $rbePlayer->getRank()->getChatPrefix())));
+        $level = ($rbePlayer->getNick() !== null) ? rand(1, 20) : $rbePlayer->getNetworkLevel()->getLevel();
+        $levelColor = $rbePlayer->getNetworkLevel()->getLevelColor($level);
+        $clan = ($rbePlayer->getClan() !== null) ? $rbePlayer->getClan()->getClanTag() : "";
+        $event->setFormat($levelColor.$level.TextFormat::GRAY." | ".TextFormat::RESET.str_replace("{player_name}", $rbePlayer->getName(true).TextFormat::DARK_GRAY." [".$clan.TextFormat::DARK_GRAY."]", str_replace("{MSG}", $event->getMessage(), ($rbePlayer->getNick() !== null) ? RankManager::getInstance()->getBackupRank()->getChatPrefix() : $rbePlayer->getRank()->getChatPrefix())));
         $discordMessage = new DiscordMessage(WebhookLinks::CHAT_LOG);
         $discordMessage->setMessage($player->getName()."[".CloudProvider::getServer()."] ".str_replace("@", "", $event->getMessage()));
         $discordMessage->send();
