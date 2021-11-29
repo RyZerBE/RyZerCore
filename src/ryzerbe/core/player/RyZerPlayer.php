@@ -14,6 +14,7 @@ use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\clan\Clan;
+use ryzerbe\core\event\player\rank\PlayerRankUpdateEvent;
 use ryzerbe\core\event\player\RyZerPlayerAuthEvent;
 use ryzerbe\core\form\types\LanguageForm;
 use ryzerbe\core\language\LanguageProvider;
@@ -62,6 +63,9 @@ class RyZerPlayer {
     private PlayerSettings $playerSettings;
     private ?DateTime $mute = null;
 
+    /** @var array  */
+    private array $myPermissions = [];
+
     /** @var Skin  */
     private Skin $skin;
 
@@ -94,6 +98,33 @@ class RyZerPlayer {
         }
         if($pushPermissions) $this->getPlayer()->addAttachment(RyZerBE::getPlugin())->setPermissions($rank->getPermissionFormat());
         if($mysql) RankManager::getInstance()->setRank($this->getPlayer()->getName(), $rank, $permanent);
+    }
+
+    public function addPlayerPermission(string $permission, bool $pushInstant = true, bool $mysql = false){
+        $this->myPermissions[] = $permission;
+        if($pushInstant) $this->getPlayer()->addAttachment(RyZerBE::getPlugin())->setPermission($permission, true);
+
+        if($mysql) {
+            $permissions = implode(";", $this->myPermissions);
+            $playerName = $this->getPlayer()->getName();
+            AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use($permissions, $playerName): void{
+                $mysqli->query("UPDATE playerranks SET permissions='$permissions' WHERE player='$playerName'");
+            });
+        }
+    }
+
+    public function addPlayerPermissions(array $permissions, bool $pushInstant = true, bool $mysql = false){
+        foreach($permissions as $permission){
+            $this->addPlayerPermission($permission, $pushInstant);
+        }
+
+        if($mysql) {
+            $permissions = implode(";", $this->myPermissions);
+            $playerName = $this->getPlayer()->getName();
+            AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use($permissions, $playerName): void{
+                $mysqli->query("UPDATE playerranks SET permissions='$permissions' WHERE player='$playerName'");
+            });
+        }
     }
 
     public function addCoins(int $coins, bool $mysql = false){
@@ -145,8 +176,9 @@ class RyZerPlayer {
         $correct_size = Skin::ACCEPTED_SKIN_SIZES[2];
         if(strlen($skinData) > $correct_size) {
             SkinDatabase::getInstance()->loadSkin("steve", function(bool $success) use ($player): void{
-                if(!$player->isConnected()) return;
-                $player->sendMessage(RyZerBE::PREFIX.TextFormat::RED."Skin aren't allowed!");
+                if(!$player->isConnected() || !$player instanceof PMMPPlayer) return;
+                if(!$success) $player->kickFromProxy("&cSkin aren't allowed! Please switch your skin!");
+                else $player->sendMessage(RyZerBE::PREFIX.TextFormat::RED."Skin aren't allowed!");
             }, null, $player);
         }
 
@@ -375,10 +407,10 @@ class RyZerPlayer {
             $ryzerPlayer->setCoins($playerData["coins"] ?? 0);
             $ryzerPlayer->gameTimeTicks = $playerData["ticks"] ?? 0;
 
-
             $rank = RankManager::getInstance()->getRank($playerData["rank"] ?? "Player");
             if($rank === null) $rank = RankManager::getInstance()->getBackupRank();
             $ryzerPlayer->setRank($rank, true, false);
+            $ryzerPlayer->addPlayerPermissions(explode(";", $playerData["permissions"] ?? ""));
             if(isset($playerData["rank_duration"])) {
                 if($playerData["rank_duration"] != 0) {
                     $now = new DateTime();
