@@ -61,6 +61,6 @@ class TimeFormat {
 
     public function asShortString(): string{
         if($this->getTime() === 0) return "???";
-        return (($this->getYears() !== 0 ? strval($this->getYears()) . " Y" . ", " : "") . ($this->getMonths() !== 0 ? strval($this->getMonths()) . " M" . ", " : "") . ($this->getDays() !== 0 ? strval($this->getDays()) . " D" . ", " : "") . ($this->getHours() !== 0 ? strval($this->getHours()) . " H" . ", " : "") . ($this->getMinutes() !== 0 ? strval($this->getMinutes()) . " Min" . ", " : "") . (($this->getSeconds() !== 0 && $this->getHours() === 0) ? strval($this->getSeconds()) . " Sec" : ""));
+        return (($this->getYears() !== 0 ? strval($this->getYears()) . " Y" . ", " : "") . ($this->getMonths() !== 0 ? strval($this->getMonths()) . " M" . ", " : "") . ($this->getDays() !== 0 ? strval($this->getDays()) . " D" . ", " : "") . ($this->getHours() !== 0 ? strval($this->getHours()) . " H" . ", " : "") . (($this->getMinutes() !== 0 && $this->getDays() === 0) ? strval($this->getMinutes()) . " Min" . ", " : "") . (($this->getSeconds() !== 0 && $this->getHours() === 0) ? strval($this->getSeconds()) . " Sec" : ""));
     }
 }
