@@ -2,8 +2,12 @@
 
 namespace ryzerbe\core\player\networklevel;
 
+use baubolp\ryzerbe\lobbycore\player\LobbyPlayerCache;
+use baubolp\ryzerbe\lobbycore\provider\LottoProvider;
 use Closure;
 use mysqli;
+use pocketmine\utils\TextFormat;
+use ryzerbe\core\player\networklevel\reward\CoinReward;
 use ryzerbe\core\player\RyZerPlayer;
 use ryzerbe\core\provider\CoinProvider;
 use ryzerbe\core\util\async\AsyncExecutor;
@@ -13,9 +17,24 @@ class NetworkLevelProvider {
     public static array $rewards = [];
 
     public static function initRewards(): void{
+        for($i = 1; $i < 15; $i++) {
+            self::registerReward(new CoinReward($i, 500 * $i));
+        }
+        for ($i = 16; $i < 50; $i++) {
+            self::registerReward(new CoinReward($i, 6000 + (250 * $i)));
+        }
+        for ($i = 51; $i < 100; $i++) {
+            self::registerReward(new CoinReward($i, 6000 + (150 * $i)));
+        }
         self::registerRewards([
-            new LevelUpReward(2, "2000 Coins", function(int $level, RyZerPlayer $ryzerPlayer): void{
-                CoinProvider::addCoins($ryzerPlayer->getPlayer()->getName(), 2000);
+            new LevelUpReward(2, "3000 Startcoins", function(int $level, RyZerPlayer $ryzerPlayer): void{
+                CoinProvider::addCoins($ryzerPlayer->getPlayer()->getName(), 3000);
+            }),
+            new LevelUpReward(4, "2 Lottotickets", function(int $level, RyZerPlayer $ryzerPlayer): void{
+                LottoProvider::addTicket(LobbyPlayerCache::getLobbyPlayer($ryzerPlayer->getPlayer()), 2);
+            }),
+            new LevelUpReward(15, TextFormat::GOLD."Custom Tag", function(int $level, RyZerPlayer $ryZerPlayer): void{
+                $ryZerPlayer->addPlayerPermission("lobby.status");
             })
         ]);
     }
