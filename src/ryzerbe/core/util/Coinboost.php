@@ -4,6 +4,7 @@ namespace ryzerbe\core\util;
 
 use DateTime;
 use ryzerbe\core\player\PMMPPlayer;
+use function round;
 
 class Coinboost {
 
@@ -68,7 +69,7 @@ class Coinboost {
         if($rbePlayer === null) return;
 
 
-        $rbePlayer->addCoins($gaveCoins + (($this->percent * $gaveCoins) / 100), true);
+        $rbePlayer->addCoins($gaveCoins + round((($this->percent * $gaveCoins) / 100)), true);
         $rbePlayer->sendTranslate("player-coinboost-get", ["#booster" => (($boosterRBEPlayer === null) ? "§f" : $boosterRBEPlayer->getRank()->getColor()).$this->getPlayer()->getName(), "#percent" => $this->percent]);
     }
 }
