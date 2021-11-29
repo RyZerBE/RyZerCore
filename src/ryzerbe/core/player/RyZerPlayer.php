@@ -30,6 +30,7 @@ use ryzerbe\core\rank\Rank;
 use ryzerbe\core\rank\RankManager;
 use ryzerbe\core\RyZerBE;
 use ryzerbe\core\util\async\AsyncExecutor;
+use ryzerbe\core\util\Coinboost;
 use ryzerbe\core\util\punishment\PunishmentReason;
 use ryzerbe\core\util\Settings;
 use ryzerbe\core\util\skin\SkinDatabase;
@@ -62,6 +63,7 @@ class RyZerPlayer {
     private ?Clan $clan = null;
     private PlayerSettings $playerSettings;
     private ?DateTime $mute = null;
+    private ?Coinboost $coinboost;
 
     /** @var array  */
     private array $myPermissions = [];
@@ -127,9 +129,9 @@ class RyZerPlayer {
         }
     }
 
-    public function addCoins(int $coins, bool $mysql = false){
+    public function addCoins(int $coins, bool $isBoosted = false, bool $mysql = false){
         $this->coins += $coins;
-        if($mysql) CoinProvider::addCoins($this->getPlayer()->getName(), $coins);
+        if($mysql) CoinProvider::addCoins($this->getPlayer()->getName(), $coins, $isBoosted);
     }
 
     public function removeCoins(int $coins, bool $mysql = false){
@@ -327,6 +329,16 @@ class RyZerPlayer {
                     }
                 }
             }
+            $res = $mysqli->query("SELECT * FROM `coinboosts` WHERE player='$playerName'");
+            if($res->num_rows > 0) {
+                if($data = $res->fetch_assoc()) {
+                    $playerData["coinboost"] = [
+                        "time" => $data["time"],
+                        "percent" => $data["percent"],
+                        "forAll" => $data["forAll"]
+                    ];
+                }
+            }
 
             $mysqli->query("INSERT INTO `second_accounts`(`player`, `accounts`) VALUES ('$playerName', '".implode(":", $accounts)."') ON DUPLICATE KEY UPDATE accounts='".implode(":", $accounts)."'");
 
@@ -362,7 +374,7 @@ class RyZerPlayer {
         }, function(Server $server, array $playerData) use ($playerName): void{
             #var_dump($playerData);
             $player = $server->getPlayer($playerName);
-            if($player === null) return;
+            if(!$player instanceof PMMPPlayer) return;
 
             $ryzerPlayer = RyZerPlayerProvider::getRyzerPlayer($player);
 
@@ -422,6 +434,10 @@ class RyZerPlayer {
                         $ryzerPlayer->getRank()->setDuration($playerData["rank_duration"]);
                     }
                 }
+            }
+
+            if(isset($playerData["coinboost"])) {
+                $ryzerPlayer->setCoinboost(new Coinboost($player, (int)$playerData["coinboost"]["percent"] ?? 15, new DateTime($playerData["coinboost"]["time"]) ?? new DateTime(), (bool)$playerData["coinboost"]["forAll"] ?? false));
             }
 
             $ryzerPlayer->setNetworkLevel(new NetworkLevel($ryzerPlayer, $playerData["network_level"], $playerData["network_level_progress"], $playerData["level_progress_today"], strtotime($playerData["last_level_progress"])));
@@ -596,5 +612,23 @@ class RyZerPlayer {
      */
     public function getName(bool $nick): string{
         return ($nick === true && $this->nick !== null) ? $this->nick : $this->getPlayer()->getName();
+    }
+
+    public function sendTranslate(string $key, array $replaces = [], string $prefix = RyZerBE::PREFIX): void{
+        $this->getPlayer()->sendMessage($prefix.LanguageProvider::getMessageContainer($key, $this->getPlayer(), $replaces));
+    }
+
+    /**
+     * @return Coinboost|null
+     */
+    public function getCoinboost(): ?Coinboost{
+        return $this->coinboost;
+    }
+
+    /**
+     * @param Coinboost|null $coinboost
+     */
+    public function setCoinboost(?Coinboost $coinboost): void{
+        $this->coinboost = $coinboost;
     }
 }
