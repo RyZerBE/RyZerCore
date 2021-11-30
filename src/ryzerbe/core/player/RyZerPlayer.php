@@ -36,6 +36,7 @@ use ryzerbe\core\util\Settings;
 use ryzerbe\core\util\skin\SkinDatabase;
 use ryzerbe\core\util\time\TimeAPI;
 use function array_key_exists;
+use function array_search;
 use function explode;
 use function implode;
 use function in_array;
@@ -108,6 +109,19 @@ class RyZerPlayer {
     public function addPlayerPermission(string $permission, bool $pushInstant = true, bool $mysql = false){
         $this->myPermissions[] = $permission;
         if($pushInstant) $this->getPlayer()->addAttachment(RyZerBE::getPlugin())->setPermission($permission, true);
+
+        if($mysql) {
+            $permissions = implode(";", $this->myPermissions);
+            $playerName = $this->getPlayer()->getName();
+            AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use($permissions, $playerName): void{
+                $mysqli->query("UPDATE playerranks SET permissions='$permissions' WHERE player='$playerName'");
+            });
+        }
+    }
+
+    public function removePlayerPermission(string $permission, bool $pushInstant = true, bool $mysql = false){
+        unset($this->myPermissions[array_search($permission, $this->myPermissions)]);
+        if($pushInstant) $this->getPlayer()->addAttachment(RyZerBE::getPlugin())->setPermissions($this->myPermissions);
 
         if($mysql) {
             $permissions = implode(";", $this->myPermissions);
