@@ -20,6 +20,8 @@ use ryzerbe\core\player\RyZerPlayerProvider;
 use ryzerbe\core\RyZerBE;
 use ryzerbe\core\util\async\AsyncExecutor;
 use function count;
+use function explode;
+use function in_array;
 use function is_nan;
 use function is_numeric;
 use function is_string;
@@ -27,6 +29,13 @@ use function time;
 use function var_dump;
 
 class JoinMeCommand extends Command {
+
+    private array $forbiddenGroups = [
+        "Lobby",
+        "EloCWBW",
+        "FunCWBW",
+        "TrainingLobby"
+    ];
     public function __construct(){
         parent::__construct("joinme", "join a joinme #stupid", "", ["jm"]);
     }
@@ -112,7 +121,10 @@ class JoinMeCommand extends Command {
                 $ryzerPlayer->connectServer($data);
             });
 
-            if($player->hasPermission("ryzer.joinme") || $joinMe["tokens"] > 0) $form->addButton(TextFormat::GREEN . "Create JoinMe", 1, "https://media.discordapp.net/attachments/602115215307309066/907983757846380594/3212872.png?width=410&height=410", "create");
+            $form->setTitle(TextFormat::AQUA.TextFormat::BOLD."JoinMe");
+            if(($player->hasPermission("ryzer.joinme") || $joinMe["tokens"] > 0)){
+                if(!in_array(explode("-", CloudProvider::getServer())[0], $this->forbiddenGroups)) $form->addButton(TextFormat::GREEN."Create JoinMe", 1, "https://media.discordapp.net/attachments/602115215307309066/907983757846380594/3212872.png?width=410&height=410", "create");
+            }
             else $form->setContent(LanguageProvider::getMessageContainer("joinme-token-info", $player->getName()));
 
             unset($joinMe["tokens"]);
