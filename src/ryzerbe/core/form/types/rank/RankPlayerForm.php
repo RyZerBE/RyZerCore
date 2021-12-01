@@ -31,6 +31,12 @@ class RankPlayerForm {
             if($days === 0 && $months === 0 && $hours === 0) $duration = true;
 
             $ryzerPlayer = RyZerPlayerProvider::getRyzerPlayer($playerName);
+            $rbePlayer = RyZerPlayerProvider::getRyzerPlayer($player);
+            if($rbePlayer === null) return;
+            if(($rbePlayer->getRank()->getJoinPower() <= $rank->getJoinPower()) && !$player->hasPermission("ryzer.admin")) {
+                $player->sendMessage(RyZerBE::PREFIX.TextFormat::RED."Du kannst keine höheren Ränge verteilen!");
+                return;
+            }
             if($ryzerPlayer === null){
                 RankManager::getInstance()->setRank($playerName, $rank, $duration);
                 return;
