@@ -36,7 +36,7 @@ class NetworkLevelCommand extends Command {
             $networkLevel = $rbePlayer->getNetworkLevel();
             $nextLevel = ($networkLevel->getLevel() + 1);
             $progressPercentage = $rbePlayer->getNetworkLevel()->getProgressPercentage();
-            $neededXP = $networkLevel->getProgressToLevelUp($networkLevel->getLevel() + 1) - $networkLevel->getProgress();
+            $neededXP = $networkLevel->getProgressToLevelUp($networkLevel->getLevel()) - $networkLevel->getProgress();
             $multiplierPercentage = $networkLevel->getMultiplier() * 100;
             //MAX_PROGRESS - 30
             //CURRENT_PROGRESS - ??
