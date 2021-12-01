@@ -56,3 +56,5 @@ permissions:
     default: op
   ryzer.joinme.tokens.add:
     default: op
+  ryzer.coinboost.admin:
+    default: op
