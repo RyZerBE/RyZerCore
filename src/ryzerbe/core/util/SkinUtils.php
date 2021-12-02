@@ -15,6 +15,12 @@ class SkinUtils {
     public const DEFAULT_GEOMETRY_NAME = "geometry.humanoid.custom";
     public const DEFAULT_GEOMETRY_SLIM_NAME = "geometry.humanoid.customSlim";
 
+    public const HEAD_GEOMETRY = [
+        "32"  => '{"geometry.player_head":{"texturewidth":64,"textureheight":64,"bones":[{"name":"head","pivot":[0,24,0],"cubes":[{"origin":[-4,0,-4],"size":[8,8,8],"uv":[0,0]}]}]}}',
+        "64"  => '{"geometry.player_head":{"texturewidth":64,"textureheight":64,"bones":[{"name":"head","pivot":[0,24,0],"cubes":[{"origin":[-4,0,-4],"size":[8,8,8],"uv":[0,0]}]}]}}',
+        "128" => '{"geometry.player_head":{"texturewidth":64,"textureheight":64,"bones":[{"name":"head","pivot":[0,24,0],"cubes":[{"origin":[-4,0,-4],"size":[8,8,8],"uv":[0,0]}]}]}}',
+    ];
+
     public static function fromImage(string $filePath): string{
         if(!is_file($filePath)) return "";
         $image = @imagecreatefrompng($filePath);
