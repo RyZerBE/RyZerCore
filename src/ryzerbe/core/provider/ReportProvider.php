@@ -2,12 +2,18 @@
 
 namespace ryzerbe\core\provider;
 
+use DateTime;
 use mysqli;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\RyZerBE;
 use ryzerbe\core\util\async\AsyncExecutor;
+use ryzerbe\core\util\discord\color\DiscordColor;
+use ryzerbe\core\util\discord\DiscordMessage;
+use ryzerbe\core\util\discord\embed\DiscordEmbed;
+use ryzerbe\core\util\discord\embed\options\EmbedField;
+use ryzerbe\core\util\discord\WebhookLinks;
 
 class ReportProvider implements RyZerProvider {
 
@@ -42,6 +48,17 @@ class ReportProvider implements RyZerProvider {
 
             if($success) {
                 $player->sendMessage(RyZerBE::PREFIX.LanguageProvider::getMessageContainer("successful-player-reported", $player->getName(), ['#playername' => $nickName, '#reason' => $reason]));
+                $discordMessage = new DiscordMessage(WebhookLinks::REPORT_LOG);
+                $discordEmbed = new DiscordEmbed();
+                $discordEmbed->setColor(DiscordColor::RED);
+                $discordEmbed->setFooter("RyZerBE Moderation", "https://media.discordapp.net/attachments/602115215307309066/907944961037729792/rbe_logo_new.png?width=702&height=702");
+                $discordEmbed->setThumbnail("https://media.discordapp.net/attachments/602115215307309066/907946777951502336/unknown.png?width=720&height=486");
+                $discordEmbed->addField(new EmbedField(":detective: Bad boy", $bad_player, true));
+                $discordEmbed->addField(new EmbedField(":dagger: Reason", $reason, true));
+                $discordEmbed->addField(new EmbedField(":cop: Detective", $reporter, false));
+                $discordEmbed->addField(new EmbedField(":trident: Nick", (($nick !== null) ? "POSITIVE (".$nickName.")" : "NEGATIVE"), true));
+                $discordEmbed->setDateTime(new DateTime());
+                $discordMessage->send();
                 StaffProvider::sendMessageToStaffs(
                     ReportProvider::PREFIX.TextFormat::GOLD.$bad_player.TextFormat::GRAY." wurde ".TextFormat::YELLOW."reportet".TextFormat::GRAY."!"
                     ."\n".TextFormat::GRAY."Grund: ".TextFormat::GOLD.$reason

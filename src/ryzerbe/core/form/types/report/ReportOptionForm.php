@@ -4,6 +4,7 @@ namespace ryzerbe\core\form\types\report;
 
 use BauboLP\Cloud\CloudBridge;
 use BauboLP\Cloud\Packets\PlayerMessagePacket;
+use DateTime;
 use jojoe77777\FormAPI\SimpleForm;
 use pocketmine\Player;
 use pocketmine\Server;
@@ -12,6 +13,11 @@ use ryzerbe\core\provider\CoinProvider;
 use ryzerbe\core\provider\ReportProvider;
 use ryzerbe\core\provider\StaffProvider;
 use ryzerbe\core\util\async\AsyncExecutor;
+use ryzerbe\core\util\discord\color\DiscordColor;
+use ryzerbe\core\util\discord\DiscordMessage;
+use ryzerbe\core\util\discord\embed\DiscordEmbed;
+use ryzerbe\core\util\discord\embed\options\EmbedField;
+use ryzerbe\core\util\discord\WebhookLinks;
 use function implode;
 
 class ReportOptionForm {
@@ -37,6 +43,14 @@ class ReportOptionForm {
                         $pk->addData("players", $report["created_by"]);
                         $pk->addData("message", "&9Report &r&7Dein Report &6".$report["bad_player"]."&7 wird bearbeitet..");
                         CloudBridge::getInstance()->getClient()->getPacketHandler()->writePacket($pk);
+                        $discordMessage = new DiscordMessage(WebhookLinks::REPORT_LOG);
+                        $discordEmbed = new DiscordEmbed();
+                        $discordEmbed->setColor(DiscordColor::ORANGE);
+                        $discordEmbed->setTitle($player->getName()." bearbeitet nun den Report ".$report["bad_player"]);
+                        $discordEmbed->setFooter("RyZerBE Moderation", "https://media.discordapp.net/attachments/602115215307309066/907944961037729792/rbe_logo_new.png?width=702&height=702");
+                        $discordEmbed->setThumbnail("https://media.discordapp.net/attachments/602115215307309066/907946777951502336/unknown.png?width=720&height=486");
+                        $discordEmbed->setDateTime(new DateTime());
+                        $discordMessage->send();
                         StaffProvider::sendMessageToStaffs(ReportProvider::PREFIX.TextFormat::GOLD.$player->getName().TextFormat::GRAY." bearbeitet den Report ".TextFormat::GOLD.$report["bad_player"], true);
                     });
                     break;
@@ -51,6 +65,14 @@ class ReportOptionForm {
                         $pk->addData("message", "&9Report &r&7Dein Report &6".$report["bad_player"]."&7 wurde &aangenommen");
                         CoinProvider::addCoins($report["created_by"], 50);
                         CloudBridge::getInstance()->getClient()->getPacketHandler()->writePacket($pk);
+                        $discordMessage = new DiscordMessage(WebhookLinks::REPORT_LOG);
+                        $discordEmbed = new DiscordEmbed();
+                        $discordEmbed->setColor(DiscordColor::GREEN);
+                        $discordEmbed->setTitle($player->getName()." hat den Report ".$report["bad_player"]." angenommen");
+                        $discordEmbed->setFooter("RyZerBE Moderation", "https://media.discordapp.net/attachments/602115215307309066/907944961037729792/rbe_logo_new.png?width=702&height=702");
+                        $discordEmbed->setThumbnail("https://media.discordapp.net/attachments/602115215307309066/907946777951502336/unknown.png?width=720&height=486");
+                        $discordEmbed->setDateTime(new DateTime());
+                        $discordMessage->send();
                         StaffProvider::sendMessageToStaffs(ReportProvider::PREFIX.TextFormat::GOLD.$player->getName().TextFormat::GRAY." hat den Report ".TextFormat::GOLD.$report["bad_player"].TextFormat::GREEN." angenommen", true);
                     });
                     break;
@@ -64,6 +86,14 @@ class ReportOptionForm {
                         $pk->addData("players", $report["created_by"]);
                         $pk->addData("message", "&9Report &r&7Dein Report &6".$report["bad_player"]."&7 wurde &cabgelehnt");
                         CloudBridge::getInstance()->getClient()->getPacketHandler()->writePacket($pk);
+                        $discordMessage = new DiscordMessage(WebhookLinks::REPORT_LOG);
+                        $discordEmbed = new DiscordEmbed();
+                        $discordEmbed->setColor(DiscordColor::DARK_RED);
+                        $discordEmbed->setTitle($player->getName()." hat den Report ".$report["bad_player"]." abgelehnt");
+                        $discordEmbed->setFooter("RyZerBE Moderation", "https://media.discordapp.net/attachments/602115215307309066/907944961037729792/rbe_logo_new.png?width=702&height=702");
+                        $discordEmbed->setThumbnail("https://media.discordapp.net/attachments/602115215307309066/907946777951502336/unknown.png?width=720&height=486");
+                        $discordEmbed->setDateTime(new DateTime());
+                        $discordMessage->send();
                         StaffProvider::sendMessageToStaffs(ReportProvider::PREFIX.TextFormat::GOLD.$player->getName().TextFormat::GRAY." hat den Report ".TextFormat::GOLD.$report["bad_player"].TextFormat::RED." abgelehnt", true);
                     });
                     break;
@@ -73,6 +103,14 @@ class ReportOptionForm {
                     }, function(Server $server, $result) use ($report, $player): void{
                         if(!$player->isConnected()) return;
                         StaffProvider::sendMessageToStaffs(ReportProvider::PREFIX.TextFormat::GOLD.$player->getName().TextFormat::GRAY." hat den Report ".TextFormat::GOLD.$report["bad_player"].TextFormat::YELLOW." freigegeben", true);
+                        $discordMessage = new DiscordMessage(WebhookLinks::REPORT_LOG);
+                        $discordEmbed = new DiscordEmbed();
+                        $discordEmbed->setColor(DiscordColor::DARK_GREEN);
+                        $discordEmbed->setTitle($player->getName()." hat den Report ".$report["bad_player"]." freigeben");
+                        $discordEmbed->setFooter("RyZerBE Moderation", "https://media.discordapp.net/attachments/602115215307309066/907944961037729792/rbe_logo_new.png?width=702&height=702");
+                        $discordEmbed->setThumbnail("https://media.discordapp.net/attachments/602115215307309066/907946777951502336/unknown.png?width=720&height=486");
+                        $discordEmbed->setDateTime(new DateTime());
+                        $discordMessage->send();
                     });
                     break;
                 case "jump":
