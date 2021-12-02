@@ -11,13 +11,15 @@ use pocketmine\level\Position;
 use ryzerbe\core\util\animation\Animation;
 use ryzerbe\core\util\TaskUtils;
 use function lcg_value;
+use function mt_rand;
+use function var_dump;
 
 class FireworkInstantAnimation extends Animation {
 
     /** @var Position[]  */
-    private array $positions;
+    public array $positions;
 
-    private int $ticks;
+    public int $ticks;
 
     /**
      * @return Fireworks
@@ -56,11 +58,15 @@ class FireworkInstantAnimation extends Animation {
 
     public function tick(): void{
         if($this->ticks === $this->getCurrentTick()) $this->cancel();
-        foreach($this->positions as $position) {
-            $center = $position->add(mt_rand(-4, 4) + lcg_value(), $position->y + lcg_value(), mt_rand(-4, 4) + lcg_value());
 
-            $entity = new FireworksRocket($position->getLevelNonNull(), Entity::createBaseNBT($center, null, lcg_value() * 360, 90), $this->getFireworks());
-            $entity->spawnToAll();
+        if($this->getCurrentTick() % 15 === 0) {
+            foreach($this->positions as $position) {
+                $center = $position->add(mt_rand(-4, 4) + lcg_value(), $position->y + lcg_value(), mt_rand(-4, 4) + lcg_value());
+
+                $entity = new FireworksRocket($position->getLevelNonNull(), Entity::createBaseNBT($center, null, lcg_value() * 360, 90), $this->getFireworks());
+                $entity->spawnToAll();
+                $entity->teleport($position);
+            }
         }
         parent::tick();
     }
