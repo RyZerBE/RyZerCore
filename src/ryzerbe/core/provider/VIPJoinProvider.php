@@ -50,7 +50,7 @@ class VIPJoinProvider implements RyZerProvider, Listener {
         $checked = 0;
         foreach($players as $player){
             $checked++;
-            if($player->getRank()->getJoinPower() >= $joinedPlayer->getRank()) continue;
+            if($player->getRank()->getJoinPower() >= $joinedPlayer->getRank()->getJoinPower()) continue;
             $player->getPlayer()->sendMessage(RyZerBE::PREFIX.LanguageProvider::getMessageContainer("vip-kick", $player->getPlayer(), ["#rank" => $player->getRank()->getColor().$player->getRank()->getRankName()]));
             $player->sendToLobby();
             $joinedPlayer->getPlayer()->sendMessage(RyZerBE::PREFIX.LanguageProvider::getMessageContainer("vip-kick-successful", $joinedPlayer->getPlayer()));
