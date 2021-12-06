@@ -8,15 +8,20 @@ use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerMoveEvent;
 
 class PlayerMoveListener implements Listener {
+    private const XZ = [
+        [0.3, 0], [0, 0.3], [-0.3, 0], [0, -0.3]
+    ];
+
     public function onPlayerMove(PlayerMoveEvent $event): void {
         $player = $event->getPlayer();
         $level = $player->getLevel();
-        if (
-            $player->fallDistance < 3.2
-            && (
-                $level->getBlock($player->subtract($player->width / 2, 1, $player->width / 2))->isSolid() ||
-                $level->getBlock($player->add($player->width / 2, -1, $player->width / 2))->isSolid()
-            )
-        ) $player->resetFallDistance();
+        if ($player->fallDistance < 3.2){
+            foreach(self::XZ as $xz) {
+                if($level->getBlock($player->add($xz[0], 1, $xz[1]))->isSolid()) {
+                    $player->resetFallDistance();
+                    break;
+                }
+            }
+        }
     }
 }
