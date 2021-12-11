@@ -215,10 +215,9 @@ class RyZerPlayer {
             if($res->num_rows > 0) {
                 while($data = $res->fetch_assoc()) {
                     if(PunishmentProvider::activatePunishment($data["until"])) {
-                        $untilString = PunishmentProvider::getUntilFormat($data["until"]);
 
                         $type =($data["type"] == PunishmentReason::BAN) ? "ban" : "mute";
-                        $playerData[$type."_until"] = $untilString;
+                        $playerData[$type."_until"] = $data["until"];
                         $playerData[$type."_staff"] = $data["created_by"];
                         $playerData[$type."_reason"] = $data["reason"];
                         $playerData[$type."_id"] = $data["id"];
@@ -403,7 +402,7 @@ class RyZerPlayer {
             }
 
             if(isset($playerData["ban_until"])) {
-                $ryzerPlayer->kick(LanguageProvider::getMessage("ban-screen", $ryzerPlayer->getLanguageName(), ["#staff" => $playerData["ban_staff"], "#until" => $playerData["ban_until"], "#reason" => $playerData["ban_reason"], "#id" => $playerData["ban_id"]]));
+                $ryzerPlayer->kick(LanguageProvider::getMessage("ban-screen", $ryzerPlayer->getLanguageName(), ["#staff" => $playerData["ban_staff"], "#until" => PunishmentProvider::getUntilFormat($playerData["ban_until"]), "#reason" => $playerData["ban_reason"], "#id" => $playerData["ban_id"]]));
                 return;
             }
 
