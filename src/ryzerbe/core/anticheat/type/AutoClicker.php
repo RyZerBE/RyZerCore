@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ryzerbe\core\anticheat\type;
 
 use pocketmine\event\server\DataPacketReceiveEvent;
-use pocketmine\item\enchantment\Enchantment;
 use pocketmine\network\mcpe\protocol\BatchPacket;
 use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
@@ -63,8 +62,6 @@ class AutoClicker extends Check {
             foreach(AntiCheatManager::getPlayers() as $player) {
                 $player->setClicksPerSecond($player->getClicks());
                 $player->setClicks(0);
-
-                $player->getPlayer()->sendActionBarMessage("§r".$player->getClicksPerSecond());
 
                 if($player->getConsistentClicks() > AntiCheatPlayer::MIN_CLICKS && $player->hasConsistentClicks()){
                     $player->addWarning($this);
