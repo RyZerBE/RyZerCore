@@ -51,13 +51,10 @@ class AutoClicker extends Check {
                 $antiCheatPlayer->addClick();
             }
         } elseif ($packet instanceof PlayerActionPacket){
-            $item = $player->getInventory()->getItemInHand();
-            if($item->hasEnchantment(Enchantment::EFFICIENCY)) return;
-            $block = $player->getLevel()->getBlockAt($packet->x, $packet->y, $packet->z);
-            if($block->getBreakTime($item) <= 0) return;
-            if($packet->action === PlayerActionPacket::ACTION_START_BREAK){
-                $antiCheatPlayer->addClick();
-            }
+            if(in_array($packet->action, [
+                PlayerActionPacket::ACTION_ABORT_BREAK, PlayerActionPacket::ACTION_START_BREAK, PlayerActionPacket::ACTION_STOP_BREAK,
+                PlayerActionPacket::ACTION_INTERACT_BLOCK, PlayerActionPacket::ACTION_PREDICT_DESTROY_BLOCK, PlayerActionPacket::ACTION_CONTINUE_DESTROY_BLOCK
+            ])) $antiCheatPlayer->addClick();
         }
     }
 
@@ -66,6 +63,8 @@ class AutoClicker extends Check {
             foreach(AntiCheatManager::getPlayers() as $player) {
                 $player->setClicksPerSecond($player->getClicks());
                 $player->setClicks(0);
+
+                $player->getPlayer()->sendActionBarMessage("§r".$player->getClicksPerSecond());
 
                 if($player->getConsistentClicks() > AntiCheatPlayer::MIN_CLICKS && $player->hasConsistentClicks()){
                     $player->addWarning($this);
