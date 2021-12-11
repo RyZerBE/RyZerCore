@@ -47,7 +47,8 @@ class EntityDamageByEntityListener implements Listener {
             $item = $player->getInventory()->getItemInHand();
             if($item->hasEnchantment(Enchantment::KNOCKBACK) && !$event->isCancelled()){
                 $event->setCancelled();
-                $entity->setSprinting(false);
+                $entity->setImmobile(true);
+                $entity->setImmobile(false);
                 $entity->broadcastEntityEvent(ActorEventPacket::HURT_ANIMATION);
                 $this->knockback($entity, $player, $item->getEnchantmentLevel(Enchantment::KNOCKBACK));
                 $entity->setHealth($entity->getHealth() - $event->getFinalDamage());
