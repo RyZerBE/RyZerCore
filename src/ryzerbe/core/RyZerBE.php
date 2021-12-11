@@ -17,6 +17,7 @@ use ryzerbe\core\command\CoinBoostCommand;
 use ryzerbe\core\command\CoinCommand;
 use ryzerbe\core\command\GamemodeCommand;
 use ryzerbe\core\command\GameTimeCommand;
+use ryzerbe\core\command\InvBugFixCommand;
 use ryzerbe\core\command\JoinMeCommand;
 use ryzerbe\core\command\KickCommand;
 use ryzerbe\core\command\LanguageCommand;
@@ -126,7 +127,8 @@ class RyZerBE extends PluginBase {
             new SkinDatabaseCommand(),
             new TestCommand(),
             new UpdatelogCommand(),
-            new CoinBoostCommand()
+            new CoinBoostCommand(),
+            new InvBugFixCommand()
         ]);
     }
 
