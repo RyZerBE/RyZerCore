@@ -20,7 +20,7 @@ class GamemodeCommand extends Command {
     public function execute(CommandSender $sender, string $commandLabel, array $args){
         if(!$sender instanceof PMMPPlayer) return;
         if(!$this->testPermission($sender)) return;
-        if(empty($args[0])){
+        if(!isset($args[0])){
             $sender->sendMessage(RyZerBE::PREFIX . TextFormat::YELLOW . "/gm <0|1|2|3> (PlayerName)");
             return;
         }
