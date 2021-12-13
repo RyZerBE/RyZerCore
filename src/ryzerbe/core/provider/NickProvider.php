@@ -7,6 +7,8 @@ use pocketmine\entity\Skin;
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\Config;
+use ryzerbe\core\event\player\nick\PlayerNickEvent;
+use ryzerbe\core\event\player\nick\PlayerUnnickEvent;
 use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\player\PMMPPlayer;
 use ryzerbe\core\player\RyZerPlayer;
@@ -142,6 +144,8 @@ class NickProvider implements RyZerProvider {
             $rbePlayer->updateStatus(null);
             $player->sendSkin();
             $player->sendMessage(RyZerBE::PREFIX.LanguageProvider::getMessageContainer('nick-set', $player));
+            $ev = new PlayerNickEvent($rbePlayer, $nickName, $nickSkin);
+            $ev->call();
         });
     }
 
@@ -153,10 +157,11 @@ class NickProvider implements RyZerProvider {
         if($rbePlayer === null) return;
         if($rbePlayer->getNick() === null) return;
         $name = $player->getName();
+        $oldNickName = $rbePlayer->getNick();
 
         AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($name): void{
             $mysqli->query("DELETE FROM nicks WHERE player='$name'");
-        }, function(Server $server, $result) use ($rbePlayer): void{
+        }, function(Server $server, $result) use ($rbePlayer, $oldNickName): void{
             $player = $rbePlayer->getPlayer();
             if(!$player->isConnected()) return;
 
@@ -165,6 +170,8 @@ class NickProvider implements RyZerProvider {
             $player->setSkin($rbePlayer->getJoinSkin());
             $player->sendSkin();
             $player->sendMessage(RyZerBE::PREFIX.LanguageProvider::getMessageContainer('nick-removed', $player));
+            $ev = new PlayerUnnickEvent($rbePlayer, $oldNickName);
+            $ev->call();
         });
     }
 }
