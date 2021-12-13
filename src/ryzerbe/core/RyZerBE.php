@@ -10,6 +10,7 @@ use ReflectionException;
 use ryzerbe\core\block\TNTBlock;
 use ryzerbe\core\command\BanCommand;
 use ryzerbe\core\command\BanHistoryDeleteCommand;
+use ryzerbe\core\command\BanUiCommand;
 use ryzerbe\core\command\BroadcastCommand;
 use ryzerbe\core\command\ChunkFixCommand;
 use ryzerbe\core\command\ClanUiCommand;
@@ -128,7 +129,8 @@ class RyZerBE extends PluginBase {
             new TestCommand(),
             new UpdatelogCommand(),
             new CoinBoostCommand(),
-            new InvBugFixCommand()
+            new InvBugFixCommand(),
+            new BanUiCommand()
         ]);
     }
 
