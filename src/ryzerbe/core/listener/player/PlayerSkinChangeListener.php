@@ -32,6 +32,8 @@ class PlayerSkinChangeListener implements Listener {
             return;
         }
 
+        $player->addDelay("skin_change", 15);
+
         $correct_size = Skin::ACCEPTED_SKIN_SIZES[2];
         if(strlen($skinData) > $correct_size) {
             SkinDatabase::getInstance()->loadSkin("steve", function(bool $success) use ($player): void{
