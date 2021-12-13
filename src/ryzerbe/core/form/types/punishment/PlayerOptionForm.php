@@ -20,18 +20,28 @@ class PlayerOptionForm {
         $playerName = $extraData["player"];
         $form = new SimpleForm(function(Player $player, $data) use ($playerName): void{
             if($data === null) return;
+            if($data === "back") {
+                PlayerNameInputForm::onOpen($player);
+                return;
+            }
 
             switch($data) {
                 case "punish":
                     $form = new SimpleForm(function(Player $player, $data) use ($playerName): void{
                         if($data === null) return;
+                        if($data === "back") {
+                            PlayerOptionForm::onOpen($player, ["player" => $playerName]);
+                            return;
+                        }
 
-                        ConfirmationForm::onOpen($player, TextFormat::RED."Möchtest Du wirklich den Spieler ".TextFormat::GOLD.$playerName.TextFormat::RED." für den Grund ".TextFormat::YELLOW.$data.TextFormat::RED." bestrafen?", function(Player $player) use ($playerName, $data): void{
+                        $punishment = PunishmentProvider::getPunishmentReasonById($data);
+                        ConfirmationForm::onOpen($player, TextFormat::RED."Möchtest Du wirklich den Spieler ".TextFormat::GOLD.$playerName.TextFormat::RED." für den Grund ".TextFormat::YELLOW.$punishment->getReasonName().TextFormat::RED." bestrafen?", function(Player $player) use ($playerName, $data): void{
                             $player->getServer()->dispatchCommand($player, "ban $playerName $data");
                         });
                     });
 
                     $id = 0;
+                    $form->addButton(TextFormat::RED . "Back", 0, "textures/ui/back_button_default.png", "back");
                     foreach(PunishmentProvider::getPunishmentReasons() as $reason) {
                         if($reason->getDays() === 0 && $reason->getHours() === 0) {
                             $form->addButton(TextFormat::RED.$reason->getReasonName()."\n".TextFormat::DARK_RED."PERMANENT ".TextFormat::RED."H".TextFormat::DARK_GRAY."[".TextFormat::AQUA.(($reason->getType() === PunishmentReason::BAN) ? "Ban" : "Mute"), -1, "", "".++$id);
@@ -99,6 +109,7 @@ class PlayerOptionForm {
         $form->addButton(TextFormat::GREEN."Unmute $playerName", 1, "https://media.discordapp.net/attachments/602115215307309066/907945456137555988/7191_unban_hammer.png?width=200&height=200", "unmute");
         $form->addButton(TextFormat::GOLD."History of $playerName", 1, "https://media.discordapp.net/attachments/602115215307309066/907974343227752538/2132336.png?width=410&height=410", "history");
         $form->addButton(TextFormat::GREEN."Entry reset of $playerName", 1, "https://media.discordapp.net/attachments/602115215307309066/908670000242520064/entry-forbidden-no-not-prohibited-traffic-37947.png?width=205&height=205", "ban_entry");
+        $form->addButton(TextFormat::RED . "Back", 0, "textures/ui/back_button_default.png", "back");
 
         $form->sendToPlayer($player);
     }

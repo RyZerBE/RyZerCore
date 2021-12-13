@@ -45,7 +45,11 @@ class PunishmentHistoryForm {
                 return;
             }
             $content = [];
-            $form = new SimpleForm(function(Player $player, $data): void{});
+            $form = new SimpleForm(function(Player $player, $data) use ($playerName): void{
+                if($data === null) return;
+
+                PlayerOptionForm::onOpen($player, ["player" => $playerName]);
+            });
             foreach(array_values($result) as $banData){
                 $until = $banData[2];
                 if(stripos($until, "unban") !== false){
@@ -86,6 +90,7 @@ class PunishmentHistoryForm {
                     }
                 }
             }
+            $form->addButton(TextFormat::RED . "Back", 0, "textures/ui/back_button_default.png", "back");
             $form->setTitle(TextFormat::RED.$playerName);
             $form->setContent(implode("\n", $content));
             $form->sendToPlayer($sender);

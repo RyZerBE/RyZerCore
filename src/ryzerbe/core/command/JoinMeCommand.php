@@ -36,13 +36,12 @@ class JoinMeCommand extends Command {
         "FunCWBW",
         "TrainingLobby"
     ];
+
     public function __construct(){
         parent::__construct("joinme", "join a joinme #stupid", "", ["jm"]);
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args): void{
-        if(!$sender instanceof PMMPPlayer) return;
-
         if(isset($args[0]) && $sender->hasPermission("ryzer.joinme.tokens.add")) {
             switch($args[0]) {
                 case "add":
@@ -58,14 +57,14 @@ class JoinMeCommand extends Command {
                     AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($playerName, $count): void{
                         $mysqli->query("INSERT INTO `joinme_tokens`(`player`, `tokens`) VALUES ('$playerName', '$count') ON DUPLICATE KEY UPDATE tokens=tokens+'$count'");
                     }, function(Server $server, $result) use ($sender, $playerName, $count): void{
-                        if(!$sender->isConnected()) return;
-
                         $sender->sendMessage(RyZerBE::PREFIX.TextFormat::GRAY."Du hast dem Spieler ".TextFormat::GOLD.$playerName.TextFormat::AQUA." $count JoinME Tokens ".TextFormat::GRAY." hinzugefügt");
                     });
                     break;
             }
             return;
         }
+        if(!$sender instanceof PMMPPlayer) return;
+
         $senderName = $sender->getName();
         AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($senderName): array{
             $res = $mysqli->query("SELECT * FROM joinme");
