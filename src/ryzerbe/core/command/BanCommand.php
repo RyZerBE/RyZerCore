@@ -23,17 +23,7 @@ class BanCommand extends Command {
 
     public function execute(CommandSender $sender, string $commandLabel, array $args): void{
         if(!$this->testPermission($sender)) return;
-        if(empty($args[0]) && $sender instanceof PMMPPlayer){
-            PunishmentMainForm::onOpen($sender);
-            $sender->sendMessage(RyZerBE::PREFIX . TextFormat::YELLOW . "/ban <PlayerName> <BanId>");
-            return;
-        }
-        $playerName = $args[0];
-        if(in_array($playerName, self::CANNOT_BANNED)) {
-            $sender->sendMessage(RyZerBE::PREFIX.TextFormat::RED."Dieser Spieler ist geschützt und kann daher nicht gebannt werden!");
-            return;
-        }
-        if(empty($args[1])){
+        if(empty($args[0])){
             $i = 0;
             foreach(PunishmentProvider::getPunishmentReasons() as $banReason){
                 $days = $banReason->getDays();
@@ -57,6 +47,15 @@ class BanCommand extends Command {
                 $typeString = ($banReason->getType() === PunishmentReason::BAN) ? TextFormat::YELLOW . "BAN" : TextFormat::YELLOW . "MUTE";
                 $sender->sendMessage(RyZerBE::PREFIX . TextFormat::YELLOW . ++$i . TextFormat::DARK_GRAY . " » " . TextFormat::RED . $banReason->getReasonName() . TextFormat::DARK_GRAY . " | " . $duration . TextFormat::DARK_GRAY . " [" . $typeString . TextFormat::DARK_GRAY . "]");
             }
+            return;
+        }
+        $playerName = $args[0];
+        if(in_array($playerName, self::CANNOT_BANNED)) {
+            $sender->sendMessage(RyZerBE::PREFIX.TextFormat::RED."Dieser Spieler ist geschützt und kann daher nicht gebannt werden!");
+            return;
+        }
+        if(empty($args[1])){
+            $sender->sendMessage(RyZerBE::PREFIX.TextFormat::RED."Syntax error: /ban <PlayerName:string> <BanID:int>");
             return;
         }
         if(!is_numeric($args[1])){
