@@ -94,15 +94,17 @@ class PunishmentProvider implements RyZerProvider {
         if($unbanFormat instanceof DateTime){
             $unbanFormat = $unbanFormat->format("Y-m-d H:i:s");
         }
-        AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($playerName, $staff, $unbanFormat, $type, $reasonName): void{
+        AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($playerName, $staff, $unbanFormat, $type, $reasonName): ?int{
             $mysqli->query("INSERT INTO `punishments`(`player`, `created_by`, `until`, `type`, `reason`) VALUES ('$playerName', '$staff', '$unbanFormat', '$type', '$reasonName')");
 
             $res = $mysqli->query("SELECT id FROM `punishments` WHERE player='$playerName' AND type='$type' AND until='$unbanFormat'");
-            if($res->num_rows <= 0) return;
+            if($res->num_rows <= 0) return null;
             $id = $res->fetch_assoc()["id"] ?? null;
-            if($id === null) return;
+            if($id === null) return null;
             $mysqli->query("INSERT INTO `proofs`(`id`, `message_id`) VALUES ('$id', '')");
-        }, function(Server $server, $result) use ($type, $reasonName, $playerName, $staff, $unbanFormat): void{
+            return $id;
+        }, function(Server $server, ?int $id) use ($type, $reasonName, $playerName, $staff, $unbanFormat): void{
+            $id = (($id === null) ? "???" : $id);
             $discordMessage = new DiscordMessage(WebhookLinks::PUNISHMENT_LOG);
             $discordEmbed = new DiscordEmbed();
             $discordEmbed->setTitle(($type === PunishmentReason::BAN) ? $playerName . " wurde gebannt" : $playerName . " wurde gemutet");
@@ -112,6 +114,7 @@ class PunishmentProvider implements RyZerProvider {
             $discordEmbed->addField(new EmbedField(":detective: Bad boy", $playerName, true));
             $discordEmbed->addField(new EmbedField(":dagger: Reason", $reasonName, true));
             $discordEmbed->addField(new EmbedField(":cop: Moderator", $staff, false));
+            $discordEmbed->addField(new EmbedField(":paperclip: Proof-ID", $id, false));
             $discordEmbed->addField(new EmbedField(":hourglass: Until", ($unbanFormat === 0) ? "PERMANENT" : $unbanFormat, true));
             $discordEmbed->setDateTime(new DateTime());
             $discordMessage->addEmbed($discordEmbed);
@@ -130,7 +133,7 @@ class PunishmentProvider implements RyZerProvider {
                 ."\n".TextFormat::GRAY."Bestraft von: ".TextFormat::GOLD.$staff, true);
             $player = $server->getPlayerExact($staff);
             if($player === null) return;
-            $player->sendMessage(RyZerBE::PREFIX . TextFormat::GRAY . "Der Spieler " . TextFormat::GOLD . $playerName . TextFormat::GRAY . " wurde für " . TextFormat::GOLD . $reasonName . TextFormat::GREEN . (($type === PunishmentReason::BAN) ? " gebannt" : " gemutet"));
+            $player->sendMessage(RyZerBE::PREFIX . TextFormat::GRAY . "Der Spieler " . TextFormat::GOLD . $playerName . TextFormat::GRAY . " wurde für " . TextFormat::GOLD . $reasonName . TextFormat::GRAY." mit der ID ".TextFormat::YELLOW.$id." ".TextFormat::GREEN . (($type === PunishmentReason::BAN) ? " gebannt" : " gemutet"));
         });
     }
 
