@@ -18,7 +18,11 @@ use function time;
 class AntiCheatPlayer {
     private Player $player;
 
-    public const CLICKS_OFFSET = 3;
+    public const CLICKS_OFFSET_LESS_30 = 5;
+    public const CLICKS_OFFSET_LESS_50 = 10;
+    public const CLICKS_OFFSET_LESS_100 = 15;
+    public const CLICKS_OFFSET_DEFAULT = 20;
+
     public const MIN_CLICKS = 15;
 
     protected int $clicks = 0;
@@ -67,9 +71,15 @@ class AntiCheatPlayer {
         if(count($this->consistentClicks) <= 0) return false;
         $lastClicks = -1;
         $currentTime = time();
+        $cps = $this->getClicksPerSecond();
         foreach($this->consistentClicks as $time => $clicks) {
             if(($currentTime - $time) > $seconds) continue;
-            if($lastClicks === -1 || abs($clicks - $lastClicks) <= self::CLICKS_OFFSET) {
+            if($lastClicks === -1 || abs($clicks - $lastClicks) <= match (true) {
+                    ($cps <= 30) => self::CLICKS_OFFSET_LESS_30,
+                    ($cps <= 50) => self::CLICKS_OFFSET_LESS_50,
+                    ($cps <= 100) => self::CLICKS_OFFSET_LESS_100,
+                    default => self::CLICKS_OFFSET_DEFAULT
+                }) {
                 $lastClicks = $clicks;
                 continue;
             }
