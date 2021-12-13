@@ -2,6 +2,7 @@
 
 namespace ryzerbe\core\form\types\party;
 
+use BauboLP\Cloud\CloudBridge;
 use jojoe77777\FormAPI\SimpleForm;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
@@ -30,7 +31,7 @@ class PartyMemberManageForm {
                     $player->sendMessage(RyZerBE::PREFIX . TextFormat::RED . "Das Freundesystem kommt in einem weiteren Update!");
                     break;
                 case "clan":
-                    $player->getServer()->dispatchCommand($player, "clan invite " . $extraData["member"]);
+                    CloudBridge::getCloudProvider()->dispatchProxyCommand($player->getName(), "clan invite ". $extraData["member"]);
                     break;
             }
         });
