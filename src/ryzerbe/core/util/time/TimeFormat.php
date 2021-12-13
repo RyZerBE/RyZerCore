@@ -2,6 +2,9 @@
 
 namespace ryzerbe\core\util\time;
 
+use function implode;
+use function strval;
+
 class TimeFormat {
     private int $years;
     private int $months;
@@ -61,6 +64,14 @@ class TimeFormat {
 
     public function asShortString(): string{
         if($this->getTime() === 0) return "???";
-        return (($this->getYears() !== 0 ? strval($this->getYears()) . " Y" : "") . ($this->getMonths() !== 0 ? ", ".strval($this->getMonths()) . " M": "") . ($this->getDays() !== 0 ? ", ".strval($this->getDays()) . " D" : "") . ($this->getHours() !== 0 ? ", ".strval($this->getHours()) . " H" : "") . (($this->getMinutes() !== 0 && $this->getDays() === 0) ? ", ".strval($this->getMinutes()) . " Min" : "") . (($this->getSeconds() !== 0 && $this->getHours() === 0) ? ", ".strval($this->getSeconds()) . " Sec" : ""));
+        $timeString = [];
+
+        if($this->getYears() !== 0) $timeString[] = $this->getYears(). " Y";
+        if($this->getMonths() !== 0) $timeString[] = $this->getMonths(). " M";
+        if($this->getDays() !== 0) $timeString[] = $this->getDays(). " D";
+        if($this->getHours() !== 0) $timeString[] = $this->getHours(). " H";
+        if($this->getMinutes() !== 0 && $this->getDays() === 0) $timeString[] = strval($this->getMinutes()) . " Min";
+        if($this->getSeconds() !== 0 && $this->getHours() === 0) $timeString[] = $this->getSeconds() . " Sec";
+        return implode(", ", $timeString);
     }
 }
