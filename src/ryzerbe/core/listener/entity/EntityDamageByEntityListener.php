@@ -42,7 +42,7 @@ class EntityDamageByEntityListener implements Listener {
             return;
         }
         $event->setModifier(0, EntityDamageEvent::MODIFIER_TOTEM);
-        $this->delay[$player->getName()] = microtime(true) + 0.5;
+        $this->delay[$player->getName()] = microtime(true) + 0.25;
         if($entity instanceof PMMPPlayer){
             $item = $player->getInventory()->getItemInHand();
             if($item->hasEnchantment(Enchantment::KNOCKBACK) && !$event->isCancelled()){
