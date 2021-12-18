@@ -54,7 +54,10 @@ use pocketmine\timings\Timings;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\util\Settings;
 use UnexpectedValueException;
+use function cos;
+use function deg2rad;
 use function microtime;
+use function sin;
 
 class PMMPPlayer extends PMPlayer {
     /** @var array  */
@@ -62,6 +65,31 @@ class PMMPPlayer extends PMPlayer {
 
     public function addDelay(string $id, int|float $seconds){
         $this->delay[$id] = microtime(true) + $seconds;
+    }
+
+    /**
+     * @param float|int|null $fakePitch
+     * @param float|int|null $fakeYaw
+     * @return Vector3
+     */
+    public function getLookVector(float|int|null $fakePitch = null, float|int|null $fakeYaw = null) : Vector3{
+        if($fakePitch === null) {
+            $y = -sin(deg2rad($this->getPitch()));
+            $xz = cos(deg2rad($this->getPitch()));
+        }else {
+            $xz = cos(deg2rad($fakePitch));
+            $y = -sin(deg2rad($fakePitch));
+        }
+
+        if($fakeYaw === null) {
+            $x = -$xz * sin(deg2rad($this->getYaw()));
+            $z = $xz * cos(deg2rad($this->getYaw()));
+        }else {
+            $x = -$xz * sin(deg2rad($fakeYaw));
+            $z = $xz * cos(deg2rad($fakeYaw));
+        }
+
+        return $this->temporalVector->setComponents($x, $y, $z)->normalize();
     }
 
     /**
