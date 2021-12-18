@@ -69,7 +69,12 @@ class EntityDamageByEntityListener implements Listener {
             $knockBack = 1.1;
             if($level > 1)
                 $knockBack = 0.9;
-            $motion = new Vector3($attacker->getDirectionVector()->x / $knockBack, $motion->y, $attacker->getDirectionVector()->z / $knockBack);
+
+            if($attacker->getPitch() >= 70) {
+                $motion = new Vector3($attacker->getLookVector(0.48)->x / $knockBack, $motion->y, $attacker->getLookVector(0.48)->z / $knockBack);
+            }else {
+                $motion = new Vector3($attacker->getLookVector()->x / $knockBack, $motion->y, $attacker->getLookVector()->z / $knockBack);
+            }
         }
 
         if(Settings::$reduce){
