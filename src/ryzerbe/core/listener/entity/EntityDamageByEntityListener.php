@@ -3,6 +3,7 @@
 namespace ryzerbe\core\listener\entity;
 
 use pocketmine\block\BlockIds;
+use pocketmine\entity\Attribute;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\Listener;
@@ -52,7 +53,8 @@ class EntityDamageByEntityListener implements Listener {
         if($entity instanceof PMMPPlayer){
             $item = $player->getInventory()->getItemInHand();
             if($event->isCancelled()) return;
-            if($player->distance($entity) > 4 && $item->getId() === ItemIds::STICK){
+            //RBE Knock
+             if($player->distance($entity) > 4 && $item->getId() === ItemIds::STICK){
                 $event->setCancelled();
                 return;
             }
@@ -62,22 +64,121 @@ class EntityDamageByEntityListener implements Listener {
                 $entity->setImmobile(true);
                 $entity->setImmobile(false);
                 $entity->broadcastEntityEvent(ActorEventPacket::HURT_ANIMATION);
-                $this->knockback($entity, $player, self::KNOCK_STICK);
+                $this->RyZerBEKnock($entity, $player, self::KNOCK_STICK);
                 $entity->setHealth($entity->getHealth() - $event->getFinalDamage());
-                //thats here bc I think so its maybe fewer player resistance
             }elseif($item->getId() != ItemIds::STICK && $item->getId() != ItemIds::GOLDEN_SWORD && $item->getId() != ItemIds::WOODEN_SWORD){
                 $this->delay[$player->getName()] = microtime(true) + 0.35;
                 $event->setCancelled();
                 $entity->setImmobile(true);
                 $entity->setImmobile(false);
                 $entity->broadcastEntityEvent(ActorEventPacket::HURT_ANIMATION);
-                $this->knockback($entity, $player, self::KNOCK_HAND);
+                $this->RyZerBEKnock($entity, $player, self::KNOCK_HAND);
                 $entity->setHealth($entity->getHealth() - $event->getFinalDamage());
             }
+            /*//BMC Knock
+            if($item->hasEnchantment(Enchantment::KNOCKBACK)){
+                $this->delay[$player->getName()] = microtime(true) + 0.35;
+                $event->setCancelled();
+                $entity->broadcastEntityEvent(ActorEventPacket::HURT_ANIMATION);
+                $this->BattleMCKnockback($entity, $player);
+                $entity->setHealth($entity->getHealth() - $event->getFinalDamage());
+            }*/
         }
     }
 
-    public function knockback(PMMPPlayer $entity, PMMPPlayer $attacker, int $level = 1): void{
+    public function BattleMCKnockback(PMMPPlayer $victim, PMMPPlayer $attacker): void{
+        $yaw = $attacker->getYaw();
+        //var_dump($yaw);
+        $look = null;
+        if ($yaw >= 315 or $yaw <= 45) {
+            // North
+            $look = "N";
+        } elseif ($yaw >= 45 and $yaw <= 135) {
+            // East
+            $look = "O";
+        } elseif ($yaw >= 135 and $yaw <= 225) {
+            // South
+            $look = "S";
+        } elseif ($yaw >= 225 and $yaw <= 315) {
+            // West
+            $look = "W";
+        } else {
+            $look = "N";
+        }
+
+        $x = $victim->x - $attacker->x;
+        $z = $victim->z - $attacker->z;
+
+        $enchantmentLevel = 1;
+
+        $edit = 0;
+        $y_edit = 1;
+        $f_edit = 1.355;
+        if (abs($x) <= 0 or abs($z) <= 0) {
+            if ($attacker->getPitch() < -70 ) {
+                $edit = 5;
+            }  else {
+                $edit = 0.7;
+            }
+        }
+
+        switch ($look) {
+            case "N":
+                if ($z < 0.4) {
+                    $edit = 3;
+                    $enchantmentLevel = 1.2;
+                }
+                $z += $edit;
+                break;
+            case "O":
+                if ($x > 0.4) {
+                    $edit = 3;
+                    $enchantmentLevel = 1.2;
+                }
+                $x -= $edit;
+                break;
+            case "S":
+                if ($z > 0.4) {
+                    $edit = 3;
+                    $enchantmentLevel = 1.2;
+                }
+                $z -= $edit;
+                break;
+            case "W":
+                if ($x < 0.4) {
+                    $edit = 3;
+                    $enchantmentLevel = 1.2;
+                }
+                $x += $edit;
+                break;
+        }
+
+        $base = 0.5 * $enchantmentLevel;
+        $div = 2 * $enchantmentLevel;
+        $y_base = $base * $y_edit - 0.345;
+
+        $f = sqrt($x * $x + $z * $z);
+        if($f <= 0){
+            return;
+        }
+        if(mt_rand() / mt_getrandmax() > $victim->getAttributeMap()->getAttribute(Attribute::KNOCKBACK_RESISTANCE)->getValue()){
+            $f = $f_edit / $f;
+
+            $motion = clone $victim->getMotion();
+
+            $motion->x /= $div;
+            $motion->y /= $div;
+            $motion->z /= $div;
+            $motion->x += $x * $f * $base;
+            $motion->y += $y_base + 0.2;
+            $motion->z += $z * $f * $base;
+
+            $victim->setMotion($motion);
+        }
+    }
+
+
+    public function RyZerBEKnock(PMMPPlayer $entity, PMMPPlayer $attacker, int $level = 1): void{
         $motion = clone $entity->getMotion();
         $motion->y /= 2;
         $motion->y += ($level === self::KNOCK_HAND) ? 0.35 : 0.5;
