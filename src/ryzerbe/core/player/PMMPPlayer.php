@@ -753,13 +753,15 @@ class PMMPPlayer extends PMPlayer {
             return false;
         }
 
-       /* if($hand->isSolid()){
+        if($hand->isSolid()){
             foreach($hand->getCollisionBoxes() as $collisionBox){
-                if(count($this->getLevel()->getCollidingEntities($collisionBox)) > 0){
-                    return false;  //Entity in block
+                foreach($this->getLevel()->getCollidingEntities($collisionBox) as $collidingEntity){
+                    if(!$collidingEntity instanceof ItemEntity){
+                        return false;
+                    }
                 }
             }
-        }*/
+        }
 
         if($player !== null){
             $ev = new BlockPlaceEvent($player, $hand, $blockReplace, $blockClicked, $item);
