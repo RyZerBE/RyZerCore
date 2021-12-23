@@ -297,7 +297,7 @@ class PartyCommand extends Command {
                 }
                 $senderName = $sender->getName();
                 $playerName = $args[1];
-                AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($senderName, $playerName): int{
+                AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($senderName, $playerName): mixed{
                     $senderParty = PartyProvider::getPartyByPlayer($mysqli, $senderName);
                     if($senderParty === null) return PartyProvider::NO_PARTY;
                     $playerParty = PartyProvider::getPartyByPlayer($mysqli, $playerName);
@@ -305,7 +305,7 @@ class PartyCommand extends Command {
                     if(PartyProvider::getPlayerRole($mysqli, $senderName, false) < PartyProvider::PARTY_ROLE_MODERATOR) return PartyProvider::NO_PERMISSION;
                     PartyProvider::leaveParty($mysqli, $playerName, $senderParty);
                     return $playerParty;
-                }, function(Server $server, $success) use ($senderName, $playerName): void{
+                }, function(Server $server, mixed $success) use ($senderName, $playerName): void{
                     $player = $server->getPlayerExact($senderName);
                     if($player === null) return;
                     switch($success){
@@ -357,6 +357,24 @@ class PartyCommand extends Command {
                             break;
                     }
                 });
+                break;
+            default:
+                $subCommands = [
+                    "invite" => "<Player>",
+                    "accept" => "<Request>",
+                    "leave" => "",
+                    "join" => "<PlayerName>",
+                    "ban" => "<PlayerName>",
+                    "unban" => "<PlayerName>",
+                    "public" => ""
+                ];
+
+                $helpList = [];
+                foreach($subCommands as $subCommand => $arguments) {
+                    $helpList[] = TextFormat::LIGHT_PURPLE."/party ".TextFormat::RED.$subCommand." ".TextFormat::LIGHT_PURPLE.$arguments.TextFormat::DARK_GRAY." | ".TextFormat::WHITE.LanguageProvider::getMessageContainer("party-help-$subCommand", $sender);
+                }
+
+                $sender->sendMessage(implode("\n".TextFormat::RESET, $helpList));
                 break;
         }
     }

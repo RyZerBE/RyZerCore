@@ -21,7 +21,7 @@ class PartySettingsForm {
                 case "unban":
                     PartyPunishForm::onOpen($player, ($data === "ban") ? PartyPunishForm::BAN : PartyPunishForm::UNBAN);
                     break;
-                case "public":
+                case "open":
                 case "close":
                     $player->getServer()->dispatchCommand($player, "p public");
                     break;
@@ -34,7 +34,7 @@ class PartySettingsForm {
             if(boolval($extraData["open"]) === true) $form->addButton(TextFormat::RED."Party schließen", 1, "https://media.discordapp.net/attachments/412217468287713282/880899284529201162/clan_role.png?width=402&height=402", "close");
             else $form->addButton(TextFormat::GREEN."Party öffnen", 1, "https://media.discordapp.net/attachments/412217468287713282/880897966993457194/clan_role.png?width=402&height=402", "open");
         }
-        $form->setTitle(TextFormat::LIGHT_PURPLE."Party ".TextFormat::YELLOW.$extraData["member"]);
+        $form->setTitle(TextFormat::LIGHT_PURPLE."Party §gSettings");
         $form->sendToPlayer($player);
     }
 }
