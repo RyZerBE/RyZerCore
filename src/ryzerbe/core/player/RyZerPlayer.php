@@ -14,11 +14,11 @@ use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\clan\Clan;
-use ryzerbe\core\event\player\rank\PlayerRankUpdateEvent;
 use ryzerbe\core\event\player\RyZerPlayerAuthEvent;
 use ryzerbe\core\form\types\LanguageForm;
 use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\player\data\LoginPlayerData;
+use ryzerbe\core\player\data\NickInfo;
 use ryzerbe\core\player\networklevel\NetworkLevel;
 use ryzerbe\core\player\setting\PlayerSettings;
 use ryzerbe\core\provider\CoinProvider;
@@ -49,12 +49,11 @@ class RyZerPlayer {
     private Player $player;
 
     private ?NetworkLevel $networkLevel;
+    private ?NickInfo $nickInfo = null;
 
     private string $languageName = "English";
     private string $muteReason = "???";
     private string $id = "???";
-    /** @var string|null  */
-    private ?string $nick = null;
 
     private int $coins = 0;
     public int $gameTimeTicks = 0;
@@ -388,7 +387,6 @@ class RyZerPlayer {
             $clanDB->close();
             return $playerData;
         }, function(Server $server, array $playerData) use ($playerName): void{
-            #var_dump($playerData);
             $player = $server->getPlayer($playerName);
             if(!$player instanceof PMMPPlayer) return;
 
@@ -427,7 +425,7 @@ class RyZerPlayer {
             }
 
             if(isset($playerData["nick"])) {
-                $ryzerPlayer->setNick($playerData["nick"]["nickName"]);
+                $ryzerPlayer->setNick(new NickInfo($playerData["nick"]["nickName"], $playerData["nick"]["skin"], $playerData["nick"]["level"]));
                 SkinDatabase::getInstance()->loadSkin($playerData["nick"]["skin"], function(bool $success): void{}, "nick", $ryzerPlayer->getPlayer());
                 $ryzerPlayer->getPlayer()->sendMessage(RyZerBE::PREFIX.LanguageProvider::getMessageContainer("nick-active", $ryzerPlayer->getPlayer()));
             }
@@ -606,14 +604,21 @@ class RyZerPlayer {
      * @return string|null
      */
     public function getNick(): ?string{
-        return $this->nick;
+        return ($this->nickInfo === null) ? null : $this->nickInfo->getNickName();
     }
 
     /**
-     * @param string|null $nick
+     * @param NickInfo|null $nick
      */
-    public function setNick(?string $nick): void{
-        $this->nick = $nick;
+    public function setNick(?NickInfo $nick): void{
+        $this->nickInfo = $nick;
+    }
+
+    /**
+     * @return NickInfo|null
+     */
+    public function getNickInfo(): ?NickInfo{
+        return $this->nickInfo;
     }
 
     /**
@@ -628,7 +633,7 @@ class RyZerPlayer {
      * @return string
      */
     public function getName(bool $nick): string{
-        return ($nick === true && $this->nick !== null) ? $this->nick : $this->getPlayer()->getName();
+        return ($nick === true && $this->nickInfo !== null) ? $this->nickInfo->getNickName() : $this->getPlayer()->getName();
     }
 
     public function sendTranslate(string $key, array $replaces = [], string $prefix = RyZerBE::PREFIX): void{

@@ -10,6 +10,7 @@ use pocketmine\utils\Config;
 use ryzerbe\core\event\player\nick\PlayerNickEvent;
 use ryzerbe\core\event\player\nick\PlayerUnnickEvent;
 use ryzerbe\core\language\LanguageProvider;
+use ryzerbe\core\player\data\NickInfo;
 use ryzerbe\core\player\PMMPPlayer;
 use ryzerbe\core\player\RyZerPlayer;
 use ryzerbe\core\RyZerBE;
@@ -23,6 +24,7 @@ use function count;
 use function file_exists;
 use function glob;
 use function popen;
+use function rand;
 use function uniqid;
 use function zlib_decode;
 
@@ -91,12 +93,12 @@ class NickProvider implements RyZerProvider {
      * @param bool $returnSkin
      * @return array
      */
-    public static function getActiveNicks(mysqli $mysqli, bool $returnSkin = false): array{
+    public static function getActiveNicks(mysqli $mysqli, bool $returnData = false): array{
         $res = $mysqli->query("SELECT * FROM nicks");
         $nicks = [];
         if($res->num_rows > 0) {
             while($data = $res->fetch_assoc()) {
-                if($returnSkin) $nicks[$data["player"]] = ["nickName" => $data["nick"], "skin" => $data["nick_skin"]];
+                if($returnData) $nicks[$data["player"]] = ["nickName" => $data["nick"], "skin" => $data["nick_skin"], "level" => $data["nick_level"]];
                 else $nicks[$data["player"]] = $data["nick"];
             }
         }
@@ -113,8 +115,9 @@ class NickProvider implements RyZerProvider {
         if($rbePlayer->getNick() !== null) return;
         $name = $player->getName();
         $nickName = self::$nickNames[array_rand(self::$nickNames)];
+        $nickLevel = rand(1, 5);
 
-        AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($name, $nickName): ?array{
+        AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($name, $nickName, $nickLevel): ?array{
             $res = $mysqli->query("SELECT * FROM skins WHERE version='nick'");
             if($res->num_rows <= 0) return null;
 
@@ -127,19 +130,20 @@ class NickProvider implements RyZerProvider {
             if($query->num_rows <= 0) return null;
             $assoc = $query->fetch_assoc();
 
-            $mysqli->query("INSERT INTO `nicks`(`player`, `nick`, `nick_skin`) VALUES ('$name', '$nickName', '$nickSkinName')");
+            $mysqli->query("INSERT INTO `nicks`(`player`, `nick`, `nick_skin`, `nick_level`) VALUES ('$name', '$nickName', '$nickSkinName', '$nickLevel')");
              return [
                 "skinData" => zlib_decode(base64_decode($assoc["skinData"])),
                 "geometryData" => zlib_decode(base64_decode($assoc["geometryData"])),
-                "geometryName" => $assoc["geometryName"]
+                "geometryName" => $assoc["geometryName"],
+                "nickSkinName" => $nickSkinName
             ];
-        }, function(Server $server, ?array $result) use ($rbePlayer, $nickName): void{
+        }, function(Server $server, ?array $result) use ($rbePlayer, $nickName, $nickLevel): void{
             $player = $rbePlayer->getPlayer();
             if(!$player->isConnected()) return;
             if($result === null) return;
             $nickSkin = new Skin(uniqid(), $result["skinData"], "", $result["geometryName"], $result["geometryData"]);
 
-            $rbePlayer->setNick($nickName);
+            $rbePlayer->setNick(new NickInfo($nickName, $result["nickSkinName"], $nickLevel));
             $player->setSkin($nickSkin);
             $rbePlayer->updateStatus(null);
             $player->sendSkin();

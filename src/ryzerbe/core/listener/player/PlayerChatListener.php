@@ -30,9 +30,9 @@ class PlayerChatListener implements Listener {
             return;
         }
 
-        $level = ($rbePlayer->getNick() !== null) ? rand(1, 20) : $rbePlayer->getNetworkLevel()->getLevel();
+        $level = ($rbePlayer->getNickInfo() !== null) ? $rbePlayer->getNickInfo()->getLevel() : $rbePlayer->getNetworkLevel()->getLevel();
         $levelColor = $rbePlayer->getNetworkLevel()->getLevelColor($level);
-        $clan = ($rbePlayer->getClan() !== null) ? $rbePlayer->getClan()->getClanTag() : "";
+        $clan = ($rbePlayer->getClan() !== null && $rbePlayer->getNickInfo() === null) ? $rbePlayer->getClan()->getClanTag() : "";
         $event->setFormat($levelColor.$level.TextFormat::GRAY." | ".TextFormat::RESET.str_replace("{player_name}", $rbePlayer->getName(true).TextFormat::DARK_GRAY." [".$clan.TextFormat::DARK_GRAY."]", str_replace("{MSG}", $event->getMessage(), ($rbePlayer->getNick() !== null) ? RankManager::getInstance()->getBackupRank()->getChatPrefix() : $rbePlayer->getRank()->getChatPrefix())));
         $discordMessage = new DiscordMessage(WebhookLinks::CHAT_LOG);
         $discordMessage->setMessage($player->getName()."[".CloudProvider::getServer()."] ".str_replace("@", "", $event->getMessage()));
