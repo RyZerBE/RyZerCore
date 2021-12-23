@@ -596,7 +596,8 @@ class RyZerPlayer {
         }
         $nametag = str_replace("&", TextFormat::ESCAPE, $nametag);
 
-        $player->setNameTag($nametag.TextFormat::BLACK." [".$this->getNetworkLevel()->getLevelColor().$this->getNetworkLevel()->getLevel().TextFormat::BLACK."]"."\n".TextFormat::YELLOW.(($status !== null ? "✎ ".$status : TextFormat::YELLOW.$this->getLoginPlayerData()->getDeviceOsName())));
+        $level = ($this->getNickInfo() !== null) ? $this->getNickInfo()->getLevel() : $this->getNetworkLevel()->getLevel();
+        $player->setNameTag($nametag.TextFormat::BLACK." [".$this->getNetworkLevel()->getLevelColor($level).$level.TextFormat::BLACK."]"."\n".TextFormat::YELLOW.(($status !== null && $this->getNickInfo() === null) ? "✎ ".$status : TextFormat::YELLOW.$this->getLoginPlayerData()->getDeviceOsName()));
         $player->setDisplayName($nametag);
     }
 
