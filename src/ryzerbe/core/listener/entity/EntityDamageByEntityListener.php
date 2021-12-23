@@ -59,7 +59,7 @@ class EntityDamageByEntityListener implements Listener {
                 return;
             }
             if($item->hasEnchantment(Enchantment::KNOCKBACK)){
-                $this->delay[$player->getName()] = microtime(true) + 0.35;
+                $this->delay[$player->getName()] = microtime(true) + 0.45;
                 $event->setCancelled();
                 $entity->setImmobile(true);
                 $entity->setImmobile(false);
@@ -67,7 +67,7 @@ class EntityDamageByEntityListener implements Listener {
                 $this->RyZerBEKnock($entity, $player, self::KNOCK_STICK);
                 $entity->setHealth($entity->getHealth() - $event->getFinalDamage());
             }elseif($item->getId() != ItemIds::STICK && $item->getId() != ItemIds::GOLDEN_SWORD && $item->getId() != ItemIds::WOODEN_SWORD){
-                $this->delay[$player->getName()] = microtime(true) + 0.35;
+                $this->delay[$player->getName()] = microtime(true) + 0.45;
                 $event->setCancelled();
                 $entity->setImmobile(true);
                 $entity->setImmobile(false);

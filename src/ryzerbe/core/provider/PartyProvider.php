@@ -111,7 +111,15 @@ class PartyProvider implements RyZerProvider {
 
     public static function hasRequest(mysqli $mysqli, string $owner, string $player): bool{
         $res = $mysqli->query("SELECT * FROM partyrequest WHERE player='$player' AND party='$owner'");
-        return $res->num_rows > 0;
+        while($data = $res->fetch_assoc()) {
+            $diff = (new DateTime())->diff(new DateTime($data["time"]));
+            var_dump($diff->i);
+            if($diff->i >= 1){
+                self::removeRequest($mysqli, $data["party"], $player);
+                return false;
+            }else return true;
+        }
+        return false;
     }
 
     public static function joinParty(mysqli $mysqli, string $player, string $owner, int $role = self::PARTY_ROLE_MEMBER){
