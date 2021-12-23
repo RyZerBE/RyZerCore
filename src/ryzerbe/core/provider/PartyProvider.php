@@ -75,6 +75,16 @@ class PartyProvider implements RyZerProvider {
 
     public static function addRequest(mysqli $mysqli, string $owner, string $player){
         $mysqli->query("INSERT INTO `partyrequest`(`player`, `party`) VALUES ('$player', '$owner')");
+
+        $res = $mysqli->query("SELECT * FROM partyrequest WHERE player='$player'");
+
+        if($res->num_rows <= 0) return;
+        while($data = $res->fetch_assoc()) {
+            $diff = (new DateTime())->diff(new DateTime($data["time"]));
+            if($diff->i >= 1){
+                self::removeRequest($mysqli, $data["party"], $player);
+            }
+        }
     }
 
     public static function removeRequest(mysqli $mysqli, string $owner, string $player){
