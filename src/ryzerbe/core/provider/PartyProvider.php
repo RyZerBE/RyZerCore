@@ -29,6 +29,7 @@ class PartyProvider implements RyZerProvider {
     public const ALREADY_BANNED = 8;
     public const ALREADY_UNBANNED = 9;
     public const PARTY_CLOSE = 6;
+    public const PARTY_FULL = 11;
     public const PARTY_DOESNT_EXIST = 5;
     public const PLAYER_DOESNT_EXIST = 10;
 

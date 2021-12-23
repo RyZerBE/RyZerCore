@@ -15,6 +15,8 @@ use ryzerbe\core\player\PMMPPlayer;
 use ryzerbe\core\provider\PartyProvider;
 use ryzerbe\core\RyZerBE;
 use ryzerbe\core\util\async\AsyncExecutor;
+use ryzerbe\core\util\Settings;
+use function count;
 use function implode;
 use function is_array;
 use function str_replace;
@@ -33,31 +35,7 @@ class PartyCommand extends Command {
         $subCommand = $args[0];
         switch($subCommand){
             case "info":
-                $senderName = $sender->getName();
-                AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($senderName): int|array{
-                    $playerParty = PartyProvider::getPartyByPlayer($mysqli, $senderName);
-                    if($playerParty === null) return PartyProvider::NO_PARTY;
-                    $memberList = [];
-                    foreach(PartyProvider::getPartyMembers($mysqli, $playerParty) as $member){
-                        $memberList[] = TextFormat::AQUA . $member . TextFormat::DARK_GRAY . "(" . TextFormat::GOLD . PartyProvider::getPlayerRole($mysqli, $member, true) . TextFormat::DARK_GRAY . ")";
-                    }
-                    return $memberList;
-                }, function(Server $server, int|array $success) use ($senderName): void{
-                    $player = $server->getPlayerExact($senderName);
-                    if($player === null) return;
-                    if(is_array($success)){
-                        $player->sendMessage(implode("\n", $success));
-                        return;
-                    }
-                    switch($success){
-                        case PartyProvider::SUCCESS:
-                            $player->sendMessage(RyZerBE::PREFIX . LanguageProvider::getMessageContainer("party-left", $player));
-                            break;
-                        case PartyProvider::NO_PARTY:
-                            $player->sendMessage(RyZerBE::PREFIX . LanguageProvider::getMessageContainer("party-self-no-party", $player));
-                            break;
-                    }
-                });
+                PartyMainForm::onOpen($sender);
                 break;
             case "invite":
                 if(empty($args[1])){
@@ -68,14 +46,17 @@ class PartyCommand extends Command {
                 $senderName = $sender->getName();
                 AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($playerName, $senderName): int{
                     $party = PartyProvider::getPartyByPlayer($mysqli, $senderName);
+
+                    if(!PartyProvider::validPlayer($mysqli, $playerName)) return PartyProvider::PLAYER_DOESNT_EXIST;
                     if($party === null){
                         $party = $senderName;
                         PartyProvider::createParty($mysqli, $senderName);
                     }
-                    if(!PartyProvider::validPlayer($mysqli, $playerName)) return PartyProvider::PLAYER_DOESNT_EXIST;
+                    $members = PartyProvider::getPartyMembers($mysqli, $party);
                     if(PartyProvider::getPartyByPlayer($mysqli, $playerName) !== null) return PartyProvider::ALREADY_IN_PARTY;
                     if(PartyProvider::hasRequest($mysqli, $party, $playerName)) return PartyProvider::ALREADY_REQUEST;
                     if(PartyProvider::getPlayerRole($mysqli, $senderName, false) < PartyProvider::PARTY_ROLE_MODERATOR) return PartyProvider::NO_PERMISSION;
+                    if(count($members) >= Settings::$maxPartyPlayers) return PartyProvider::PARTY_FULL;
                     PartyProvider::addRequest($mysqli, $party, $playerName);
                     return PartyProvider::SUCCESS;
                 }, function(Server $server, int $success) use ($senderName, $playerName): void{
@@ -97,6 +78,9 @@ class PartyCommand extends Command {
                             break;
                         case PartyProvider::PLAYER_DOESNT_EXIST:
                             $player->sendMessage(RyZerBE::PREFIX . LanguageProvider::getMessageContainer("unknown-player", $player, ["#player" => $playerName]));
+                            break;
+                        case PartyProvider::PARTY_FULL:
+                            $player->sendMessage(RyZerBE::PREFIX.LanguageProvider::getMessageContainer("party-full", $player));
                             break;
                     }
                 });
@@ -138,6 +122,8 @@ class PartyCommand extends Command {
                     if($party === null) return PartyProvider::PARTY_DOESNT_EXIST;
                     $playerParty = PartyProvider::getPartyByPlayer($mysqli, $senderName);
                     if($playerParty !== null) return PartyProvider::ALREADY_IN_PARTY;
+                    $memberCount = PartyProvider::getPartyMembers($mysqli, $partyOwner);
+                    if(count($memberCount) >= Settings::$maxPartyPlayers) return PartyProvider::PARTY_FULL;
                     PartyProvider::removeRequest($mysqli, $partyOwner, $senderName);
                     PartyProvider::joinParty($mysqli, $senderName, $partyOwner);
                     return PartyProvider::SUCCESS;
@@ -148,7 +134,7 @@ class PartyCommand extends Command {
                         case PartyProvider::SUCCESS:
                             $player->sendMessage(RyZerBE::PREFIX.LanguageProvider::getMessageContainer("party-accept", $player, ["#player" => $partyOwner]));
                             $message = LanguageProvider::getMessageContainer("party-joined", $player, ["#player" => $player->getName()]);
-                            PartyProvider::sendPartyMessage($partyOwner, str_replace("§", "&", $message));
+                            PartyProvider::sendPartyMessage($partyOwner, "&f&lRyZer&cBE &r".str_replace("§", "&", $message));
                             break;
                         case PartyProvider::NO_REQUEST:
                             $player->sendMessage(RyZerBE::PREFIX.LanguageProvider::getMessageContainer("party-no-request", $player, ["#player" => $partyOwner]));
@@ -158,6 +144,9 @@ class PartyCommand extends Command {
                             break;
                         case PartyProvider::PARTY_DOESNT_EXIST:
                             $player->sendMessage(RyZerBE::PREFIX.LanguageProvider::getMessageContainer("party-doesnt-exist", $player));
+                            break;
+                        case PartyProvider::PARTY_FULL:
+                            $player->sendMessage(RyZerBE::PREFIX.LanguageProvider::getMessageContainer("party-full", $player));
                             break;
                     }
                 });
@@ -188,7 +177,7 @@ class PartyCommand extends Command {
                         case PartyProvider::SUCCESS:
                             $player->sendMessage(RyZerBE::PREFIX . LanguageProvider::getMessageContainer("party-accept", $player, ["#player" => $partyOwner]));
                             $message = LanguageProvider::getMessageContainer("party-joined", $player, ["#player" => $player->getName()]);
-                            PartyProvider::sendPartyMessage($partyOwner, str_replace("§", "&", $message));
+                            PartyProvider::sendPartyMessage($partyOwner, "&f&lRyZer&cBE &r".str_replace("§", "&", $message));
                             break;
                         case PartyProvider::PARTY_CLOSED:
                             $player->sendMessage(RyZerBE::PREFIX . LanguageProvider::getMessageContainer("party-party-closed-join", $player, ["#player" => $partyOwner]));
@@ -219,7 +208,7 @@ class PartyCommand extends Command {
                         default:
                             $player->sendMessage(RyZerBE::PREFIX . LanguageProvider::getMessageContainer("party-left", $player));
                             $message = LanguageProvider::getMessageContainer("party-left-info", $player, ["#player" => $player->getName()]);
-                            PartyProvider::sendPartyMessage($success, str_replace("§", "&", $message));
+                            PartyProvider::sendPartyMessage($success, "&f&lRyZer&cBE &r".str_replace("§", "&", $message));
                             break;
                         case PartyProvider::NO_PARTY:
                             $player->sendMessage(RyZerBE::PREFIX . LanguageProvider::getMessageContainer("party-self-no-party", $player));

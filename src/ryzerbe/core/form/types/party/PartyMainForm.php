@@ -11,12 +11,13 @@ use ryzerbe\core\form\types\ConfirmationForm;
 use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\provider\PartyProvider;
 use ryzerbe\core\util\async\AsyncExecutor;
+use ryzerbe\core\util\Settings;
+use function boolval;
+use function count;
+use function implode;
 
 class PartyMainForm {
-    public static function onOpen(Player $player, array $extraData = []): void{
-        $form = new SimpleForm(function(Player $player, $data): void{
-            if($data === null) return;
-        });
+    public static function onOpen(Player $player): void{
         $playerName = $player->getName();
         AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($playerName): array{
             $party = PartyProvider::getPartyByPlayer($mysqli, $playerName);
@@ -25,6 +26,7 @@ class PartyMainForm {
                 "members" => PartyProvider::getPartyMembers($mysqli, $party),
                 "role" => PartyProvider::getPlayerRole($mysqli, $playerName, false),
                 "open" => PartyProvider::isPartyOpen($mysqli, $party),
+                "leader" => $party
             ];
         }, function(Server $server, array $partyData) use ($playerName): void{
             $player = $server->getPlayerExact($playerName);
@@ -51,10 +53,21 @@ class PartyMainForm {
                     case "invite":
                         PartyInvitePlayerForm::onOpen($player);
                         break;
+                    case "settings":
+                        PartySettingsForm::onOpen($player, $partyData);
+                        break;
                 }
             });
+            $memberCount = count($partyData["members"] ?? []);
+            $form->setContent(implode("\n".TextFormat::RESET, [
+                TextFormat::LIGHT_PURPLE."Leader: ".TextFormat::WHITE.$partyData["leader"] ?? "???",
+                TextFormat::LIGHT_PURPLE."Role: ".TextFormat::WHITE.PartyProvider::getRoleNameById($partyData["role"]) ?? "???",
+                TextFormat::LIGHT_PURPLE."Player count: ".TextFormat::WHITE.$memberCount."/".Settings::$maxPartyPlayers,
+                TextFormat::LIGHT_PURPLE."Open state: ".((boolval($partyData["open"]) === true) ? TextFormat::GREEN."OPENED" : TextFormat::RED."CLOSED"),
+            ]));
             if(isset($partyData["requests"])){
-                $form->addButton(TextFormat::GREEN . "Invite player", 0, "textures/ui/anvil-plus.png", "invite");
+                if(count($partyData["members"] ?? []) < Settings::$maxPartyPlayers) $form->addButton(TextFormat::GREEN . "Invite player", 0, "textures/ui/anvil-plus.png", "invite");
+                else $form->addButton(TextFormat::RED . "Party is full!", 0, "textures/ui/anvil-plus.png", "PARTY_FULL");
                 $form->addButton(TextFormat::DARK_PURPLE . "Requests", 0, "textures/ui/invite_base.png", "requests");
             }
             else{
@@ -62,9 +75,11 @@ class PartyMainForm {
                 switch((int)$partyData["role"]){
                     case PartyProvider::PARTY_ROLE_MODERATOR:
                         $form->addButton(TextFormat::GREEN . "Invite player", 0, "textures/ui/anvil-plus.png", "invite");
+                        $form->addButton("§gSettings", 0, "textures/ui/anvil-plus.png", "settings");
                         break;
                     case PartyProvider::PARTY_ROLE_LEADER:
                         $form->addButton(TextFormat::GREEN . "Invite player", 0, "textures/ui/anvil-plus.png", "invite");
+                        $form->addButton("§gSettings", 0, "textures/ui/anvil-plus.png", "settings");
                         break;
                 }
                 $form->addButton(TextFormat::RED . "Leave Party", 0, "textures/ui/crossout.png", "leave");

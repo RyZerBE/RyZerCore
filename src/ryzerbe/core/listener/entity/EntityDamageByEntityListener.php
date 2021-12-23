@@ -54,7 +54,7 @@ class EntityDamageByEntityListener implements Listener {
             $item = $player->getInventory()->getItemInHand();
             if($event->isCancelled()) return;
             //RBE Knock
-             if($player->distance($entity) > 4 && $item->getId() === ItemIds::STICK){
+             if($player->distance($entity) > 4 && $item->hasEnchantment(Enchantment::KNOCKBACK)){
                 $event->setCancelled();
                 return;
             }

@@ -13,6 +13,7 @@ class Settings {
 
     public static bool $reduce = false;
     public static array $mysqlLoginData = [];
+    public static int $maxPartyPlayers = 12;
 
     public static array $ips = [
         "5.181.151.61",
