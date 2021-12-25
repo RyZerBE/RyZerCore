@@ -67,6 +67,8 @@ use function sin;
 class PMMPPlayer extends PMPlayer {
     /** @var array  */
     private array $delay = [];
+    /** @var bool  */
+    public bool $container_packet_cancel = true;
 
     public function addDelay(string $id, int|float $seconds){
         $this->delay[$id] = microtime(true) + $seconds;

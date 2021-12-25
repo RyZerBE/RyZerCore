@@ -10,22 +10,24 @@ use pocketmine\network\mcpe\protocol\EmotePacket;
 use pocketmine\network\mcpe\protocol\LoginPacket;
 use pocketmine\Server;
 use ryzerbe\core\player\data\LoginPlayerData;
+use ryzerbe\core\player\PMMPPlayer;
 use ryzerbe\core\player\RyZerPlayerProvider;
 
 class DataPacketReceiveListener implements Listener {
 
-    private bool $cancel_send = true;
-
     public function receive(DataPacketReceiveEvent $event){
         $packet = $event->getPacket();
+        /** @var PMMPPlayer $player */
+        $player = $event->getPlayer();
+
         if($packet instanceof LoginPacket) {
             RyZerPlayerProvider::$loginData[$packet->username] = new LoginPlayerData($packet);
         }
 
         if($packet instanceof ContainerClosePacket){
-            $this->cancel_send = false;
+            $player->container_packet_cancel = false;
             $event->getPlayer()->sendDataPacket($event->getPacket(), false, true);
-            $this->cancel_send = true;
+            $player->container_packet_cancel = true;
         }
         if($packet instanceof EmotePacket){
             $emoteId = $packet->getEmoteId();
@@ -34,7 +36,9 @@ class DataPacketReceiveListener implements Listener {
     }
 
     public function onDataPacketSend(DataPacketSendEvent $event) : void{
-        if($this->cancel_send && $event->getPacket() instanceof ContainerClosePacket){
+        /** @var PMMPPlayer $player */
+        $player = $event->getPlayer();
+        if($player->container_packet_cancel && $event->getPacket() instanceof ContainerClosePacket){
             $event->setCancelled();
         }
     }
