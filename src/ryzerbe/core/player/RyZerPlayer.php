@@ -17,6 +17,7 @@ use ryzerbe\core\clan\Clan;
 use ryzerbe\core\event\player\RyZerPlayerAuthEvent;
 use ryzerbe\core\form\types\LanguageForm;
 use ryzerbe\core\language\LanguageProvider;
+use ryzerbe\core\player\chatmod\PlayerChatMod;
 use ryzerbe\core\player\data\LoginPlayerData;
 use ryzerbe\core\player\data\NickInfo;
 use ryzerbe\core\player\networklevel\NetworkLevel;
@@ -64,6 +65,7 @@ class RyZerPlayer {
     private PlayerSettings $playerSettings;
     private ?DateTime $mute = null;
     private ?Coinboost $coinboost = null;
+    private PlayerChatMod $chatMod;
 
     /** @var array  */
     private array $myPermissions = [];
@@ -77,6 +79,7 @@ class RyZerPlayer {
         $this->rank = RankManager::getInstance()->getBackupRank();
         $this->skin = $player->getSkin();
         $this->playerSettings = new PlayerSettings();
+        $this->chatMod = new PlayerChatMod();
     }
 
     /**
@@ -671,5 +674,12 @@ class RyZerPlayer {
                 $mysqli->query("INSERT INTO `coinboosts`(`player`, `time`, `percent`, `for_all`) VALUES ('$name', '$endTime', '$percent', '$isForAll')");
             });
         }
+    }
+
+    /**
+     * @return PlayerChatMod
+     */
+    public function getChatModData(): PlayerChatMod{
+        return $this->chatMod;
     }
 }

@@ -57,12 +57,14 @@ use pocketmine\Player as PMPlayer;
 use pocketmine\tile\Spawnable;
 use pocketmine\timings\Timings;
 use pocketmine\utils\TextFormat;
+use ryzerbe\core\provider\ChatModProvider;
 use ryzerbe\core\util\Settings;
 use UnexpectedValueException;
 use function cos;
 use function deg2rad;
 use function microtime;
 use function sin;
+use function strtolower;
 
 class PMMPPlayer extends PMPlayer {
     /** @var array  */
@@ -637,10 +639,51 @@ class PMMPPlayer extends PMPlayer {
                     $this->server->dispatchCommand($ev->getPlayer(), substr($ev->getMessage(), 1));
                     Timings::$playerCommandTimer->stopTiming();
                 }else{
-                    $ev = new PlayerChatEvent($this, $ev->getMessage());
+                    $rbePlayer = $this->getPlayer()->getRyZerPlayer();
+                    if($rbePlayer !== null && !$this->getPlayer()->hasPermission("ryzer.chatmod.bypass")) {
+                        $chatMod = ChatModProvider::getInstance();
+                        if($rbePlayer->getChatModData()->isSpamming()) {
+                            $rbePlayer->sendTranslate("chatmod-spamming");
+                            $rbePlayer->getChatModData()->lastMessageTime = microtime(true);
+                            return false;
+                        }
+
+                        if(strtolower($rbePlayer->getChatModData()->getLastMessage()) === $chatMod->cleanMessageForCheck($message)) {
+                            $rbePlayer->sendTranslate("chatmod-equals-message");
+                            return false;
+                        }
+
+                        $rbePlayer->getChatModData()->lastMessage = $message;
+                        if($chatMod->checkCaps($message)) {
+                            $rbePlayer = $this->getPlayer()->getRyZerPlayer();
+                            $message = strtolower($message);
+                        }
+
+                        if($provocation = $chatMod->checkProvocation($message)) {
+                            $replaceMessage = $chatMod->replaceBadWords($message, $provocation);
+                            if($replaceMessage !== false) {
+                                $message = $replaceMessage;
+                            }else {
+                                $rbePlayer->sendTranslate("chatmod-provocation");
+                                return false;
+                            }
+                        }
+
+                        if($badWords = $chatMod->checkForbiddenWord($message)) {
+                            $replaceMessage = $chatMod->replaceBadWords($message, $badWords);
+                            if($replaceMessage !== false) {
+                                $message = $replaceMessage;
+                            }else {
+                                $rbePlayer->sendTranslate("chatmod-forbidden-word");
+                                return false;
+                            }
+                        }
+                        $rbePlayer->getChatModData()->lastMessageTime = microtime(true);
+                    }
+                    $ev = new PlayerChatEvent($this, $message);
                     $ev->call();
                     if(!$ev->isCancelled()){
-                        $this->server->broadcastMessage($this->getServer()->getLanguage()->translateString($ev->getFormat(), [$ev->getPlayer()->getDisplayName(), $ev->getMessage()]), $ev->getRecipients());
+                        $this->server->broadcastMessage($this->getServer()->getLanguage()->translateString($ev->getFormat(), [$ev->getPlayer()->getDisplayName(), $message]), $ev->getRecipients());
                     }
                 }
             }
