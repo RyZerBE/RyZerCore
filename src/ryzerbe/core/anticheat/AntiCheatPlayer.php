@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace ryzerbe\core\anticheat;
 
+use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\player\PMMPPlayer;
-use ryzerbe\core\provider\PunishmentProvider;
 use function array_filter;
 use function array_shift;
 use function array_sum;
 use function count;
 use function round;
 use function time;
+use const PHP_INT_MAX;
 
 class AntiCheatPlayer {
     private Player $player;
@@ -35,8 +36,17 @@ class AntiCheatPlayer {
     public float|int $breakTime = -1;
     public float|int $breakCount = 0;
 
+    private int $moveOnAirCount = 0;
+    private float $serverMotion = 0.0;
+    private float|int $maxFlightHeight = 0.0;
+
+    public Vector3 $lastVector;
+
+    public string $lastFlagReason = "BroxstarIstFett";
+
     public function __construct(Player $player){
         $this->player = $player;
+        $this->lastVector = $player->asVector3();
     }
 
     /**
@@ -120,7 +130,7 @@ class AntiCheatPlayer {
         }));
     }
 
-    public function addWarning(Check $check): void {
+    public function addWarning(Check $check): void{
         $this->warnings[$check::class][] = time();
         if(count($this->warnings[$check::class]) > 500){
             array_shift($this->warnings[$check::class]);
@@ -128,17 +138,93 @@ class AntiCheatPlayer {
         $warnings = $this->getWarnings($check, 30);
         $ban = $warnings >= $check->getMaxWarnings();
 
-        if(!$this->getPlayer()->hasDelay($check::class."_once")) {
+        if(!$this->getPlayer()->hasDelay($check::class."_once")){
             $check->sendWarningMessage($this->getPlayer(), $ban);
             $this->getPlayer()->addDelay($check::class."_once", 1);
         }
         if(
             ($warnings >= $check->getMinWarningsPerReport() &&
-            !$this->getPlayer()->hasDelay($check::class)) || $ban
+                !$this->getPlayer()->hasDelay($check::class)) || $ban
         ){
             $this->getPlayer()->addDelay($check::class, 10);
             $check->sendWarningMessage($this->getPlayer(), $ban);
             #PunishmentProvider::punishPlayer($this->getPlayer()->getName(), "AntiCheat", 15);
         }
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function isServerMotionSet(): bool
+    {
+        return (microtime(true) - $this->serverMotion < 3);
+    }
+
+    public function setServerMotionSet(): void
+    {
+        $this->maxFlightHeight = PHP_INT_MAX;
+        if ($this->getPlayer()->fallDistance == 0) $this->getPlayer()->fallDistance = 0.1;
+        $this->serverMotion = microtime(true);
+    }
+
+    /**
+     * @return float|int
+     */
+    public function getBreakCount(): float|int{
+        return $this->breakCount;
+    }
+
+    /**
+     * @return float|int
+     */
+    public function getBreakTime(): float|int{
+        return $this->breakTime;
+    }
+
+    /**
+     * @return float|int
+     */
+    public function getMaxFlightHeight(): float|int{
+        return $this->maxFlightHeight;
+    }
+
+    /**
+     * @param float|int $maxFlightHeight
+     */
+    public function setMaxFlightHeight(float|int $maxFlightHeight): void{
+        $this->maxFlightHeight = $maxFlightHeight;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMoveOnAirCount(): int{
+        return $this->moveOnAirCount;
+    }
+
+    public function countMoveOnAir(){
+        $this->moveOnAirCount++;
+    }
+
+    public function resetCountsOnAir(): void{
+        $this->moveOnAirCount = 0;
+    }
+
+    /**
+     * @return float
+     */
+    public function getServerMotion(): float{
+        return $this->serverMotion;
+    }
+
+    public function resetMaxFlightHeight(){
+        $this->maxFlightHeight = 0.0;
+    }
+
+    public function flag(string $reason, Check $check): void{
+        $this->getPlayer()->teleport($this->lastVector);
+        $this->lastFlagReason = $reason;
+        $this->addWarning($check);
     }
 }

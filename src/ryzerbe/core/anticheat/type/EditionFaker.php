@@ -29,9 +29,11 @@ class EditionFaker extends Check {
 
     public function onDataPacketReceive(RyZerPlayerAuthEvent $event): void {
         $rbePlayer = $event->getRyZerPlayer();
+        $acPlayer = AntiCheatManager::getPlayer($rbePlayer->getPlayer());
+        if($acPlayer === null) return;
         if($rbePlayer->getLoginPlayerData()->getDefaultInputMode() === 1 && $rbePlayer->getLoginPlayerData()->getDeviceOs() === 1) {
+            $acPlayer->addWarning($this);
             $rbePlayer->kick(TextFormat::DARK_GRAY."» ".TextFormat::RED.TextFormat::BOLD."AntiCheat ".TextFormat::YELLOW."Please deactivate your modification!");
-            $this->sendWarningMessage($rbePlayer->getPlayer());
         }
     }
 

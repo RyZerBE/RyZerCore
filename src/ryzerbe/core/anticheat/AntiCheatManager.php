@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace ryzerbe\core\anticheat;
 
+use BauboLP\Cloud\Provider\CloudProvider;
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
 use ryzerbe\core\anticheat\type\AutoClicker;
 use ryzerbe\core\anticheat\type\EditionFaker;
+use ryzerbe\core\anticheat\type\Fly;
 use ryzerbe\core\anticheat\type\Nuker;
 use ryzerbe\core\RyZerBE;
+use function str_contains;
+use function var_dump;
 
 class AntiCheatManager {
     use SingletonTrait;
@@ -29,6 +33,11 @@ class AntiCheatManager {
             new Nuker(),
             new EditionFaker()
         );
+
+        if(str_contains(CloudProvider::getServer(), "BuildFFA")){
+            self::registerCheck(new Fly());
+            Server::getInstance()->getLogger()->warning("BETA: Fly Module activated!");
+        }
     }
 
     public static function addPlayer(Player $player): void {

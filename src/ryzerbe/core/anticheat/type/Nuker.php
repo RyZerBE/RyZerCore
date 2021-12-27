@@ -46,7 +46,7 @@ class Nuker extends Check {
             $acPlayer->breakCount++;
             if($acPlayer->breakCount < 5) return;
             if($acPlayer->breakTime === -1){
-                $this->sendWarningMessage($player);
+                $acPlayer->addWarning($this);
                 $event->setCancelled();
                 return;
             }
@@ -79,10 +79,11 @@ class Nuker extends Check {
 
     /**
      * @param Player $player
+     * @param bool $ban
      * @param float|int $expectedTime
      * @param float|int $actualTime
      */
-    public function sendWarningMessage(Player $player, float|int $expectedTime = -1, float|int $actualTime = -1): void{
+    public function sendWarningMessage(Player $player, bool $ban = false, float|int $expectedTime = -1, float|int $actualTime = -1): void{
         $antiCheatPlayer = AntiCheatManager::getPlayer($player);
         $ryzerPlayer = RyZerPlayerProvider::getRyzerPlayer($player);
         if($antiCheatPlayer === null || $ryzerPlayer === null) return;
@@ -113,7 +114,8 @@ class Nuker extends Check {
             $warnings <= 5 => TextFormat::GREEN.":-)",
             $warnings <= 10 => TextFormat::YELLOW.":|",
             $warnings <= 15 => TextFormat::RED.":(",
-            $warnings <= 20 => TextFormat::RED."BAN",
+            $warnings <= 20 => TextFormat::DARK_RED.":/",
+            default => TextFormat::RED."Too much calls"
         };
         $content = [];
         $content[] = "\n";
