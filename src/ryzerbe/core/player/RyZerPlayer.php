@@ -536,7 +536,7 @@ class RyZerPlayer {
     public function kick(string $reason){
         $pk = new PlayerDisconnectPacket();
         $pk->addData("playerName", $this->getPlayer()->getName());
-        $pk->addData("message", $reason);
+        $pk->addData("message", str_replace("§", "&", $reason));
         CloudBridge::getInstance()->getClient()->getPacketHandler()->writePacket($pk);
     }
 
