@@ -11,6 +11,7 @@ use function in_array;
 use function preg_match_all;
 use function preg_replace;
 use function str_contains;
+use function str_ireplace;
 use function str_replace;
 use function strlen;
 use function strtolower;
@@ -67,9 +68,9 @@ class ChatModProvider implements RyZerProvider {
 
     public const REPLACE_WORDS = [
         "rushnation" => "bugnation",
-        "l" => "besser als ich lol",
-        "ll" => "besser als ich lol",
-        "lll" => "besser als ich lol",
+        "l" => "besser als ich gg",
+        "ll" => "besser als ich gg",
+        "lll" => "besser als ich gg",
         "ez" => "voll gut",
         "bg" => "Gut gespielt!"
     ];
@@ -153,7 +154,7 @@ class ChatModProvider implements RyZerProvider {
             $replaceWord = self::REPLACE_WORDS[$badWord] ?? null;
             if($replaceWord === null) return false;
 
-            $message = str_replace($badWord, $replaceWord, $message);
+            $message = str_ireplace($badWord, $replaceWord, $message);
         }
 
         return $message;
