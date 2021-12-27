@@ -58,3 +58,5 @@ permissions:
     default: op
   ryzer.coinboost.admin:
     default: op
+  ryzer.chatmod.bypass:
+    default: op
