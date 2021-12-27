@@ -5,7 +5,11 @@ namespace ryzerbe\core\provider;
 use pocketmine\utils\SingletonTrait;
 use function count;
 use function explode;
+use function filter_var;
+use function gethostbyname;
 use function in_array;
+use function preg_match_all;
+use function preg_replace;
 use function str_contains;
 use function str_replace;
 use function strlen;
@@ -66,7 +70,6 @@ class ChatModProvider implements RyZerProvider {
         "l" => "besser als ich lol",
         "ll" => "besser als ich lol",
         "lll" => "besser als ich lol",
-        "llll" => "besser als ich lol",
         "ez" => "voll gut",
         "bg" => "Gut gespielt!"
     ];
@@ -96,7 +99,7 @@ class ChatModProvider implements RyZerProvider {
      * @return array
      */
     public function checkProvocation(string $message): array{
-        $message = explode(" ", $this->cleanMessageForCheck(strtolower($message), false));
+        $message = explode(" ", $this->cleanMessageForCheck(strtolower($message), [" "]));
 
         $provocations = [];
         foreach(self::PROVOCATIONS as $PROVOCATION) {
@@ -106,6 +109,35 @@ class ChatModProvider implements RyZerProvider {
         }
 
         return $provocations;
+    }
+
+    /**
+     * @param string $message
+     * @return array
+     */
+    public function checkDomain(string $message): array{
+        $message = explode(" ", $this->cleanMessageForCheck(strtolower(str_replace(",", ".", $message)), [" ", "."]));
+        $advertisement = [];
+        foreach($message as $word){
+            if(str_contains($word, "ryzer.be")) continue;
+            $checkDNS = gethostbyname($word);
+            if(filter_var($word, FILTER_VALIDATE_URL) !== false
+                || filter_var($checkDNS, FILTER_VALIDATE_IP) !== false){
+                $advertisement[] = $word;
+            }
+        }
+
+        return $advertisement;
+    }
+
+    /**
+     * return a string without duplicated characters
+     *
+     * @param string $message
+     * @return string
+     */
+    public function replaceDuplicatedCharacters(string $message): string{
+        return preg_replace('/(([^\d])\2\2)\2+/', '$1', $message);
     }
 
     /**
@@ -131,12 +163,12 @@ class ChatModProvider implements RyZerProvider {
      * remove useless chars
      *
      * @param string $message
-     * @param bool $replaceSpace
+     * @param array $notReplace
      * @return string
      */
-    public function cleanMessageForCheck(string $message, bool $replaceSpace = true): string{
+    public function cleanMessageForCheck(string $message, array $notReplace = []): string{
         $removeChars = [
-            "-",
+            "-", " ",
             "_", "+",
             ".", ",",
             "#", "~",
@@ -148,9 +180,10 @@ class ChatModProvider implements RyZerProvider {
             "?", "`"
         ];
 
-        if($replaceSpace) $removeChars[] = " ";
-
-        foreach($removeChars as $char) $message = str_replace($char, "", $message);
+        foreach($removeChars as $char){
+            if(in_array($char, $notReplace)) continue;
+            $message = str_replace($char, "", $message);
+        }
         return $message;
     }
 

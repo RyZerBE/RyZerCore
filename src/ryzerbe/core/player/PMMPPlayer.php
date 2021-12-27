@@ -61,6 +61,7 @@ use ryzerbe\core\provider\ChatModProvider;
 use ryzerbe\core\util\Settings;
 use UnexpectedValueException;
 use function cos;
+use function count;
 use function deg2rad;
 use function microtime;
 use function sin;
@@ -658,7 +659,7 @@ class PMMPPlayer extends PMPlayer {
                             $rbePlayer = $this->getPlayer()->getRyZerPlayer();
                             $message = strtolower($message);
                         }
-
+                        $message = $chatMod->replaceDuplicatedCharacters($message);
                         if($provocation = $chatMod->checkProvocation($message)) {
                             $replaceMessage = $chatMod->replaceBadWords($message, $provocation);
                             if($replaceMessage !== false) {
@@ -667,6 +668,11 @@ class PMMPPlayer extends PMPlayer {
                                 $rbePlayer->sendTranslate("chatmod-provocation");
                                 return false;
                             }
+                        }
+
+                        if(count($chatMod->checkDomain($message)) > 0) {
+                            $rbePlayer->sendTranslate("chatmod-domain");
+                            return false;
                         }
 
                         if($badWords = $chatMod->checkForbiddenWord($message)) {
