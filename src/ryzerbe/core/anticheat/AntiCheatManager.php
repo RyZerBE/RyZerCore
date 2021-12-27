@@ -8,6 +8,7 @@ use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
 use ryzerbe\core\anticheat\type\AutoClicker;
+use ryzerbe\core\anticheat\type\Nuker;
 use ryzerbe\core\RyZerBE;
 
 class AntiCheatManager {
@@ -23,7 +24,8 @@ class AntiCheatManager {
 
     public function __construct(){
         self::registerChecks(
-             new AutoClicker(),
+            new AutoClicker(),
+            new Nuker()
         );
     }
 

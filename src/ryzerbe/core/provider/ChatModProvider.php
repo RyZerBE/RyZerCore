@@ -15,6 +15,7 @@ use function str_ireplace;
 use function str_replace;
 use function strlen;
 use function strtolower;
+use function var_dump;
 
 class ChatModProvider implements RyZerProvider {
     use SingletonTrait;
@@ -55,8 +56,12 @@ class ChatModProvider implements RyZerProvider {
         "rushnation",
         "stimomc",
         "bulle",
-        "hs",
-        "huso"
+        "huso",
+        "wichser",
+        "spasti",
+        "spast",
+        "pisser",
+        "pissdich"
     ];
 
     public const PROVOCATIONS = [
@@ -89,6 +94,7 @@ class ChatModProvider implements RyZerProvider {
         foreach(self::FORBIDDEN_WORDS as $FORBIDDEN_WORD) {
             if(str_contains(strtolower($message), $FORBIDDEN_WORD)) {
                 $badWords[] = $FORBIDDEN_WORD;
+                var_dump("WORD: ".$FORBIDDEN_WORD);
             }
         }
 
@@ -125,6 +131,7 @@ class ChatModProvider implements RyZerProvider {
             if(filter_var($word, FILTER_VALIDATE_URL) !== false
                 || filter_var($checkDNS, FILTER_VALIDATE_IP) !== false){
                 $advertisement[] = $word;
+                var_dump("DOMAIN: $word");
             }
         }
 
@@ -178,7 +185,8 @@ class ChatModProvider implements RyZerProvider {
             "%", "&",
             "/", "(",
             ")", "=",
-            "?", "`"
+            "?", "`",
+            ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
         ];
 
         foreach($removeChars as $char){

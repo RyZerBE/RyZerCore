@@ -32,6 +32,9 @@ class AntiCheatPlayer {
 
     protected array $warnings = [];
 
+    public float|int $breakTime = -1;
+    public float|int $breakCount = 0;
+
     public function __construct(Player $player){
         $this->player = $player;
     }
