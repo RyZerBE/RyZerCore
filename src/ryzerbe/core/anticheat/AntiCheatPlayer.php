@@ -12,6 +12,7 @@ use function array_filter;
 use function array_shift;
 use function array_sum;
 use function count;
+use function microtime;
 use function round;
 use function time;
 use const PHP_INT_MAX;
@@ -34,9 +35,13 @@ class AntiCheatPlayer {
     protected array $warnings = [];
 
     public float|int $breakTime = -1;
+    private float|int $lastJump;
+    private float|int $lastBlockPlace;
+
     public float|int $breakCount = 0;
 
     private int $moveOnAirCount = 0;
+    private int $airJumpCount = 0;
     private float $serverMotion = 0.0;
     private float|int $maxFlightHeight = 0.0;
 
@@ -47,6 +52,8 @@ class AntiCheatPlayer {
     public function __construct(Player $player){
         $this->player = $player;
         $this->lastVector = $player->asVector3();
+        $this->lastJump = microtime(true);
+        $this->lastBlockPlace = microtime(true);
     }
 
     /**
@@ -207,8 +214,16 @@ class AntiCheatPlayer {
         $this->moveOnAirCount++;
     }
 
+    public function countAirJump(){
+        $this->airJumpCount++;
+    }
+
     public function resetCountsOnAir(): void{
         $this->moveOnAirCount = 0;
+    }
+
+    public function resetAirJumpCount(): void{
+        $this->airJumpCount = 0;
     }
 
     /**
@@ -226,5 +241,41 @@ class AntiCheatPlayer {
         $this->getPlayer()->teleport($this->lastVector);
         $this->lastFlagReason = $reason;
         $this->addWarning($check);
+    }
+
+    public function jump(): void{
+        $this->lastJump = microtime(true);
+    }
+
+    public function placeBlock(): void{
+        $this->lastBlockPlace = microtime(true);
+    }
+
+    /**
+     * @return float|int
+     */
+    public function getLastBlockPlaceTime(): float|int{
+        return $this->lastBlockPlace;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLastFlagReason(): string{
+        return $this->lastFlagReason;
+    }
+
+    /**
+     * @return float|int
+     */
+    public function getLastJump(): float|int{
+        return $this->lastJump;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAirJumpCount(): int{
+        return $this->airJumpCount;
     }
 }

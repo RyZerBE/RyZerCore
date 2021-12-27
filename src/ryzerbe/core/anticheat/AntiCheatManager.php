@@ -8,6 +8,7 @@ use BauboLP\Cloud\Provider\CloudProvider;
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
+use ryzerbe\core\anticheat\type\AirJump;
 use ryzerbe\core\anticheat\type\AutoClicker;
 use ryzerbe\core\anticheat\type\EditionFaker;
 use ryzerbe\core\anticheat\type\Fly;
@@ -36,7 +37,9 @@ class AntiCheatManager {
 
         if(str_contains(CloudProvider::getServer(), "BuildFFA")){
             self::registerCheck(new Fly());
+            self::registerCheck(new AirJump());
             Server::getInstance()->getLogger()->warning("BETA: Fly Module activated!");
+            Server::getInstance()->getLogger()->warning("BETA: AirJump Module activated!");
         }
     }
 

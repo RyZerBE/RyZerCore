@@ -128,7 +128,8 @@ class AutoClicker extends Check {
             $warnings <= 5 => TextFormat::GREEN.":-)",
             $warnings <= 10 => TextFormat::YELLOW.":|",
             $warnings <= 15 => TextFormat::RED.":(",
-            $warnings <= 20 => TextFormat::RED."SHORTLY BEFORE BAN",
+            $warnings <= 20 => TextFormat::DARK_RED.":/",
+            default => TextFormat::RED."Too much calls"
         };
         $content = [];
         $content[] = "\n";

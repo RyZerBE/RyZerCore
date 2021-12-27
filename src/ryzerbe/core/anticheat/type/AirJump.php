@@ -3,13 +3,10 @@
 namespace ryzerbe\core\anticheat\type;
 
 use pocketmine\block\BlockIds;
-use pocketmine\entity\Effect;
-use pocketmine\event\entity\EntityMotionEvent;
-use pocketmine\event\player\PlayerMoveEvent;
-use pocketmine\event\server\DataPacketReceiveEvent;
-use pocketmine\inventory\ArmorInventory;
-use pocketmine\item\ItemIds;
-use pocketmine\network\mcpe\protocol\AdventureSettingsPacket;
+use pocketmine\entity\Entity;
+use pocketmine\event\block\BlockPlaceEvent;
+use pocketmine\event\player\PlayerJumpEvent;
+use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
@@ -27,95 +24,35 @@ use function implode;
 use function microtime;
 use function strval;
 
-class Fly extends Check {
+class AirJump extends Check {
 
-    public const DETECTED_FLIGHT_BLOCKS = [
-        BlockIds::WATER,
-        BlockIds::FLOWING_LAVA,
-        BlockIds::FLOWING_WATER,
-        BlockIds::LAVA,
-        BlockIds::LADDER,
-        BlockIds::SKULL_BLOCK,
-        BlockIds::VINE,
-        BlockIds::LILY_PAD
-    ];
-
-    public const DETECTED_FLIGHT_EFFECTS = [
-        Effect::JUMP_BOOST,
-        Effect::LEVITATION
-    ];
-
-    public function onMove(PlayerMoveEvent $event){
+    public function onJump(PlayerJumpEvent $event){
         $player = $event->getPlayer();
         $acPlayer = AntiCheatManager::getPlayer($player);
         if($acPlayer === null) return;
-        if($acPlayer->isServerMotionSet() || $player->getAllowFlight()) return;
-        if($player->getArmorInventory()->getItem(ArmorInventory::SLOT_CHEST)->getId() === ItemIds::ELYTRA) return;
-
-        $block = $player->getLevel()->getBlock($player->asVector3());
-        if(in_array($block->getId(), self::DETECTED_FLIGHT_BLOCKS)) return;
-        if(in_array($player->getLevel()->getBlock($player->asVector3()->add(1))->getId(), self::DETECTED_FLIGHT_BLOCKS)) return;
-        if(in_array($player->getLevel()->getBlock($player->asVector3()->add(0, 0, 1))->getId(), self::DETECTED_FLIGHT_BLOCKS)) return;
-        if(in_array($player->getLevel()->getBlock($player->asVector3()->add(-1))->getId(), self::DETECTED_FLIGHT_BLOCKS)) return;
-        if(in_array($player->getLevel()->getBlock($player->asVector3()->add(0, 0, -1))->getId(), self::DETECTED_FLIGHT_BLOCKS)) return;
-        if(in_array($player->getLevel()->getBlock($player->asVector3()->add(-1, 0, -1))->getId(), self::DETECTED_FLIGHT_BLOCKS)) return;
-        if(in_array($player->getLevel()->getBlock($player->asVector3()->add(1, 0, 1))->getId(), self::DETECTED_FLIGHT_BLOCKS)) return;
-        if(in_array($player->getLevel()->getBlock($player->asVector3()->add(0, -1))->getId(), self::DETECTED_FLIGHT_BLOCKS)) return;
-        foreach($player->getEffects() as $effect) if(in_array($effect->getId(), self::DETECTED_FLIGHT_EFFECTS)) return;
-
-        if($player->fallDistance == 0){
-            $acPlayer->resetMaxFlightHeight();
-        }else{
-            if($acPlayer->getMaxFlightHeight() < $player->getY()) $acPlayer->setMaxFlightHeight($player->getY());
+        $acPlayer->jump();
+        $block = $player->getLevel()->getBlock($player->getSide(Vector3::SIDE_DOWN));
+        $block2 = $player->getLevel()->getBlock($player->asVector3()->subtract(0, 2));
+        if($block->getId() === BlockIds::AIR && $block2->getId() === BlockIds::AIR){
+            if((microtime(true) - $acPlayer->getLastBlockPlaceTime()) < 2) return;
+            $acPlayer->countAirJump();
+            if($acPlayer->getAirJumpCount() > 10) $acPlayer->flag("AirJump", $this);
+        }else {
+            $acPlayer->resetAirJumpCount();
         }
-
-        if((!$player->isOnGround()
-                && $player->fallDistance == 0)
-            && $player->getY() > -1){
-            $acPlayer->countMoveOnAir();
-        }else{
-            //if((microtime(true) - $acPlayer->getLastJump()) > 2)
-            $acPlayer->resetCountsOnAir();
-        }
-
-        if($acPlayer->getMoveOnAirCount() > 10) $acPlayer->flag("Fly", $this);
     }
 
-    public function onEntityMotion(EntityMotionEvent $event){
-        $entity = $event->getEntity();
-        if(!$entity instanceof Player) return;
-
-        $acPlayer = AntiCheatManager::getPlayer($entity);
-        if($acPlayer === null) return;
-        $vector = $event->getVector();
-        if ($vector->getX() == 0 && $vector->getY() == 0 && $vector->getZ() == 0) return;
-        $acPlayer->setServerMotionSet();
-    }
-
-    public function receivePacket(DataPacketReceiveEvent $event){
-        $packet = $event->getPacket();
+    public function onPlace(BlockPlaceEvent $event){
         $player = $event->getPlayer();
         $acPlayer = AntiCheatManager::getPlayer($player);
         if($acPlayer === null) return;
-
-        if($packet instanceof AdventureSettingsPacket){
-            $isFlying = $packet->getFlag(AdventureSettingsPacket::FLYING);
-            if(!$acPlayer->isServerMotionSet() && !$player->getAllowFlight() && $isFlying){
-                $event->setCancelled();
-                $acPlayer->flag("Fly", $this);
-            }elseif($packet->getFlag(AdventureSettingsPacket::NO_CLIP) and !$player->isSpectator()){
-                $acPlayer->flag("NoClip", $this);
-                $event->setCancelled();
-            }
-        }
+        $acPlayer->placeBlock();
     }
-
 
     /**
      * @param Player $player
-     * @param bool $ban
      */
-    public function sendWarningMessage(Player $player, bool $ban = false): void{
+    public function sendWarningMessage(Player $player): void{
         $antiCheatPlayer = AntiCheatManager::getPlayer($player);
         $ryzerPlayer = RyZerPlayerProvider::getRyzerPlayer($player);
         if($antiCheatPlayer === null || $ryzerPlayer === null) return;
@@ -177,14 +114,5 @@ class Fly extends Check {
      */
     public function getImportance(AntiCheatPlayer $antiCheatPlayer): string{
         return "";
-    }
-
-    public function onUpdate(int $currentTick): bool{
-        if(($currentTick % 20) === 0) {
-            foreach(AntiCheatManager::getPlayers() as $player){
-                $player->lastVector = $player->getPlayer()->asVector3();
-            }
-        }
-        return true;
     }
 }
