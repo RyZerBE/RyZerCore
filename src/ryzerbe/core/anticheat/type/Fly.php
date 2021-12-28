@@ -2,9 +2,11 @@
 
 namespace ryzerbe\core\anticheat\type;
 
+use BauboLP\Cloud\Provider\CloudProvider;
 use pocketmine\block\BlockIds;
 use pocketmine\entity\Effect;
 use pocketmine\event\entity\EntityMotionEvent;
+use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\inventory\ArmorInventory;
@@ -16,6 +18,7 @@ use pocketmine\utils\TextFormat;
 use ryzerbe\core\anticheat\AntiCheatManager;
 use ryzerbe\core\anticheat\AntiCheatPlayer;
 use ryzerbe\core\anticheat\Check;
+use ryzerbe\core\event\player\RyZerPlayerAuthEvent;
 use ryzerbe\core\player\RyZerPlayerProvider;
 use ryzerbe\core\provider\StaffProvider;
 use ryzerbe\core\util\discord\color\DiscordColor;
@@ -24,7 +27,7 @@ use ryzerbe\core\util\discord\embed\DiscordEmbed;
 use ryzerbe\core\util\discord\embed\options\EmbedField;
 use ryzerbe\core\util\discord\WebhookLinks;
 use function implode;
-use function microtime;
+use function str_contains;
 use function strval;
 
 class Fly extends Check {
@@ -45,8 +48,16 @@ class Fly extends Check {
         Effect::LEVITATION
     ];
 
+    public function onJoin(RyZerPlayerAuthEvent $event){
+        if(str_contains(CloudProvider::getServer(), "BuildFFA")) {
+            $event->getRyZerPlayer()->getPlayer()->sendMessage("\n\n".TextFormat::RED.TextFormat::BOLD."AntiCheat ".TextFormat::YELLOW."Achtung! Wir testen hier mit dem Anticheat!"."\n\n");
+        }
+    }
+
     public function onMove(PlayerMoveEvent $event){
         $player = $event->getPlayer();
+        if($player->isClosed()) return;
+
         $acPlayer = AntiCheatManager::getPlayer($player);
         if($acPlayer === null) return;
         if($acPlayer->isServerMotionSet() || $player->getAllowFlight()) return;

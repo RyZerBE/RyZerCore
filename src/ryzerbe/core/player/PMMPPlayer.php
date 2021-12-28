@@ -102,6 +102,10 @@ class PMMPPlayer extends PMPlayer {
         return $this->temporalVector->setComponents($x, $y, $z)->normalize();
     }
 
+    public function getBlockUnderPlayer(): Block{
+        return $this->getLevel()->getBlock($this->getSide(Vector3::SIDE_DOWN));
+    }
+
     /**
      * @param string $id
      */
@@ -807,9 +811,8 @@ class PMMPPlayer extends PMPlayer {
         if($hand->isSolid()){
             foreach($hand->getCollisionBoxes() as $collisionBox){
                 foreach($this->getLevel()->getCollidingEntities($collisionBox) as $collidingEntity){
-                    if(!$collidingEntity instanceof ItemEntity){
-                        return false;
-                    }
+                    if($collidingEntity instanceof ItemEntity) continue;
+                    return false;
                 }
             }
         }

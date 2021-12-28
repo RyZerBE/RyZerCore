@@ -5,17 +5,20 @@ declare(strict_types=1);
 namespace ryzerbe\core\anticheat;
 
 use BauboLP\Cloud\Provider\CloudProvider;
+use pocketmine\entity\Entity;
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
+use ryzerbe\core\anticheat\command\CheckKillAuraCommand;
+use ryzerbe\core\anticheat\entity\KillAuraBot;
 use ryzerbe\core\anticheat\type\AirJump;
 use ryzerbe\core\anticheat\type\AutoClicker;
 use ryzerbe\core\anticheat\type\EditionFaker;
 use ryzerbe\core\anticheat\type\Fly;
+use ryzerbe\core\anticheat\type\KillAura;
 use ryzerbe\core\anticheat\type\Nuker;
 use ryzerbe\core\RyZerBE;
 use function str_contains;
-use function var_dump;
 
 class AntiCheatManager {
     use SingletonTrait;
@@ -35,11 +38,16 @@ class AntiCheatManager {
             new EditionFaker()
         );
 
+        Server::getInstance()->getCommandMap()->register("anticheat", new CheckKillAuraCommand());
+        Entity::registerEntity(KillAuraBot::class, TRUE);
+
         if(str_contains(CloudProvider::getServer(), "BuildFFA")){
             self::registerCheck(new Fly());
             self::registerCheck(new AirJump());
+            self::registerCheck(new KillAura());
             Server::getInstance()->getLogger()->warning("BETA: Fly Module activated!");
             Server::getInstance()->getLogger()->warning("BETA: AirJump Module activated!");
+            Server::getInstance()->getLogger()->warning("BETA: KillAura Module activated!");
         }
     }
 
@@ -70,6 +78,10 @@ class AntiCheatManager {
 
     public static function registerChecks(Check... $checks): void {
         foreach($checks as $check) self::registerCheck($check);
+    }
+
+    public static function isCheckRegistered(Check $check): bool{
+        return isset(self::$registeredChecks[$check::class]);
     }
 
     /**

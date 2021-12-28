@@ -7,6 +7,7 @@ namespace ryzerbe\core\anticheat;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
+use ryzerbe\core\anticheat\entity\KillAuraBot;
 use ryzerbe\core\player\PMMPPlayer;
 use function array_filter;
 use function array_shift;
@@ -33,19 +34,23 @@ class AntiCheatPlayer {
     protected array $consistentClicks = [];
 
     protected array $warnings = [];
+    public array $hitEntityCount = [];
 
     public float|int $breakTime = -1;
     private float|int $lastJump;
     private float|int $lastBlockPlace;
+    public float|int|null $lastHitCheck = null;
 
     public float|int $breakCount = 0;
 
     private int $moveOnAirCount = 0;
     private int $airJumpCount = 0;
+    private int $killAuraCount = 0;
     private float $serverMotion = 0.0;
     private float|int $maxFlightHeight = 0.0;
 
     public Vector3 $lastVector;
+    public ?KillAuraBot $killAuraBot = null;
 
     public string $lastFlagReason = "BroxstarIstFett";
 
@@ -237,6 +242,21 @@ class AntiCheatPlayer {
         $this->maxFlightHeight = 0.0;
     }
 
+    public function countKillAura(): void{
+        $this->killAuraCount++;
+    }
+
+    public function resetKillAuraCount(){
+        $this->killAuraCount = 0;
+    }
+
+    /**
+     * @return int
+     */
+    public function getKillAuraCount(): int{
+        return $this->killAuraCount;
+    }
+
     public function flag(string $reason, Check $check): void{
         $this->getPlayer()->teleport($this->lastVector);
         $this->lastFlagReason = $reason;
@@ -277,5 +297,13 @@ class AntiCheatPlayer {
      */
     public function getAirJumpCount(): int{
         return $this->airJumpCount;
+    }
+
+    public function resetHitCount(): void{
+        $this->hitEntityCount = [];
+    }
+
+    public function resetLastHitCheck(): void{
+        $this->lastHitCheck = null;
     }
 }

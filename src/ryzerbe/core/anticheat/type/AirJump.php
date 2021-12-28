@@ -28,6 +28,8 @@ class AirJump extends Check {
 
     public function onJump(PlayerJumpEvent $event){
         $player = $event->getPlayer();
+        if($player->isClosed()) return;
+
         $acPlayer = AntiCheatManager::getPlayer($player);
         if($acPlayer === null) return;
         $acPlayer->jump();
@@ -51,8 +53,9 @@ class AirJump extends Check {
 
     /**
      * @param Player $player
+     * @param bool $ban
      */
-    public function sendWarningMessage(Player $player): void{
+    public function sendWarningMessage(Player $player, bool $ban = false): void{
         $antiCheatPlayer = AntiCheatManager::getPlayer($player);
         $ryzerPlayer = RyZerPlayerProvider::getRyzerPlayer($player);
         if($antiCheatPlayer === null || $ryzerPlayer === null) return;
