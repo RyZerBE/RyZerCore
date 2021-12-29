@@ -50,7 +50,7 @@ class KillAura extends Check {
             if($acPlayer->getKillAuraCount() >= 2) {
                 $this->sendWarningMessage($damager);
                 $acPlayer->resetKillAuraCount();
-                $damager->kickFromProxy("&c&lPlease deactivate your hacks!");
+                $damager->kickFromProxy(AntiCheatManager::PREFIX.TextFormat::YELLOW."Please deactivate your hacks!");
             }
             return;
         }
@@ -72,13 +72,13 @@ class KillAura extends Check {
             if (count($acPlayer->hitEntityCount) >= 2) {
                 if ($acPlayer->getKillAuraCount() >= 5) {
                     $acPlayer->resetKillAuraCount();
-                    $this->sendWarningMessage($damager);
+                    #$this->sendWarningMessage($damager);
                     $this->spawnBotToPlayer($acPlayer);
                 }
                 $acPlayer->countKillAura();
             }
             if (count($acPlayer->hitEntityCount) >= 5) {
-                $this->sendWarningMessage($damager);
+                $acPlayer->addWarning($this);
                 $this->spawnBotToPlayer($acPlayer);
             }
             $acPlayer->resetHitCount();

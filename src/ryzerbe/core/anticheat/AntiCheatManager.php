@@ -9,6 +9,7 @@ use pocketmine\entity\Entity;
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
+use pocketmine\utils\TextFormat;
 use ryzerbe\core\anticheat\command\CheckKillAuraCommand;
 use ryzerbe\core\anticheat\entity\KillAuraBot;
 use ryzerbe\core\anticheat\type\AirJump;
@@ -22,6 +23,8 @@ use function str_contains;
 
 class AntiCheatManager {
     use SingletonTrait;
+
+    public const PREFIX = TextFormat::DARK_GRAY."» ".TextFormat::RED."AntiCheat ".TextFormat::RESET;
 
     /** @var AntiCheatPlayer[]  */
     protected static array $players = [];

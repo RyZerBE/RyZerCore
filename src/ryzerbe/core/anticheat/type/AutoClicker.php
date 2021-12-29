@@ -144,7 +144,6 @@ class AutoClicker extends Check {
         $content[] = TextFormat::DARK_GRAY."» ".TextFormat::GRAY."Calls(last 30 sec): ".$calls;
         $content[] = "\n";
         StaffProvider::sendMessageToStaffs(implode("\n", $content), false);
-
     }
 
     public function getMinWarningsPerReport(): int{

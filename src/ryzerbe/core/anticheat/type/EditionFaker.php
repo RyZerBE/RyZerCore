@@ -33,7 +33,7 @@ class EditionFaker extends Check {
         if($acPlayer === null) return;
         if($rbePlayer->getLoginPlayerData()->getDefaultInputMode() === 1 && $rbePlayer->getLoginPlayerData()->getDeviceOs() === 1) {
             $acPlayer->addWarning($this);
-            $rbePlayer->kick(TextFormat::DARK_GRAY."» ".TextFormat::RED.TextFormat::BOLD."AntiCheat ".TextFormat::YELLOW."Please deactivate your modification!");
+            $rbePlayer->kick(AntiCheatManager::PREFIX.TextFormat::YELLOW."Please deactivate your hacks!");
         }
     }
 
