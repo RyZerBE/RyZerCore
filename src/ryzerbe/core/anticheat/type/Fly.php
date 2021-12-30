@@ -19,6 +19,7 @@ use ryzerbe\core\anticheat\AntiCheatManager;
 use ryzerbe\core\anticheat\AntiCheatPlayer;
 use ryzerbe\core\anticheat\Check;
 use ryzerbe\core\event\player\RyZerPlayerAuthEvent;
+use ryzerbe\core\player\PMMPPlayer;
 use ryzerbe\core\player\RyZerPlayerProvider;
 use ryzerbe\core\provider\StaffProvider;
 use ryzerbe\core\util\discord\color\DiscordColor;
@@ -38,6 +39,7 @@ class Fly extends Check {
         BlockIds::FLOWING_WATER,
         BlockIds::LAVA,
         BlockIds::LADDER,
+        BlockIds::WEB,
         BlockIds::SKULL_BLOCK,
         BlockIds::VINE,
         BlockIds::LILY_PAD
@@ -57,8 +59,10 @@ class Fly extends Check {
     public function onMove(PlayerMoveEvent $event){
         $player = $event->getPlayer();
         if($player->isClosed()) return;
-
+        if(!$player instanceof PMMPPlayer) return;
         $acPlayer = AntiCheatManager::getPlayer($player);
+
+        #$player->sendMessage(strval($player->fallDistance));
         if($acPlayer === null) return;
         if($acPlayer->isServerMotionSet() || $player->getAllowFlight()) return;
         if($player->getArmorInventory()->getItem(ArmorInventory::SLOT_CHEST)->getId() === ItemIds::ELYTRA) return;
@@ -188,14 +192,5 @@ class Fly extends Check {
      */
     public function getImportance(AntiCheatPlayer $antiCheatPlayer): string{
         return "";
-    }
-
-    public function onUpdate(int $currentTick): bool{
-        if(($currentTick % 20) === 0) {
-            foreach(AntiCheatManager::getPlayers() as $player){
-                $player->lastVector = $player->getPlayer()->asVector3();
-            }
-        }
-        return true;
     }
 }

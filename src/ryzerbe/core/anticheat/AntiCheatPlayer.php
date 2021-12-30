@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace ryzerbe\core\anticheat;
 
+use Exception;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
+use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\anticheat\entity\KillAuraBot;
 use ryzerbe\core\player\PMMPPlayer;
@@ -13,8 +15,10 @@ use function array_filter;
 use function array_shift;
 use function array_sum;
 use function count;
+use function floatval;
 use function microtime;
 use function round;
+use function strval;
 use function time;
 use const PHP_INT_MAX;
 
@@ -46,8 +50,14 @@ class AntiCheatPlayer {
     private int $moveOnAirCount = 0;
     private int $airJumpCount = 0;
     private int $killAuraCount = 0;
+    private int $speedCount = 0;
     private float $serverMotion = 0.0;
     private float|int $maxFlightHeight = 0.0;
+
+    /** @var int  */
+    private int $tickOnAir = 0;
+    /** @var array  */
+    private array $fallDistanceLog = [];
 
     public Vector3 $lastVector;
     public ?KillAuraBot $killAuraBot = null;
@@ -305,5 +315,69 @@ class AntiCheatPlayer {
 
     public function resetLastHitCheck(): void{
         $this->lastHitCheck = null;
+    }
+
+    public function airTick(): void{
+        $this->tickOnAir++;
+    }
+
+    public function resetAirTick(): void{
+        $this->tickOnAir = 0;
+    }
+
+    public function logDistance(float $distance): void{
+        $this->fallDistanceLog[strval(microtime(true))] = $distance;
+    }
+
+    public function resetFallDistanceLog(): void{
+        $this->fallDistanceLog = [];
+    }
+
+    /**
+     * @return int
+     */
+    public function getTickOnAir(): int{
+        return $this->tickOnAir;
+    }
+
+    /**
+     * @param int $sec
+     * @return array
+     */
+    public function getFallDistanceLog(int $sec = 0): array{
+        if($sec === 0) return $this->fallDistanceLog;
+        if($sec >= 5){
+            Server::getInstance()->getLogger()->error("AntiCheatPlayer#getFalDistanceLog => Sec/s cannot greater than 4!");
+            return [];
+        }
+
+        $log = [];
+        foreach($this->fallDistanceLog as $microTime => $fallDistance) {
+            if((microtime(true) - (float)$microTime) < $sec) $log[] = $fallDistance;
+        }
+
+        return $log;
+    }
+
+    /**
+     * @return Vector3
+     */
+    public function getLastVector3(): Vector3{
+        return $this->lastVector;
+    }
+
+    public function countSpeed(): void{
+        $this->speedCount++;
+    }
+
+    public function resetSpeedCount(): void{
+        $this->speedCount = 0;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSpeedCount(): int{
+        return $this->speedCount;
     }
 }

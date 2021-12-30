@@ -65,6 +65,7 @@ use function count;
 use function deg2rad;
 use function microtime;
 use function sin;
+use function str_replace;
 use function strtolower;
 
 class PMMPPlayer extends PMPlayer {
@@ -106,6 +107,10 @@ class PMMPPlayer extends PMPlayer {
         return $this->getLevel()->getBlock($this->getSide(Vector3::SIDE_DOWN));
     }
 
+    public function getBlockOverPlayer(): Block{
+        return $this->getLevel()->getBlock($this->asVector3()->add(0, 2));
+    }
+
     /**
      * @param string $id
      */
@@ -122,7 +127,7 @@ class PMMPPlayer extends PMPlayer {
     public function kickFromProxy(string $reason): void{
         $pk = new PlayerDisconnectPacket();
         $pk->addData("playerName", $this->getPlayer()->getName());
-        $pk->addData("message", $reason);
+        $pk->addData("message", str_replace("§", "&", $reason));
         CloudBridge::getInstance()->getClient()->getPacketHandler()->writePacket($pk);
     }
 

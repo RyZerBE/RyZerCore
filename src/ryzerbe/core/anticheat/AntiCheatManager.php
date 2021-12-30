@@ -16,8 +16,10 @@ use ryzerbe\core\anticheat\type\AirJump;
 use ryzerbe\core\anticheat\type\AutoClicker;
 use ryzerbe\core\anticheat\type\EditionFaker;
 use ryzerbe\core\anticheat\type\Fly;
+use ryzerbe\core\anticheat\type\JetPackByPass;
 use ryzerbe\core\anticheat\type\KillAura;
 use ryzerbe\core\anticheat\type\Nuker;
+use ryzerbe\core\anticheat\type\Speed;
 use ryzerbe\core\RyZerBE;
 use function str_contains;
 
@@ -48,9 +50,13 @@ class AntiCheatManager {
             self::registerCheck(new Fly());
             self::registerCheck(new AirJump());
             self::registerCheck(new KillAura());
+            self::registerCheck(new JetPackByPass());
+            self::registerCheck(new Speed());
             Server::getInstance()->getLogger()->warning("BETA: Fly Module activated!");
             Server::getInstance()->getLogger()->warning("BETA: AirJump Module activated!");
             Server::getInstance()->getLogger()->warning("BETA: KillAura Module activated!");
+            Server::getInstance()->getLogger()->warning("BETA: JetPackByPass Module activated!");
+            Server::getInstance()->getLogger()->warning("BETA: Speed Module activated!");
         }
     }
 

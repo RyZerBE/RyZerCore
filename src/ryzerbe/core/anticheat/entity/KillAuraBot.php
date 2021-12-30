@@ -39,7 +39,7 @@ class KillAuraBot extends Human {
         $pk->entityRuntimeId = $this->getId();
         $pk->position = $pos;
         $pk->xRot = $pitch;
-        $pk->yRot = $yaw; //TODO: head yaw
+        $pk->yRot = $yaw; 
         $pk->zRot = $yaw;
         $pk->flags = MoveActorAbsolutePacket::FLAG_GROUND;
         $this->server->broadcastPacket($this->hasSpawned, $pk);
@@ -77,7 +77,7 @@ class KillAuraBot extends Human {
 
     public function entityBaseTick(int $tickDiff = 1): bool
     {
-        if ((microtime(true) - $this->spawned) > 4) $this->flagForDespawn();
+        if ((microtime(true) - $this->spawned) > 3) $this->flagForDespawn();
         return parent::entityBaseTick($tickDiff);
     }
 

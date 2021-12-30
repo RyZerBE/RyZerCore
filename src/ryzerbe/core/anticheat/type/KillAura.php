@@ -47,7 +47,7 @@ class KillAura extends Check {
 
         if($entity instanceof KillAuraBot) {
             $acPlayer->countKillAura();
-            if($acPlayer->getKillAuraCount() >= 2) {
+            if($acPlayer->getKillAuraCount() > 2) {
                 $this->sendWarningMessage($damager);
                 $acPlayer->resetKillAuraCount();
                 $damager->kickFromProxy(AntiCheatManager::PREFIX.TextFormat::YELLOW."Please deactivate your hacks!");
