@@ -46,7 +46,7 @@ class AntiCheatManager {
         Server::getInstance()->getCommandMap()->register("anticheat", new CheckKillAuraCommand());
         Entity::registerEntity(KillAuraBot::class, TRUE);
 
-        if(str_contains(CloudProvider::getServer(), "BuildFFA")){
+        if(str_contains(CloudProvider::getServer(), "BuildFFA") || str_contains(CloudProvider::getServer(), "BW2x1")){
             self::registerCheck(new Fly());
             self::registerCheck(new AirJump());
             self::registerCheck(new KillAura());

@@ -51,7 +51,7 @@ class Fly extends Check {
     ];
 
     public function onJoin(RyZerPlayerAuthEvent $event){
-        if(str_contains(CloudProvider::getServer(), "BuildFFA")) {
+        if(str_contains(CloudProvider::getServer(), "BuildFFA") || str_contains(CloudProvider::getServer(), "BW2x1")) {
             $event->getRyZerPlayer()->getPlayer()->sendMessage("\n\n".TextFormat::RED.TextFormat::BOLD."AntiCheat ".TextFormat::YELLOW."Achtung! Wir testen hier mit dem Anticheat!"."\n\n");
         }
     }
@@ -64,6 +64,9 @@ class Fly extends Check {
 
         #$player->sendMessage(strval($player->fallDistance));
         if($acPlayer === null) return;
+        if($player->getBlockUnderPlayer()->getId() === BlockIds::SLIME_BLOCK) {
+            $acPlayer->setServerMotionSet();
+        }
         if($acPlayer->isServerMotionSet() || $player->getAllowFlight()) return;
         if($player->getArmorInventory()->getItem(ArmorInventory::SLOT_CHEST)->getId() === ItemIds::ELYTRA) return;
 
@@ -83,6 +86,7 @@ class Fly extends Check {
         }else{
             if($acPlayer->getMaxFlightHeight() < $player->getY()) $acPlayer->setMaxFlightHeight($player->getY());
         }
+
 
         if((!$player->isOnGround()
                 && $player->fallDistance == 0)

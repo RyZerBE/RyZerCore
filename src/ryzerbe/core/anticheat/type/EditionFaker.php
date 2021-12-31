@@ -10,7 +10,6 @@ use pocketmine\utils\TextFormat;
 use ryzerbe\core\anticheat\AntiCheatManager;
 use ryzerbe\core\anticheat\AntiCheatPlayer;
 use ryzerbe\core\anticheat\Check;
-use ryzerbe\core\event\player\RyZerPlayerAuthEvent;
 use ryzerbe\core\player\data\LoginPlayerData;
 use ryzerbe\core\player\PMMPPlayer;
 use ryzerbe\core\player\RyZerPlayerProvider;

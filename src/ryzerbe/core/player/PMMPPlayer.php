@@ -64,6 +64,7 @@ use UnexpectedValueException;
 use function cos;
 use function count;
 use function deg2rad;
+use function floor;
 use function microtime;
 use function sin;
 use function str_replace;
@@ -111,6 +112,32 @@ class PMMPPlayer extends PMPlayer {
         }
 
         return $this->temporalVector->setComponents($x, $y, $z)->normalize();
+    }
+
+    /**
+     * @return Block[]
+     */
+    public function getBlocksAroundOfPlayer(): array{
+        $inset = 0.001; //Offset against floating-point errors
+
+        $minX = (int) floor($this->boundingBox->minX + $inset);
+        $minY = (int) floor($this->boundingBox->minY + $inset);
+        $minZ = (int) floor($this->boundingBox->minZ + $inset);
+        $maxX = (int) floor($this->boundingBox->maxX - $inset);
+        $maxY = (int) floor($this->boundingBox->maxY - $inset);
+        $maxZ = (int) floor($this->boundingBox->maxZ - $inset);
+
+        $blocksAround = [];
+
+        for($z = $minZ; $z <= $maxZ; ++$z){
+            for($x = $minX; $x <= $maxX; ++$x){
+                for($y = $minY; $y <= $maxY; ++$y){
+                    $blocksAround[] = $this->level->getBlockAt($x, $y, $z);
+                }
+            }
+        }
+
+        return $blocksAround;
     }
 
     public function getEyePos() : Vector3{
