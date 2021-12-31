@@ -71,6 +71,9 @@ class Fly extends Check {
         if($player->getArmorInventory()->getItem(ArmorInventory::SLOT_CHEST)->getId() === ItemIds::ELYTRA) return;
 
         $block = $player->getLevel()->getBlock($player->asVector3());
+        $block2 = $player->getLevel()->getBlock($player->asVector3()->add(0, 1));
+        #$player->sendMessage("Block: ".$block->getName());
+        #$player->sendMessage("Block 2: ".$block2->getName());
         if(in_array($block->getId(), self::DETECTED_FLIGHT_BLOCKS)) return;
         if(in_array($player->getLevel()->getBlock($player->asVector3()->add(1))->getId(), self::DETECTED_FLIGHT_BLOCKS)) return;
         if(in_array($player->getLevel()->getBlock($player->asVector3()->add(0, 0, 1))->getId(), self::DETECTED_FLIGHT_BLOCKS)) return;
