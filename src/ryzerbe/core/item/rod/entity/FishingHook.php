@@ -6,13 +6,16 @@ use pocketmine\entity\Entity;
 use pocketmine\entity\projectile\Projectile;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
+use pocketmine\item\FishingRod;
 use pocketmine\level\Level;
 use pocketmine\math\RayTraceResult;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\ActorEventPacket;
 use pocketmine\utils\Random;
+use ryzerbe\core\item\rod\PvPRod;
 use ryzerbe\core\player\PMMPPlayer;
+use function sqrt;
 
 class FishingHook extends Projectile {
 
@@ -31,33 +34,6 @@ class FishingHook extends Projectile {
         if($shootingEntity instanceof PMMPPlayer) $shootingEntity->pvpFishingHook = $this;
     }
 
-    public function onUpdate(int $currentTick): bool{
-        if($this->isFlaggedForDespawn() || !$this->isAlive()){
-            return false;
-        }
-
-        $this->timings->startTiming();
-
-        $hasUpdate = parent::onUpdate($currentTick);
-
-        if($this->isCollidedVertically){
-            $this->motion->x = 0;
-            $this->motion->y += 0.01;
-            $this->motion->z = 0;
-            $hasUpdate = true;
-        }elseif($this->isCollided && $this->keepMovement === true){
-            $this->motion->x = 0;
-            $this->motion->y = 0;
-            $this->motion->z = 0;
-            $this->keepMovement = false;
-            $hasUpdate = true;
-        }
-
-        $this->timings->stopTiming();
-
-        return $hasUpdate;
-    }
-
     public function flagForDespawn(): void{
         parent::flagForDespawn();
         $shooter = $this->getOwningEntity();
@@ -70,7 +46,7 @@ class FishingHook extends Projectile {
         return 1;
     }
 
-    public function throwHook(): void{
+    public function throwHookJava(): void{
         $entity = $this->getOwningEntity();
         if($entity === null) return;
 
@@ -104,10 +80,52 @@ class FishingHook extends Projectile {
         );
     }
 
+    public function onUpdate(int $currentTick): bool{
+        if($this->isFlaggedForDespawn() || !$this->isAlive()){
+            return false;
+        }
+        $hasUpdate = parent::onUpdate($currentTick);
+
+        if($this->isCollidedVertically){
+            $this->motion->x = 0;
+            $this->motion->y += 0.01;
+            $this->motion->z = 0;
+            $hasUpdate = true;
+        }elseif($this->isCollided && $this->keepMovement === true){
+            $this->motion->x = 0;
+            $this->motion->y = 0;
+            $this->motion->z = 0;
+            $this->keepMovement = false;
+            $hasUpdate = true;
+        }
+        return $hasUpdate;
+    }
+
+
+    public function throwHook(PvPRod $fishingRod){
+       $this->setMotion($this->getMotion()->multiply($fishingRod->getThrowForce()));
+    }
+
+    public function restrictHook(): void{
+        $entity = $this->getOwningEntity();
+        if($entity === null) return;
+        $d0 = $entity->x - $this->x;
+        $d2 = $entity->y - $this->y;
+        $d4 = $entity->z - $this->z;
+        $d6 = sqrt($d0 * $d0 + $d2 * $d2 + $d4 * $d4);
+        $d8 = 0.1;
+        $this->setMotion(new Vector3($d0 * $d8, $d2 * $d8 + sqrt($d6) * 0.08, $d4 * $d8));
+    }
+    
+    
+
     protected function onHitEntity(Entity $entityHit, RayTraceResult $hitResult): void{
-        if($entityHit instanceof PMMPPlayer and $this->getOwningEntity() instanceof PMMPPlayer) {
-            $event = new EntityDamageByEntityEvent($this->getOwningEntity(), $entityHit, EntityDamageEvent::CAUSE_ENTITY_ATTACK, 0.0);
+        $player = $this->getOwningEntity();
+        if($entityHit instanceof PMMPPlayer and $player instanceof PMMPPlayer) {
+            $event = new EntityDamageByEntityEvent($player, $entityHit, EntityDamageEvent::CAUSE_ENTITY_ATTACK, 0.0);
             $event->call();
+            if($entityHit->getName() === $player->getName()) $event->setCancelled();
+
             if(!$event->isCancelled()) {
                 $entityHit->setHealth($entityHit->getHealth());
                 $entityHit->broadcastEntityEvent(ActorEventPacket::HURT_ANIMATION);

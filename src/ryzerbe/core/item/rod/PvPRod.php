@@ -34,8 +34,8 @@ class PvPRod extends Durable {
         $fishingHook = $player->getPvpFishingHook();
 
         if($fishingHook === null) {
-            $fishingHook = new FishingHook($player->getLevel(), Entity::createBaseNBT($player->asVector3()), $player);
-            $fishingHook->throwHook();
+            $fishingHook = new FishingHook($player->getLevel(), Entity::createBaseNBT($player->getEyePos(), $player->getDirectionVector(), $player->yaw, $player->pitch), $player);
+            $fishingHook->throwHook($this);
 
             $ev = new ProjectileLaunchEvent($fishingHook);
             $ev->call();
@@ -49,9 +49,12 @@ class PvPRod extends Durable {
             return true;
         }
 
-        #$fishingHook->pullCloser($player, 0.1);
-        $fishingHook->flagForDespawn();
+        $fishingHook->restrictHook();
         $this->applyDamage(1);
         return true;
+    }
+
+    public function getThrowForce(): float{
+        return 1.9;
     }
 }
