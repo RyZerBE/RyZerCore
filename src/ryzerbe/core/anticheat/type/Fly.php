@@ -6,11 +6,13 @@ use BauboLP\Cloud\Provider\CloudProvider;
 use pocketmine\block\BlockIds;
 use pocketmine\entity\Effect;
 use pocketmine\event\entity\EntityMotionEvent;
+use pocketmine\event\entity\EntityTeleportEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\inventory\ArmorInventory;
 use pocketmine\item\ItemIds;
+use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\AdventureSettingsPacket;
 use pocketmine\Player;
 use pocketmine\Server;
@@ -27,6 +29,7 @@ use ryzerbe\core\util\discord\DiscordMessage;
 use ryzerbe\core\util\discord\embed\DiscordEmbed;
 use ryzerbe\core\util\discord\embed\options\EmbedField;
 use ryzerbe\core\util\discord\WebhookLinks;
+use ryzerbe\core\util\math\Facing;
 use function implode;
 use function str_contains;
 use function strval;
@@ -69,11 +72,17 @@ class Fly extends Check {
         }
         if($acPlayer->isServerMotionSet() || $player->getAllowFlight()) return;
         if($player->getArmorInventory()->getItem(ArmorInventory::SLOT_CHEST)->getId() === ItemIds::ELYTRA) return;
-
         $block = $player->getLevel()->getBlock($player->asVector3());
-        $block2 = $player->getLevel()->getBlock($player->asVector3()->add(0, 1));
-        #$player->sendMessage("Block: ".$block->getName());
-        #$player->sendMessage("Block 2: ".$block2->getName());
+
+        $blockInFront = match ($player->getDirection()) {
+            Vector3::SIDE_NORTH => $player->getLevel()->getBlock($event->getTo()->subtract(1)),
+            Vector3::SIDE_SOUTH => $player->getLevel()->getBlock($event->getTo()->subtract(0, 0, 1)),
+            Vector3::SIDE_UP => $player->getLevel()->getBlock($event->getTo()->add(0, 0, 1)),
+            Vector3::SIDE_DOWN => $player->getLevel()->getBlock($event->getTo()->add(1)),
+            default => null,
+        };
+
+
         if(in_array($block->getId(), self::DETECTED_FLIGHT_BLOCKS)) return;
         if(in_array($player->getLevel()->getBlock($player->asVector3()->add(1))->getId(), self::DETECTED_FLIGHT_BLOCKS)) return;
         if(in_array($player->getLevel()->getBlock($player->asVector3()->add(0, 0, 1))->getId(), self::DETECTED_FLIGHT_BLOCKS)) return;
@@ -100,7 +109,13 @@ class Fly extends Check {
             $acPlayer->resetCountsOnAir();
         }
 
-        if($acPlayer->getMoveOnAirCount() > 10) $acPlayer->flag("Fly", $this);
+        if($acPlayer->getMoveOnAirCount() > 10){
+            if($blockInFront->getId() != BlockIds::AIR){
+                #$player->sendMessage("PLEASE REPORT THIS MESSAGE: fly.flag.cancel");
+                return;
+            }
+            $acPlayer->flag("Fly", $this);
+        }
     }
 
     public function onEntityMotion(EntityMotionEvent $event){
