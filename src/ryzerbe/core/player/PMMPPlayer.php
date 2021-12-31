@@ -57,6 +57,7 @@ use pocketmine\Player as PMPlayer;
 use pocketmine\tile\Spawnable;
 use pocketmine\timings\Timings;
 use pocketmine\utils\TextFormat;
+use ryzerbe\core\item\rod\entity\FishingHook;
 use ryzerbe\core\provider\ChatModProvider;
 use ryzerbe\core\util\Settings;
 use UnexpectedValueException;
@@ -74,8 +75,17 @@ class PMMPPlayer extends PMPlayer {
     /** @var bool  */
     public bool $container_packet_cancel = true;
 
+    public ?FishingHook $pvpFishingHook = null;
+
     public function addDelay(string $id, int|float $seconds){
         $this->delay[$id] = microtime(true) + $seconds;
+    }
+
+    /**
+     * @return FishingHook|null
+     */
+    public function getPvpFishingHook(): ?FishingHook{
+        return $this->pvpFishingHook;
     }
 
     /**
@@ -101,6 +111,10 @@ class PMMPPlayer extends PMPlayer {
         }
 
         return $this->temporalVector->setComponents($x, $y, $z)->normalize();
+    }
+
+    public function getEyePos() : Vector3{
+        return new Vector3($this->asVector3()->x, $this->asVector3()->y + $this->getEyeHeight(), $this->asVector3()->z);
     }
 
     public function getBlockUnderPlayer(): Block{

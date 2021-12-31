@@ -4,6 +4,7 @@ namespace ryzerbe\core;
 
 use pocketmine\block\BlockFactory;
 use pocketmine\entity\Entity;
+use pocketmine\item\ItemFactory;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\TextFormat;
 use ReflectionException;
@@ -41,6 +42,8 @@ use ryzerbe\core\command\VerifyCommand;
 use ryzerbe\core\command\YouTubeCommand;
 use ryzerbe\core\entity\Arrow;
 use ryzerbe\core\entity\EnderPearl;
+use ryzerbe\core\item\rod\entity\FishingHook;
+use ryzerbe\core\item\rod\PvPRod;
 use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\player\networklevel\NetworkLevelProvider;
 use ryzerbe\core\provider\NickProvider;
@@ -68,6 +71,7 @@ class RyZerBE extends PluginBase {
         $this->initCommands();
         $this->initBlocks();
         $this->initEntities();
+        $this->initItems();
 
         Settings::getInstance()->initMySQL();
         RankManager::getInstance();
@@ -137,12 +141,16 @@ class RyZerBE extends PluginBase {
     private function initEntities(): void{
         Entity::registerEntity(EnderPearl::class, true, ["minecraft:enderpearl", "Enderpearl"]); // Java Enderpearl
         Entity::registerEntity(Arrow::class, true, ['Arrow', 'minecraft:arrow']); //Bow-Knockback...
+        Entity::registerEntity(FishingHook::class, true, ['fishing_hook']);
     }
 
     public function initBlocks(): void{
         BlockFactory::registerBlock(new TNTBlock(), true); //TEAM TNT
     }
 
+    public function initItems(): void{
+        ItemFactory::registerItem(new PvPRod(), true);
+    }
 
 
     public static function getPlugin(): RyZerBE{

@@ -138,14 +138,14 @@ class Speed extends Check {
                 $lastVector3 = $cheatPlayer->getLastVector3();
                 $bigYDifference = $lastVector3->distance(new Vector3($lastVector3->getX(), $cheatPlayer->getPlayer()->getY(), $lastVector3->getZ()));
                 if($bigYDifference > 3) continue;
-                
+
                 if($cheatPlayer->getPlayer()->getBlockOverPlayer()->getId() === BlockIds::AIR){
                     $blocksPerSecond = $lastVector3->distance($cheatPlayer->getPlayer()->asVector3());
                     #$cheatPlayer->getPlayer()->sendMessage("Blocks/s: $blocksPerSecond");
                     if($blocksPerSecond >= 8) {
                         $cheatPlayer->countSpeed();
                         if($cheatPlayer->getSpeedCount() > 1) {
-                            $cheatPlayer->flag("Speed (".$blocksPerSecond. "Blocks/s".")", $this);
+                            $cheatPlayer->flag("Speed (".$blocksPerSecond. " Blocks/s".")", $this);
                         }
                     }else {
                         $cheatPlayer->resetSpeedCount();
