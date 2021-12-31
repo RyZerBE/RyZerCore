@@ -2,6 +2,8 @@
 
 namespace ryzerbe\core\anticheat\type;
 
+use pocketmine\event\server\DataPacketReceiveEvent;
+use pocketmine\network\mcpe\protocol\LoginPacket;
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
@@ -9,25 +11,40 @@ use ryzerbe\core\anticheat\AntiCheatManager;
 use ryzerbe\core\anticheat\AntiCheatPlayer;
 use ryzerbe\core\anticheat\Check;
 use ryzerbe\core\event\player\RyZerPlayerAuthEvent;
+use ryzerbe\core\player\data\LoginPlayerData;
+use ryzerbe\core\player\PMMPPlayer;
 use ryzerbe\core\player\RyZerPlayerProvider;
 use ryzerbe\core\provider\StaffProvider;
+use ryzerbe\core\util\async\AsyncExecutor;
 use ryzerbe\core\util\discord\color\DiscordColor;
 use ryzerbe\core\util\discord\DiscordMessage;
 use ryzerbe\core\util\discord\embed\DiscordEmbed;
 use ryzerbe\core\util\discord\embed\options\EmbedField;
 use ryzerbe\core\util\discord\WebhookLinks;
+use ryzerbe\core\util\TaskUtils;
 use function implode;
 use function strval;
 
 class EditionFaker extends Check {
 
-    public function onDataPacketReceive(RyZerPlayerAuthEvent $event): void {
-        $rbePlayer = $event->getRyZerPlayer();
-        $acPlayer = AntiCheatManager::getPlayer($rbePlayer->getPlayer());
-        if($acPlayer === null) return;
-        if($rbePlayer->getLoginPlayerData()->getDefaultInputMode() === 1 && $rbePlayer->getLoginPlayerData()->getDeviceOs() === 1) {
-            $acPlayer->addWarning($this);
-            $rbePlayer->kick(AntiCheatManager::PREFIX.TextFormat::YELLOW."Please deactivate your hacks!");
+    public function onDataPacketReceive(DataPacketReceiveEvent $event): void{
+        $packet = $event->getPacket();
+        if($packet instanceof LoginPacket){
+            $input = $packet->clientData["DefaultInputMode"];
+            $os = $packet->clientData["DeviceOS"];
+            if($os === LoginPlayerData::ANDROID || $os === LoginPlayerData::IOS){
+                if($input === LoginPlayerData::KEYBOARD){
+                    $event->getPlayer()->kick(AntiCheatManager::PREFIX.TextFormat::YELLOW."Please deactivate your hacks!");
+                    $name = $packet->username;
+                    AsyncExecutor::submitClosureTask(TaskUtils::secondsToTicks(3), function(int $currentTick) use ($name): void{
+                        if(($player = Server::getInstance()->getPlayerExact($name)) !== null){
+                            if($player instanceof PMMPPlayer){
+                                $player->kickFromProxy(AntiCheatManager::PREFIX.TextFormat::YELLOW."Please deactivate your hacks!");
+                            }
+                        }
+                    });
+                }
+            }
         }
     }
 
