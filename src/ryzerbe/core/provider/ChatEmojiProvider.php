@@ -18,7 +18,14 @@ class ChatEmojiProvider implements RyZerProvider {
         "love" => "",
         "tear" => "",
         "thinking" => "",
-        "confused" => ""
+        "confused" => "",
+        "sunglassses" => "",
+        "smirk" => "",
+        "clown" => "",
+        "woozy" => "",
+        "salt" => "",
+        "cry" => "",
+        "sherlock" => ""
     ];
 
     /**
