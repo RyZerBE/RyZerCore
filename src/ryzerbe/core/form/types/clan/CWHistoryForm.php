@@ -10,6 +10,12 @@ use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\language\LanguageProvider;
 use ryzerbe\core\util\async\AsyncExecutor;
+use function asort;
+use function count;
+use function date;
+use function krsort;
+use function ksort;
+use function strtotime;
 
 class CWHistoryForm {
     public static function open(Player $player, array $extraData = []){
@@ -20,23 +26,30 @@ class CWHistoryForm {
             if($res->num_rows <= 0) return null;
             $history = [];
             while($data = $res->fetch_assoc()){
-                $history[$data["date"]] = $data;
+                $history[strtotime($data["date"])] = $data;
             }
             return $history;
         }, function(Server $server, ?array $result) use ($playerName): void{
             $player = $server->getPlayerExact($playerName);
             if($player === null) return;
-            $form = new SimpleForm(function(Player $player, $data) use ($result): void{
+            krsort($result);
+            $newResult = [];
+            foreach($result as $time => $data) {
+                $newResult[date("d.m.Y H:i", $time)] = $data;
+            }
+            $form = new SimpleForm(function(Player $player, $data) use ($newResult): void{
                 if($data === null) return;
-                CWHistoryDisplayForm::open($player, ["data" => $result[$data] ?? []]);
+                CWHistoryDisplayForm::open($player, ["data" => $newResult[$data] ?? []]);
             });
-            $form->setTitle(TextFormat::GOLD . "ClanWar History");
-            if($result === null){
+
+            if(count($newResult) <= 0) {
                 $form->setContent(LanguageProvider::getMessageContainer("clan-no-cw-history", $playerName));
                 $form->sendToPlayer($player);
                 return;
             }
-            foreach($result as $date => $data){
+
+            $form->setTitle(TextFormat::GOLD . "ClanWar History");
+            foreach($newResult as $date => $data){
                 $dateTime = new DateTime($date);
                 $now = new DateTime("now");
                 $diff = $dateTime->diff($now);
