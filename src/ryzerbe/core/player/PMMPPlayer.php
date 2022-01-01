@@ -58,6 +58,7 @@ use pocketmine\tile\Spawnable;
 use pocketmine\timings\Timings;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\item\rod\entity\FishingHook;
+use ryzerbe\core\provider\ChatEmojiProvider;
 use ryzerbe\core\provider\ChatModProvider;
 use ryzerbe\core\util\Settings;
 use UnexpectedValueException;
@@ -736,6 +737,8 @@ class PMMPPlayer extends PMPlayer {
                         }
                         $rbePlayer->getChatModData()->lastMessageTime = microtime(true);
                     }
+
+                    $message = ChatEmojiProvider::getInstance()->replaceKeys($message);
                     $ev = new PlayerChatEvent($this, $message);
                     $ev->call();
                     if(!$ev->isCancelled()){
