@@ -15,19 +15,21 @@ class Scoreboard {
 
     private RyZerPlayer $player;
     private string $title;
+    private ?string $imagePath; //provided our resource pack
     /** @var ScorePacketEntry[] */
     private array $lines = [];
 
-    public function __construct(RyZerPlayer $player, string $title){
+    public function __construct(RyZerPlayer $player, string $title, ?string $titleImage = null){
         $this->player = $player;
         $this->title = $title;
+        $this->imagePath = $titleImage;
         $this->initScoreboard();
     }
 
     private function initScoreboard(): void{
         $pkt = new SetDisplayObjectivePacket();
         $pkt->objectiveName = $this->player->getPlayer()->getName();
-        $pkt->displayName = $this->title;
+        $pkt->displayName = ($this->imagePath !== null) ? $this->imagePath : $this->title;
         $pkt->sortOrder = self::SORT_ASCENDING;
         $pkt->displaySlot = self::SLOT_SIDEBAR;
         $pkt->criteriaName = self::CRITERIA_NAME;

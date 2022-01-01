@@ -35,6 +35,6 @@ class InvBugFixCommand extends Command {
 
         $pk->windowId = ContainerIds::FIXED_INVENTORY;
         $sender->dataPacket($pk);
-        $sender->sendMessage("FIX");
+        #$sender->sendMessage("FIX");
     }
 }
