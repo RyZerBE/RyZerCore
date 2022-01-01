@@ -25,6 +25,7 @@ class RankManager {
 
     public function __construct(){
         $this->backupRank = new Rank("Player", "§f{player_name}", "§fS §8× §7{player_name} §8» §8{MSG}", "§f", 0, []);
+        $this->addRank($this->backupRank);
     }
 
     public function getBackupRank(): Rank{

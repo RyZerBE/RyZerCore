@@ -67,6 +67,7 @@ class ChatModProvider implements RyZerProvider {
     public const PROVOCATIONS = [
         "ez",
         "l",
+        "loser",
         "kek",
         "bg",
     ];
@@ -76,6 +77,7 @@ class ChatModProvider implements RyZerProvider {
         "l" => "besser als ich gg",
         "ll" => "besser als ich gg",
         "lll" => "besser als ich gg",
+        "loser" => "besser als ich gg",
         "ez" => "voll gut",
         "bg" => "Gut gespielt!"
     ];

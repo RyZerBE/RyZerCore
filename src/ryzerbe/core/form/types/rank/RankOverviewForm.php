@@ -16,8 +16,13 @@ class RankOverviewForm {
             RankOptionForm::onOpen($player, ["rank" => $rank]);
         });
         $form->setTitle(TextFormat::RED . "Ranks");
+        $backupRank = RankManager::getInstance()->getBackupRank();
         foreach(RankManager::getInstance()->getRanks() as $rank){
-            $form->addButton($rank->getColor() . $rank->getRankName(), -1, "", $rank->getRankName());
+            if($backupRank->getRankName() === $rank->getRankName()) {
+                $form->addButton($rank->getColor().$rank->getRankName()."\n".TextFormat::GRAY."(".TextFormat::YELLOW."Default".TextFormat::GRAY.")", -1, "", $rank->getRankName());
+            }else {
+                $form->addButton($rank->getColor() . $rank->getRankName(), -1, "", $rank->getRankName());
+            }
         }
         $form->sendToPlayer($player);
     }
