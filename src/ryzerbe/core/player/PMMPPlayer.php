@@ -5,6 +5,7 @@ namespace ryzerbe\core\player;
 use BauboLP\Cloud\CloudBridge;
 use BauboLP\Cloud\Packets\PlayerDisconnectPacket;
 use BauboLP\Cloud\Packets\PlayerMoveServerPacket;
+use Exception;
 use pocketmine\block\Block;
 use pocketmine\block\BlockIds;
 use pocketmine\entity\Attribute;
@@ -27,6 +28,7 @@ use pocketmine\inventory\transaction\action\InventoryAction;
 use pocketmine\inventory\transaction\CraftingTransaction;
 use pocketmine\inventory\transaction\InventoryTransaction;
 use pocketmine\inventory\transaction\TransactionValidationException;
+use pocketmine\item\Bow;
 use pocketmine\item\Consumable;
 use pocketmine\item\Durable;
 use pocketmine\item\enchantment\Enchantment;
@@ -34,6 +36,7 @@ use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\enchantment\MeleeWeaponEnchantment;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
+use pocketmine\item\ItemIds;
 use pocketmine\item\MaybeConsumable;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
@@ -67,6 +70,7 @@ use function count;
 use function deg2rad;
 use function floor;
 use function microtime;
+use function random_bytes;
 use function sin;
 use function str_replace;
 use function strtolower;
@@ -422,7 +426,7 @@ class PMMPPlayer extends PMPlayer {
                     if ($item->onClickAir($this, $directionVector)) {
                         $this->resetItemCooldown($item);
                         if ($this->isSurvival()) {
-                            $this->inventory->setItemInHand($item);
+                            #$this->inventory->setItemInHand($item);
                         }
                     }
 
@@ -557,28 +561,34 @@ class PMMPPlayer extends PMPlayer {
             $this->inventory->sendContents($this);
             return false;
         } elseif ($packet->trData instanceof ReleaseItemTransactionData) {
-            try {
-                switch ($packet->trData->getActionType()) {
+            if($this->isOp()) $this->sendMessage("ReleaseItemTransactionData");
+                switch ($packet->trData->getActionType()){
                     case ReleaseItemTransactionData::ACTION_RELEASE:
-                        if ($this->isUsingItem()) {
+                        if($this->isOp()) $this->sendMessage("ACTION_RELEASE WILL BE HANDLE");
+                        if($this->isUsingItem()){
                             $item = $this->inventory->getItemInHand();
-                            if ($this->hasItemCooldown($item)) {
+                            if($this->hasItemCooldown($item)){
                                 $this->inventory->sendContents($this);
+                                if($this->isOp()) $this->sendMessage("Item Cooldown");
                                 return false;
                             }
-                            if ($item->onReleaseUsing($this)) {
+                            if($item->onReleaseUsing($this)){
                                 $this->resetItemCooldown($item);
                                 $this->inventory->setItemInHand($item);
+                                if($this->isOp()) $this->sendMessage("Action onReleaseUsing successfully executed!");
+                            }else{
+                                if($this->isOp()) $this->sendMessage("Action onReleaseUsing cannot be executed!");
                             }
+                            $this->setUsingItem(false);
                             return true;
+                        }else{
+                            if($this->isOp()) $this->sendMessage("isnt using item");
                         }
                         break;
                     default:
                         break;
                 }
-            } finally {
-                $this->setUsingItem(false);
-            }
+
 
             $this->inventory->sendContents($this);
             return false;
@@ -586,6 +596,13 @@ class PMMPPlayer extends PMPlayer {
             $this->inventory->sendContents($this);
             return false;
         }
+    }
+
+    public function setUsingItem(bool $value){
+        if($this->getInventory()->getItemInHand()->getId() === ItemIds::BOW && !$value) return;
+
+        $this->startAction = $value ? $this->server->getTick() : -1;
+        $this->setGenericFlag(self::DATA_FLAG_ACTION, $value);
     }
 
 

@@ -85,7 +85,6 @@ class FishingHook extends Projectile {
         if($entityHit instanceof PMMPPlayer and $player instanceof PMMPPlayer) {
             $event = new EntityDamageByEntityEvent($player, $entityHit, EntityDamageEvent::CAUSE_ENTITY_ATTACK, 0.0);
             $event->call();
-            if($entityHit->getName() === $player->getName()) $event->setCancelled();
 
             if(!$event->isCancelled()) {
                 $entityHit->setHealth($entityHit->getHealth());

@@ -42,6 +42,7 @@ use ryzerbe\core\command\VerifyCommand;
 use ryzerbe\core\command\YouTubeCommand;
 use ryzerbe\core\entity\Arrow;
 use ryzerbe\core\entity\EnderPearl;
+use ryzerbe\core\item\bow\PvPBow;
 use ryzerbe\core\item\rod\entity\FishingHook;
 use ryzerbe\core\item\rod\PvPRod;
 use ryzerbe\core\language\LanguageProvider;
@@ -150,6 +151,7 @@ class RyZerBE extends PluginBase {
 
     public function initItems(): void{
         ItemFactory::registerItem(new PvPRod(), true);
+        ItemFactory::registerItem(new PvPBow(), true);
     }
 
 

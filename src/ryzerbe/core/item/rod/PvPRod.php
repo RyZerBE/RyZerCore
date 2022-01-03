@@ -8,9 +8,11 @@ use pocketmine\item\Durable;
 use pocketmine\item\ItemIds;
 use pocketmine\level\sound\LaunchSound;
 use pocketmine\math\Vector3;
+use pocketmine\network\mcpe\protocol\ActorEventPacket;
 use pocketmine\Player;
 use ryzerbe\core\item\rod\entity\FishingHook;
 use ryzerbe\core\player\PMMPPlayer;
+use function mt_rand;
 
 class PvPRod extends Durable {
 
@@ -39,18 +41,18 @@ class PvPRod extends Durable {
 
             $ev = new ProjectileLaunchEvent($fishingHook);
             $ev->call();
-            if($ev->isCancelled()) {
-                $fishingHook->flagForDespawn();
-                return false;
-            }
+            if($ev->isCancelled()) return false;
 
+            $fishingHook->throwHook($this);
             $fishingHook->spawnToAll();
             $player->getLevel()->addSound(new LaunchSound($player->asVector3()), [$player]);
             return true;
         }
 
-        $fishingHook->restrictHook();
-        $this->applyDamage(1);
+        #$fishingHook->restrictHook();
+        $fishingHook->broadcastEntityEvent(ActorEventPacket::FISH_HOOK_TEASE, null, $fishingHook->getViewers());
+        $fishingHook->flagForDespawn();
+        $this->applyDamage(mt_rand(1, 10));
         return true;
     }
 

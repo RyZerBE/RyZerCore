@@ -16,6 +16,8 @@ use pocketmine\network\mcpe\protocol\ActorEventPacket;
 use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
 use pocketmine\network\mcpe\protocol\TakeItemActorPacket;
 use pocketmine\Player;
+use pocketmine\Server;
+use ryzerbe\core\player\PMMPPlayer;
 
 class Arrow extends Projectile {
 
