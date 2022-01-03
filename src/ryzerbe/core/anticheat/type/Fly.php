@@ -65,7 +65,6 @@ class Fly extends Check {
         if(!$player instanceof PMMPPlayer) return;
         $acPlayer = AntiCheatManager::getPlayer($player);
 
-        #$player->sendMessage(strval($player->fallDistance));
         if($acPlayer === null) return;
         if($player->getBlockUnderPlayer()->getId() === BlockIds::SLIME_BLOCK) {
             $acPlayer->setServerMotionSet();
@@ -82,8 +81,8 @@ class Fly extends Check {
             default => null,
         };
 
-
         if(in_array($block->getId(), self::DETECTED_FLIGHT_BLOCKS)) return;
+        if(in_array($player->getLevel()->getBlock($player->getEyePos())->getId(), self::DETECTED_FLIGHT_BLOCKS)) return;
         if(in_array($player->getLevel()->getBlock($player->asVector3()->add(1))->getId(), self::DETECTED_FLIGHT_BLOCKS)) return;
         if(in_array($player->getLevel()->getBlock($player->asVector3()->add(0, 0, 1))->getId(), self::DETECTED_FLIGHT_BLOCKS)) return;
         if(in_array($player->getLevel()->getBlock($player->asVector3()->add(-1))->getId(), self::DETECTED_FLIGHT_BLOCKS)) return;
