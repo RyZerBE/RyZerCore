@@ -17,7 +17,7 @@ class NetworkLevelProvider {
     public static array $rewards = [];
 
     public static function initRewards(): void{
-        self::registerRewards([
+        /*self::registerRewards([
             new LevelUpReward(2, "3000 Startcoins", function(int $level, RyZerPlayer $ryzerPlayer): void{
                 CoinProvider::addCoins($ryzerPlayer->getPlayer()->getName(), 3000);
             }),
@@ -27,7 +27,7 @@ class NetworkLevelProvider {
             new LevelUpReward(15, TextFormat::GOLD."Custom Tag", function(int $level, RyZerPlayer $ryZerPlayer): void{
                 $ryZerPlayer->addPlayerPermission("lobby.status");
             })
-        ]);
+        ]);*/
 
         $perLevelCoin = function (int $level) {
             return match (true) {
@@ -45,7 +45,7 @@ class NetworkLevelProvider {
             if(self::getReward($i) !== null) continue;
             self::registerReward(new CoinReward($i, 6000 + ($perLevelCoin($i) * $i)));
         }
-        for ($i = 51; $i < 100; $i++) {
+        for ($i = 51; $i <= 100; $i++) {
             if(self::getReward($i) !== null) continue;
             self::registerReward(new CoinReward($i, 6000 + ($perLevelCoin($i) * $i)));
         }

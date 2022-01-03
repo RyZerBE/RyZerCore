@@ -577,7 +577,7 @@ class PMMPPlayer extends PMPlayer {
                                 $this->inventory->setItemInHand($item);
                                 if($this->isOp()) $this->sendMessage("Action onReleaseUsing successfully executed!");
                             }else{
-                                if($this->isOp()) $this->sendMessage("Action onReleaseUsing cannot be executed!");
+                                if($this->isOp()) $this->sendMessage("Action onReleaseUsing is not in use!");
                             }
                             $this->setUsingItem(false);
                             return true;
