@@ -19,13 +19,25 @@ class ChatEmojiProvider implements RyZerProvider {
         "tear" => "",
         "thinking" => "",
         "confused" => "",
-        "sunglassses" => "",
-        "smirk" => "",
+        "sunglasses" => "",
+        "smirk" => "",
         "clown" => "",
-        "woozy" => "",
-        "salt" => "",
+        "woozy" => "",
+        "salt" => "",
         "cry" => "",
-        "sherlock" => ""
+        "sherlock" => "",
+        "surprised" => "",
+        "derp" => "",
+        "money" => "",
+        "scream" => "",
+        "sleepy" => "",
+        "trash" => "",
+        "thinkingc" => "",
+        "hmmm" => "",
+        "feelsbadman" => "",
+        "penguin" => "",
+        "yocker" => "",
+        "angry" => ""
     ];
 
     /**

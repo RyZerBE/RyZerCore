@@ -70,6 +70,7 @@ class ChatModProvider implements RyZerProvider {
         "loser",
         "kek",
         "bg",
+        "noob"
     ];
 
     public const REPLACE_WORDS = [
@@ -77,7 +78,7 @@ class ChatModProvider implements RyZerProvider {
         "l" => "besser als ich gg",
         "ll" => "besser als ich gg",
         "lll" => "besser als ich gg",
-        "loser" => "besser als ich gg",
+        "loser" => "ich bin voll schlecht bruh",
         "ez" => "voll gut",
         "bg" => "Gut gespielt!"
     ];
