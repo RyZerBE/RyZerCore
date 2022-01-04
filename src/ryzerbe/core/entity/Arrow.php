@@ -18,6 +18,7 @@ use pocketmine\network\mcpe\protocol\TakeItemActorPacket;
 use pocketmine\Player;
 use pocketmine\Server;
 use ryzerbe\core\player\PMMPPlayer;
+use function round;
 
 class Arrow extends Projectile {
 
@@ -134,10 +135,10 @@ class Arrow extends Projectile {
     protected function onHitEntity(Entity $entityHit, RayTraceResult $hitResult) : void{
         parent::onHitEntity($entityHit, $hitResult);
         $horizontalSpeed = sqrt($this->motion->x ** 2 + $this->motion->z ** 2);
-        if($this->punchKnockback == 0) $this->punchKnockback = 1;
+        if($this->punchKnockback <= 0) $this->punchKnockback = 1;
         if($horizontalSpeed > 0){
-            $multiplier = $this->punchKnockback * 1 / $horizontalSpeed;
-            $entityHit->setMotion($entityHit->getMotion()->add($this->motion->x * $multiplier, 0.2, $this->motion->z * $multiplier));
+            $multiplier = $this->punchKnockback * 0.5 / $horizontalSpeed;
+            $entityHit->setMotion($entityHit->getMotion()->add($this->motion->x * $multiplier, 0.1, $this->motion->z * $multiplier));
         }
     }
 
