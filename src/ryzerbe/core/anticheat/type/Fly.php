@@ -128,6 +128,16 @@ class Fly extends Check {
         $acPlayer->setServerMotionSet();
     }
 
+    public function onEntityTeleport(EntityTeleportEvent $event){
+        //EntityMotion: Components to 0, 0, 0 so the EntityMotionEvent will not handle the server motion!
+        $entity = $event->getEntity();
+        if(!$entity instanceof Player) return;
+
+        $acPlayer = AntiCheatManager::getPlayer($entity);
+        if($acPlayer === null) return;
+        $acPlayer->setServerMotionSet();
+    }
+
     public function receivePacket(DataPacketReceiveEvent $event){
         $packet = $event->getPacket();
         $player = $event->getPlayer();
