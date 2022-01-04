@@ -10,6 +10,7 @@ use pocketmine\level\sound\LaunchSound;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\ActorEventPacket;
 use pocketmine\network\mcpe\protocol\AnimatePacket;
+use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
 use pocketmine\Player;
 use ryzerbe\core\item\rod\entity\FishingHook;
 use ryzerbe\core\player\PMMPPlayer;
@@ -46,7 +47,7 @@ class PvPRod extends Durable {
 
             $fishingHook->throwHook($this);
             $fishingHook->spawnToAll();
-            $player->getLevel()->addSound(new LaunchSound($player->asVector3()), [$player]);
+            $player->getLevelNonNull()->broadcastLevelSoundEvent($player, LevelSoundEventPacket::SOUND_THROW);
             $player->broadcastEntityEvent(AnimatePacket::ACTION_SWING_ARM);
             return true;
         }
@@ -55,7 +56,6 @@ class PvPRod extends Durable {
         $fishingHook->broadcastEntityEvent(ActorEventPacket::FISH_HOOK_TEASE, null, $fishingHook->getViewers());
         $fishingHook->flagForDespawn();
         $this->applyDamage(mt_rand(1, 10));
-        $player->broadcastEntityEvent(AnimatePacket::ACTION_SWING_ARM);
         return true;
     }
 

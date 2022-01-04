@@ -11,25 +11,27 @@ use pocketmine\item\Bow;
 use pocketmine\item\enchantment\Enchantment;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
+use pocketmine\item\ItemIds;
 use pocketmine\item\Tool;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
 use pocketmine\Player;
+use ryzerbe\core\entity\Arrow;
 use ryzerbe\core\player\PMMPPlayer;
 use function intdiv;
 use function min;
 
-class PvPBow extends Tool{
+class PvPBow extends Tool {
 
     public function __construct(int $meta = 0){
         parent::__construct(self::BOW, $meta, "Bow");
     }
 
-    public function getFuelTime() : int{
+    public function getFuelTime(): int{
         return 200;
     }
 
-    public function getMaxDurability() : int{
+    public function getMaxDurability(): int{
         return 385;
     }
 
@@ -42,7 +44,7 @@ class PvPBow extends Tool{
      * @param PMMPPlayer $player
      * @return bool
      */
-    public function onReleaseUsing(Player $player) : bool{
+    public function onReleaseUsing(Player $player): bool{
         if($player->isSurvival() and !$player->getInventory()->contains(ItemFactory::get(Item::ARROW, 0, 1))){
             $player->getInventory()->sendContents($player);
             if($player->isOp()) $player->sendMessage("You need an arrow to shoot!");
@@ -61,60 +63,54 @@ class PvPBow extends Tool{
         $p = $diff / 20;
         $baseForce = min((($p ** 2) + $p * 2) / 3, 1);
 
-        $entity = Entity::createEntity("Arrow", $player->getLevelNonNull(), $nbt, $player, $baseForce >= 1);
-        if($entity instanceof Projectile){
-            $infinity = $this->hasEnchantment(Enchantment::INFINITY);
-            if($entity instanceof ArrowEntity){
-                if($infinity){
-                    $entity->setPickupMode(ArrowEntity::PICKUP_CREATIVE);
-                }
-                if(($punchLevel = $this->getEnchantmentLevel(Enchantment::PUNCH)) > 0){
-                    $entity->setPunchKnockback($punchLevel);
-                }
-            }
-            if(($powerLevel = $this->getEnchantmentLevel(Enchantment::POWER)) > 0){
-                $entity->setBaseDamage($entity->getBaseDamage() + (($powerLevel + 1) / 2));
-            }
-            if($this->hasEnchantment(Enchantment::FLAME)){
-                $entity->setOnFire(intdiv($entity->getFireTicks(), 20) + 100);
-            }
-            $ev = new EntityShootBowEvent($player, $this, $entity, $baseForce * 3);
+        $entity = new Arrow($player->getLevelNonNull(), $nbt, $player, $baseForce > 0);
+        $infinity = $this->hasEnchantment(Enchantment::INFINITY);
+        if($infinity){
+            $entity->setPickupMode(ArrowEntity::PICKUP_CREATIVE);
+        }
+        if(($punchLevel = $this->getEnchantmentLevel(Enchantment::PUNCH)) > 0){
+            $entity->setPunchKnockback($punchLevel);
+        }
+        if(($powerLevel = $this->getEnchantmentLevel(Enchantment::POWER)) > 0){
+            $entity->setBaseDamage($entity->getBaseDamage() + (($powerLevel + 1) / 2));
+        }
+        if($this->hasEnchantment(Enchantment::FLAME)){
+            $entity->setOnFire(intdiv($entity->getFireTicks(), 20) + 100);
+        }
+        $ev = new EntityShootBowEvent($player, $this, $entity, $baseForce * 3);
 
-            if($player->isSpectator()){
-                $ev->setCancelled();
-            }
+        if($player->isSpectator()){
+            $ev->setCancelled();
+        }
 
-            $ev->call();
+        $ev->call();
 
-            $entity = $ev->getProjectile(); //This might have been changed by plugins
+        $entity = $ev->getProjectile(); //This might have been changed by plugins
 
-            if($ev->isCancelled()){
-                $entity->flagForDespawn();
-                $player->getInventory()->sendContents($player);
-            }else{
-                $entity->setMotion($entity->getMotion()->multiply($ev->getForce()));
-                if($player->isSurvival()){
-                    if(!$infinity){ //TODO: tipped arrows are still consumed when Infinity is applied
-                        $player->getInventory()->removeItem(ItemFactory::get(Item::ARROW, 0, 1));
-                    }
-                    $this->applyDamage(1);
-                }
-
-                if($entity instanceof Projectile){
-                    $projectileEv = new ProjectileLaunchEvent($entity);
-                    $projectileEv->call();
-                    if($projectileEv->isCancelled()){
-                        $ev->getProjectile()->flagForDespawn();
-                    }else{
-                        $ev->getProjectile()->spawnToAll();
-                        $player->getLevelNonNull()->broadcastLevelSoundEvent($player, LevelSoundEventPacket::SOUND_BOW);
-                    }
-                }else{
-                    $entity->spawnToAll();
-                }
-            }
+        if($ev->isCancelled()){
+            $entity->flagForDespawn();
+            $player->getInventory()->sendContents($player);
         }else{
-            $entity->spawnToAll();
+            $entity->setMotion($entity->getMotion()->multiply($ev->getForce()));
+            if($player->isSurvival()){
+                if(!$infinity){
+                    $player->getInventory()->removeItem(ItemFactory::get(ItemIds::ARROW, 0, 1));
+                }
+                $this->applyDamage(1);
+            }
+
+            if($entity instanceof Projectile){
+                $projectileEv = new ProjectileLaunchEvent($entity);
+                $projectileEv->call();
+                if($projectileEv->isCancelled()){
+                    $ev->getProjectile()->flagForDespawn();
+                }else{
+                    $ev->getProjectile()->spawnToAll();
+                    $player->getLevelNonNull()->broadcastLevelSoundEvent($player, LevelSoundEventPacket::SOUND_BOW);
+                }
+            }else{
+                $entity->spawnToAll();
+            }
         }
 
         return true;
