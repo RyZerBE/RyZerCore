@@ -31,7 +31,11 @@ class ClanInformationForm {
         $information .= TextFormat::GOLD . TextFormat::BOLD . "Owner: " . TextFormat::RESET . TextFormat::RED . $extraData["clan_owner"] . "\n";
         $information .= TextFormat::GOLD . TextFormat::BOLD . "Created: " . TextFormat::RESET . TextFormat::YELLOW . $extraData["created"] . "\n";
         $information .= TextFormat::GOLD . TextFormat::BOLD . "Info: " . TextFormat::RESET . TextFormat::YELLOW . $extraData["message"] . "\n";
+        $information .=  " " ."\n";
         $information .= TextFormat::GOLD . TextFormat::BOLD . "Elo: " . TextFormat::RESET . TextFormat::YELLOW . $extraData["elo"] . "\n";
+        $information .= TextFormat::GOLD . TextFormat::BOLD . "Won ClanWars: " . TextFormat::RESET . TextFormat::GREEN . $extraData["wonMatches"] . "\n";
+        $information .= TextFormat::GOLD . TextFormat::BOLD . "Lose ClanWars " . TextFormat::RESET . TextFormat::RED . $extraData["loseMatches"] . "\n";
+        $information .=  " " ."\n";
         $information .= TextFormat::GOLD . TextFormat::BOLD . "State: " . TextFormat::RESET . $state . "\n";
         $information .= TextFormat::GOLD . TextFormat::BOLD . "Members: \n" . TextFormat::RESET;
         foreach($extraData["players"] as $clanMemberName){
