@@ -12,6 +12,7 @@ use pocketmine\network\mcpe\protocol\types\PlayerListEntry;
 use pocketmine\Player;
 use pocketmine\Server;
 use ryzerbe\core\anticheat\AntiCheatManager;
+use ryzerbe\core\anticheat\type\KillAura;
 use function microtime;
 
 class KillAuraBot extends Human {
@@ -93,6 +94,9 @@ class KillAuraBot extends Human {
         if($player !== null) {
             $acPlayer = AntiCheatManager::getPlayer($player);
             if($acPlayer !== null) {
+                if($acPlayer->getKillAuraCount() < 3) {
+                    (new KillAura())->sendKillAuraBotResult($acPlayer, false);
+                }
                 $acPlayer->killAuraBot = null;
             }
         }

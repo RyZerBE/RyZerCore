@@ -48,7 +48,7 @@ class KillAura extends Check {
         if($entity instanceof KillAuraBot) {
             $acPlayer->countKillAura();
             if($acPlayer->getKillAuraCount() > 2) {
-                $this->sendWarningMessage($damager);
+                $this->sendKillAuraBotResult($acPlayer, true);
                 $acPlayer->resetKillAuraCount();
                 $damager->kickFromProxy(AntiCheatManager::PREFIX.TextFormat::YELLOW."Please deactivate your hacks!");
             }
@@ -72,7 +72,6 @@ class KillAura extends Check {
             if (count($acPlayer->hitEntityCount) >= 2) {
                 if ($acPlayer->getKillAuraCount() >= 5) {
                     $acPlayer->resetKillAuraCount();
-                    #$this->sendWarningMessage($damager);
                     $this->spawnBotToPlayer($acPlayer);
                 }
                 $acPlayer->countKillAura();
@@ -128,6 +127,7 @@ class KillAura extends Check {
         $content[] = TextFormat::DARK_GRAY."» ".TextFormat::GRAY."Device: ".TextFormat::GOLD.$ryzerPlayer->getLoginPlayerData()->getDeviceOsName();
         $content[] = TextFormat::DARK_GRAY."» ".TextFormat::GRAY."Server: ".TextFormat::RED.Server::getInstance()->getMotd();
         $content[] = TextFormat::DARK_GRAY."» ".TextFormat::GRAY."Calls: ".TextFormat::RED.$calls;
+        $content[] = TextFormat::DARK_GRAY."» ".TextFormat::GRAY."KillAuraBot Test §astarted§7!";
         $content[] = "\n";
         StaffProvider::sendMessageToStaffs(implode("\n", $content), false);
     }
@@ -137,6 +137,9 @@ class KillAura extends Check {
      * @param bool $hasKillAura
      */
     public function sendKillAuraBotResult(AntiCheatPlayer $checkedPlayer, bool $hasKillAura): void{
+        $ryzerPlayer = RyZerPlayerProvider::getRyzerPlayer($checkedPlayer->getPlayer());
+        if($ryzerPlayer === null) return;
+
         $content = [];
         $content[] = "\n";
         $content[] = TextFormat::DARK_GRAY."» ".TextFormat::RED.TextFormat::BOLD."AntiCheat ".TextFormat::GOLD."RESULT".TextFormat::RESET.TextFormat::DARK_GRAY." «";
@@ -144,9 +147,27 @@ class KillAura extends Check {
         $content[] = TextFormat::DARK_GRAY."» ".TextFormat::GRAY."Module: ".TextFormat::GOLD."KillAura";
         $content[] = TextFormat::DARK_GRAY."» ".TextFormat::GRAY."Device: ".TextFormat::GOLD.$checkedPlayer->getPlayer()->getRyZerPlayer()->getLoginPlayerData()->getDeviceOsName();
         $content[] = TextFormat::DARK_GRAY."» ".TextFormat::GRAY."Server: ".TextFormat::RED.Server::getInstance()->getMotd();
-        $content[] = TextFormat::DARK_GRAY."» ".TextFormat::GRAY."Check: ".($hasKillAura === true) ? TextFormat::GREEN.TextFormat::BOLD."DETECTED" : TextFormat::RED."NOT DETECTED";
+        $content[] = TextFormat::DARK_GRAY."» ".TextFormat::GRAY."Check: ".(($hasKillAura === true) ? TextFormat::GREEN.TextFormat::BOLD."DETECTED" : TextFormat::RED."NOT DETECTED");
         $content[] = "\n";
         StaffProvider::sendMessageToStaffs(implode("\n", $content), false);
+
+        $discordMessage = new DiscordMessage(WebhookLinks::AUTOCLICKER_LOG);
+        $embed = new DiscordEmbed();
+        $embed->setTitle("KillAuraBot Result");
+        $embed->addField(new EmbedField("Player", $ryzerPlayer->getPlayer()->getName(), true));
+        $embed->addField(new EmbedField("Device", $ryzerPlayer->getLoginPlayerData()->getDeviceOsName(), true));
+        $embed->addField(new EmbedField("Warnings", strval($checkedPlayer->getWarnings($this)), true));
+        $embed->addField(new EmbedField("Server", Server::getInstance()->getMotd(), true));
+        $embed->addField(new EmbedField("TPS", Server::getInstance()->getTicksPerSecondAverage() . " (" . Server::getInstance()->getTickUsageAverage() . "%)", true));
+        $embed->addField(new EmbedField("Result", (($hasKillAura === true) ? "DETECTED | Player kicked" : "NOT DETECTED"), true));
+        $embed->setColor(match ($hasKillAura) {
+            true => DiscordColor::GREEN,
+            false => DiscordColor::RED,
+            default => DiscordColor::DARK_RED
+        });
+        $embed->setFooter("RyZerBE", "https://images-ext-2.discordapp.net/external/Pvz56xrz36E9uwwoKvZWm-WN2XGFk15m-GmF3ckaP_8/%3Fwidth%3D703%26height%3D703/https/media.discordapp.net/attachments/693494109842833469/730816117311930429/RYZER_Network.png");
+        $discordMessage->addEmbed($embed);
+        $discordMessage->send();
     }
 
     /**
