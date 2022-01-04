@@ -9,6 +9,7 @@ use pocketmine\event\Listener;
 use pocketmine\inventory\PlayerOffHandInventory;
 
 class InventoryTransactionListener implements Listener {
+
     public function onInventoryTransaction(InventoryTransactionEvent $event): void {
         foreach($event->getTransaction()->getInventories() as $inventory) {
             if(!$inventory instanceof PlayerOffHandInventory) continue;
