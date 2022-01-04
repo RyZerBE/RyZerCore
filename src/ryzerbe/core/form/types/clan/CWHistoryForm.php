@@ -32,6 +32,14 @@ class CWHistoryForm {
         }, function(Server $server, ?array $result) use ($playerName): void{
             $player = $server->getPlayerExact($playerName);
             if($player === null) return;
+            if($result === null) {
+                $form = new SimpleForm(function(Player $player, $data): void{});
+                $form->setTitle(TextFormat::GOLD . "ClanWar History");
+                $form->setContent(LanguageProvider::getMessageContainer("clan-no-cw-history", $playerName));
+                $form->sendToPlayer($player);
+                return;
+            }
+
             krsort($result);
             $newResult = [];
             foreach($result as $time => $data) {
@@ -59,11 +67,11 @@ class CWHistoryForm {
                     $hours = $diff->h ?? 0;
                     $strTime = "Vor ";
                     if($minutes <= 0){
-                        $strTime .= $seconds . (($seconds > 1) ? "Seconds" : "Second");
+                        $strTime .= $seconds . (($seconds > 1) ? " Seconds" : " Second");
                     }
                     else{
-                        if($hours > 0) $strTime .= $hours . (($hours > 1) ? "Hours" : "Hour") . ", ";
-                        $strTime .= $minutes . (($minutes > 1) ? "Minutes" : "Minute");
+                        if($hours > 0) $strTime .= $hours . (($hours > 1) ? " Hours" : " Hour") . ", ";
+                        $strTime .= $minutes . (($minutes > 1) ? " Minutes" : " Minute");
                     }
                     $form->addButton(TextFormat::BLUE . $data["clan_1"] . TextFormat::DARK_GRAY . " VS " . TextFormat::RED . $data["clan_2"] . "\n" . TextFormat::GRAY . $strTime, -1, "", $date);
                 }

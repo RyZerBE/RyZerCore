@@ -2,11 +2,14 @@
 
 namespace ryzerbe\core\listener\player;
 
+use pocketmine\block\Block;
+use pocketmine\block\BlockIds;
 use pocketmine\entity\Entity;
 use pocketmine\entity\projectile\Projectile;
 use pocketmine\event\entity\ProjectileLaunchEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
+use pocketmine\item\Armor;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
 use pocketmine\nbt\tag\CompoundTag;
@@ -36,11 +39,16 @@ class PlayerInteractListener implements Listener {
             $customItem->onInteract($player, $item);
             return;
         }
+        $rightClick = $action === PlayerInteractEvent::RIGHT_CLICK_AIR;
 
-        if($item->getId() == ItemIds::ENDER_PEARL && $action === PlayerInteractEvent::RIGHT_CLICK_AIR) {
+        if($item->getId() == ItemIds::ENDER_PEARL && $rightClick) {
             $event->setCancelled();
             $player->getInventory()->removeItem(Item::get(ItemIds::ENDER_PEARL));
             $this->createEnderpearl($player);
+        }
+
+        if($item instanceof Armor && $rightClick && $player->getArmorInventory()->getItem($item->getArmorSlot())->getId() === BlockIds::AIR) {
+            $player->getInventory()->removeItem(Item::get($item->getId()));
         }
     }
 
