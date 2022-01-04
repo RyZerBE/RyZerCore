@@ -119,32 +119,6 @@ class PMMPPlayer extends PMPlayer {
         return $this->temporalVector->setComponents($x, $y, $z)->normalize();
     }
 
-    /**
-     * @return Block[]
-     */
-    public function getBlocksAroundOfPlayer(): array{
-        $inset = 0.001; //Offset against floating-point errors
-
-        $minX = (int) floor($this->boundingBox->minX + $inset);
-        $minY = (int) floor($this->boundingBox->minY + $inset);
-        $minZ = (int) floor($this->boundingBox->minZ + $inset);
-        $maxX = (int) floor($this->boundingBox->maxX - $inset);
-        $maxY = (int) floor($this->boundingBox->maxY - $inset);
-        $maxZ = (int) floor($this->boundingBox->maxZ - $inset);
-
-        $blocksAround = [];
-
-        for($z = $minZ; $z <= $maxZ; ++$z){
-            for($x = $minX; $x <= $maxX; ++$x){
-                for($y = $minY; $y <= $maxY; ++$y){
-                    $blocksAround[] = $this->level->getBlockAt($x, $y, $z);
-                }
-            }
-        }
-
-        return $blocksAround;
-    }
-
     public function getEyePos() : Vector3{
         return new Vector3($this->asVector3()->x, $this->asVector3()->y + $this->getEyeHeight(), $this->asVector3()->z);
     }
@@ -935,9 +909,6 @@ class PMMPPlayer extends PMPlayer {
     }
 
     public function useLadder(): bool{
-        foreach ($this->getBlocksAround() as $block) {
-            if($block->getId() === BlockIds::LADDER) return true;
-        }
         return false;
     }
 }
