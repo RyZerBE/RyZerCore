@@ -472,7 +472,7 @@ class RyZerPlayer {
                 $ryzerPlayer->getPlayerSettings()->setMsgEnabled($playerData["msg_toggle"]);
             }
 
-            if(isset($playerData["party_members"]) && stripos(CloudProvider::getServer(), "CWBW") === false) {
+            if(isset($playerData["party_members"]) && stripos(CloudProvider::getServer(), "CWBW") === false && stripos(CloudProvider::getServer(), "Lobby") === false) {
                 $pk = new PlayerMoveServerPacket();
                 unset($playerData["party_members"][array_search($playerName, $playerData["party_members"])]);
                 $pk->addData("playerNames", implode(":", $playerData["party_members"]));
