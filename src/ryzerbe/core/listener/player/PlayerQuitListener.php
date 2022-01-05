@@ -14,5 +14,6 @@ class PlayerQuitListener implements Listener {
         if($ryzerPlayer === null) return;
         AntiCheatManager::removePlayer($player);
         $ryzerPlayer->saveData();
+        RyZerPlayerProvider::unregisterRyzerPlayer($player->getName());
     }
 }
