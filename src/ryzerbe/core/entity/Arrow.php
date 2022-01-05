@@ -22,6 +22,10 @@ use function round;
 
 class Arrow extends Projectile {
 
+    const BOW_I = 0.25;
+    const BOW_II = 0.5;
+    const BOW_III = 1.0;
+
     public const NETWORK_ID = self::ARROW;
 
     public const PICKUP_NONE = 0;
@@ -135,7 +139,10 @@ class Arrow extends Projectile {
     protected function onHitEntity(Entity $entityHit, RayTraceResult $hitResult) : void{
         parent::onHitEntity($entityHit, $hitResult);
         $horizontalSpeed = sqrt($this->motion->x ** 2 + $this->motion->z ** 2);
-        if($this->punchKnockback <= 0) $this->punchKnockback = 0.5;
+        if($this->punchKnockback <= 0) $this->punchKnockback = self::BOW_I;
+        if($this->punchKnockback == 1) $this->punchKnockback = self::BOW_II;
+        if($this->punchKnockback == 2) $this->punchKnockback = self::BOW_III;
+
         if($horizontalSpeed > 0){
             $multiplier = $this->punchKnockback * 0.5 / $horizontalSpeed;
             $entityHit->setMotion($entityHit->getMotion()->add($this->motion->x * $multiplier, 0.1, $this->motion->z * $multiplier));
