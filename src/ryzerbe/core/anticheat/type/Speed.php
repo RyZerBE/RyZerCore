@@ -34,36 +34,6 @@ class Speed extends Check {
     ];
 
     /**
-     * public function onMove(PlayerMoveEvent $event){
-    $player = $event->getPlayer();
-    $cheatPlayer = AntiCheatManager::getPlayer($player);
-    if($cheatPlayer === null) return;
-    if($cheatPlayer->isServerMotionSet() || $cheatPlayer->getPlayer()->getAllowFlight()) return;
-    foreach($player->getEffects() as $effect){
-    if(in_array($effect->getId(), self::DETECTED_SPEED_EFFECTS)) return;
-    }
-
-    $lastVector3 = $cheatPlayer->getLastVector3();
-    $bigYDifference = $lastVector3->distance(new Vector3($lastVector3->getX(), $cheatPlayer->getPlayer()->getY(), $lastVector3->getZ()));
-    if($bigYDifference > 3) return;
-    if($cheatPlayer->getPlayer()->getBlockOverPlayer()->getId() != BlockIds::AIR) return;
-
-    $distanceSquare = ($lastVector3->getX() - $event->getTo()->getX()) ** 2 + ($lastVector3->getZ() - $event->getTo()->getZ()) ** 2;
-    if($distanceSquare === 0) return;
-
-    $player->sendMessage("DistanceSquare: $distanceSquare");
-    if($distanceSquare > 1000000){
-    if($cheatPlayer->getSpeedCount() >= 3){
-    $cheatPlayer->flag("Speed", $this);
-    }
-    $cheatPlayer->countSpeed();
-    }else{
-    $cheatPlayer->resetSpeedCount();
-    }
-    }
-     */
-
-    /**
      * @param Player $player
      * @param bool $ban
      */
