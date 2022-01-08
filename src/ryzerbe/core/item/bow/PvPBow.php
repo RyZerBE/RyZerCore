@@ -47,7 +47,6 @@ class PvPBow extends Tool {
     public function onReleaseUsing(Player $player): bool{
         if($player->isSurvival() and !$player->getInventory()->contains(ItemFactory::get(Item::ARROW, 0, 1))){
             $player->getInventory()->sendContents($player);
-            if($player->isOp()) $player->sendMessage("You need an arrow to shoot!");
             return false;
         }
 

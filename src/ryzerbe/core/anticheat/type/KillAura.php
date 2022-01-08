@@ -15,6 +15,7 @@ use ryzerbe\core\anticheat\AntiCheatManager;
 use ryzerbe\core\anticheat\AntiCheatPlayer;
 use ryzerbe\core\anticheat\Check;
 use ryzerbe\core\anticheat\entity\KillAuraBot;
+use ryzerbe\core\event\player\anticheat\PlayerAntiCheatKickEvent;
 use ryzerbe\core\player\PMMPPlayer;
 use ryzerbe\core\player\RyZerPlayerProvider;
 use ryzerbe\core\provider\StaffProvider;
@@ -50,6 +51,9 @@ class KillAura extends Check {
             if($acPlayer->getKillAuraCount() > 2) {
                 $this->sendKillAuraBotResult($acPlayer, true);
                 $acPlayer->resetKillAuraCount();
+                $ev = new PlayerAntiCheatKickEvent($acPlayer, $this);
+                $ev->call();
+                if($ev->isCancelled()) return;
                 $damager->kickFromProxy(AntiCheatManager::PREFIX.TextFormat::YELLOW."Please deactivate your hacks!");
             }
             return;

@@ -49,6 +49,7 @@ class ReportProvider implements RyZerProvider {
             if($success) {
                 $player->sendMessage(RyZerBE::PREFIX.LanguageProvider::getMessageContainer("successful-player-reported", $player->getName(), ['#playername' => $nickName, '#reason' => $reason]));
                 $discordMessage = new DiscordMessage(WebhookLinks::REPORT_LOG);
+                $discordMessage->setMessage("<@&719213028943331359>");
                 $discordEmbed = new DiscordEmbed();
                 $discordEmbed->setColor(DiscordColor::RED);
                 $discordEmbed->setFooter("RyZerBE Moderation", "https://media.discordapp.net/attachments/602115215307309066/907944961037729792/rbe_logo_new.png?width=702&height=702");
@@ -58,6 +59,7 @@ class ReportProvider implements RyZerProvider {
                 $discordEmbed->addField(new EmbedField(":cop: Detective", $reporter, false));
                 $discordEmbed->addField(new EmbedField(":trident: Nick", (($nick !== null) ? "POSITIVE (".$nickName.")" : "NEGATIVE"), true));
                 $discordEmbed->setDateTime(new DateTime());
+                $discordMessage->addEmbed($discordEmbed);
                 $discordMessage->send();
                 StaffProvider::sendMessageToStaffs(
                     ReportProvider::PREFIX.TextFormat::GOLD.$bad_player.TextFormat::GRAY." wurde ".TextFormat::YELLOW."reportet".TextFormat::GRAY."!"

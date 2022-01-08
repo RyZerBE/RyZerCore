@@ -38,7 +38,9 @@ class ChatModProvider implements RyZerProvider {
         "amana",
         "sikerim",
         "arschloch",
+        "asshole",
         "fotze",
+        "fötzchen",
         "vagina",
         "penis",
         "gangbang",
@@ -61,11 +63,15 @@ class ChatModProvider implements RyZerProvider {
         "spasti",
         "spast",
         "pisser",
-        "pissdich"
+        "pissdich",
+        "bumsen",
+        "bitch"
     ];
 
     public const PROVOCATIONS = [
         "ez",
+        "e2",
+        "l2p",
         "l",
         "loser",
         "kek",
@@ -78,8 +84,10 @@ class ChatModProvider implements RyZerProvider {
         "l" => "besser als ich gg",
         "ll" => "besser als ich gg",
         "lll" => "besser als ich gg",
+        "l2p" => "Ich muss glaube besser werden :/",
         "loser" => "ich bin voll schlecht bruh",
-        "ez" => "voll gut",
+        "ez" => "voll gut gespielt",
+        "e2" => "voll gut gespielt",
         "bg" => "Gut gespielt!"
     ];
 
@@ -109,7 +117,7 @@ class ChatModProvider implements RyZerProvider {
      * @return array
      */
     public function checkProvocation(string $message): array{
-        $message = explode(" ", $this->cleanMessageForCheck(strtolower($message), [" "]));
+        $message = explode(" ", $this->cleanMessageForCheck(strtolower($message), [" ", "2"]));
 
         $provocations = [];
         foreach(self::PROVOCATIONS as $PROVOCATION) {

@@ -22,6 +22,7 @@ use function round;
 
 class Arrow extends Projectile {
 
+    // PUNCH FLOAT \\
     const BOW_I = 0.25;
     const BOW_II = 0.5;
     const BOW_III = 1.0;
@@ -138,6 +139,10 @@ class Arrow extends Projectile {
 
     protected function onHitEntity(Entity $entityHit, RayTraceResult $hitResult) : void{
         parent::onHitEntity($entityHit, $hitResult);
+        $shooter = $entityHit->getOwningEntity();
+        if($entityHit instanceof PMMPPlayer && $shooter instanceof PMMPPlayer) {
+            if($entityHit->getName() === $shooter->getName()) return;
+        }
         $horizontalSpeed = sqrt($this->motion->x ** 2 + $this->motion->z ** 2);
         if($this->punchKnockback <= 0) $this->punchKnockback = self::BOW_I;
         if($this->punchKnockback == 1) $this->punchKnockback = self::BOW_II;

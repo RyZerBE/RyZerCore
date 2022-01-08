@@ -47,7 +47,14 @@ class PlayerInteractListener implements Listener {
             $this->createEnderpearl($player);
         }
 
-        if($item instanceof Armor && $rightClick && $player->getArmorInventory()->getItem($item->getArmorSlot())->getId() === BlockIds::AIR) {
+        if($item instanceof Armor && $rightClick) {
+            $itemInArmorSlot = $player->getArmorInventory()->getItem($item->getArmorSlot());
+            if($player->getArmorInventory()->getItem($item->getArmorSlot())->getId() != BlockIds::AIR){
+                $event->setCancelled();
+                $player->getArmorInventory()->setItem($item->getArmorSlot(), $item);
+                $player->getInventory()->setItemInHand($itemInArmorSlot);
+                return;
+            }
             $player->getInventory()->removeItem(Item::get($item->getId()));
         }
     }

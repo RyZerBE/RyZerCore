@@ -5,17 +5,22 @@ declare(strict_types=1);
 namespace ryzerbe\core\anticheat;
 
 use Exception;
+use pocketmine\block\BlockIds;
+use pocketmine\inventory\ArmorInventory;
+use pocketmine\item\ItemIds;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\anticheat\entity\KillAuraBot;
+use ryzerbe\core\anticheat\type\Fly;
 use ryzerbe\core\player\PMMPPlayer;
 use function array_filter;
 use function array_shift;
 use function array_sum;
 use function count;
 use function floatval;
+use function in_array;
 use function microtime;
 use function round;
 use function strval;
@@ -53,6 +58,8 @@ class AntiCheatPlayer {
     private int $speedCount = 0;
     private float $serverMotion = 0.0;
     private float|int $maxFlightHeight = 0.0;
+
+    public float $fallDistance = 0.0;
 
     /** @var int  */
     private int $tickOnAir = 0;
@@ -267,10 +274,10 @@ class AntiCheatPlayer {
         return $this->killAuraCount;
     }
 
-    public function flag(string $reason, Check $check): void{
+    public function flag(string $reason, Check $check, bool $warning = true): void{
         $this->getPlayer()->teleport($this->lastVector);
         $this->lastFlagReason = $reason;
-        $this->addWarning($check);
+        if($warning) $this->addWarning($check);
     }
 
     public function jump(): void{
@@ -344,7 +351,7 @@ class AntiCheatPlayer {
      * @param int $sec
      * @return array
      */
-    public function getFallDistanceLog(int $sec = 0): array{
+    public function getFallDistanceLog(int $sec = 1): array{
         if($sec === 0) return $this->fallDistanceLog;
         if($sec >= 5){
             Server::getInstance()->getLogger()->error("AntiCheatPlayer#getFalDistanceLog => Sec/s cannot greater than 4!");
@@ -379,5 +386,30 @@ class AntiCheatPlayer {
      */
     public function getSpeedCount(): int{
         return $this->speedCount;
+    }
+
+    public function canFlyCheck(): bool{
+        $player = $this->getPlayer();
+        if($player->getBlockUnderPlayer()->getId() === BlockIds::SLIME_BLOCK) {
+            $this->setServerMotionSet();
+        }
+        if($this->isServerMotionSet() || $player->getAllowFlight()) return false;
+        if($player->getArmorInventory()->getItem(ArmorInventory::SLOT_CHEST)->getId() === ItemIds::ELYTRA) return false;
+        $block = $player->getLevel()->getBlock($player->asVector3());
+
+        if(in_array($block->getId(), Fly::DETECTED_FLIGHT_BLOCKS)) return false;
+        if(in_array($player->getLevel()->getBlock($player->getEyePos())->getId(), Fly::DETECTED_FLIGHT_BLOCKS)) return false;
+        if(in_array($player->getLevel()->getBlock($player->asVector3()->add(1))->getId(), Fly::DETECTED_FLIGHT_BLOCKS)) return false;
+        if(in_array($player->getLevel()->getBlock($player->asVector3()->add(0, 0, 1))->getId(), Fly::DETECTED_FLIGHT_BLOCKS)) return false;
+        if(in_array($player->getLevel()->getBlock($player->asVector3()->add(-1))->getId(), Fly::DETECTED_FLIGHT_BLOCKS)) return false;
+        if(in_array($player->getLevel()->getBlock($player->asVector3()->add(0, 0, -1))->getId(), Fly::DETECTED_FLIGHT_BLOCKS)) return false;
+        if(in_array($player->getLevel()->getBlock($player->asVector3()->add(-1, 0, -1))->getId(), Fly::DETECTED_FLIGHT_BLOCKS)) return false;
+        if(in_array($player->getLevel()->getBlock($player->asVector3()->add(1, 0, 1))->getId(), Fly::DETECTED_FLIGHT_BLOCKS)) return false;
+        if(in_array($player->getLevel()->getBlock($player->asVector3()->add(0, -1))->getId(), Fly::DETECTED_FLIGHT_BLOCKS)) return false;
+
+        foreach($player->getEffects() as $effect) if(in_array($effect->getId(), Fly::DETECTED_FLIGHT_EFFECTS)) return false;
+        foreach($player->getBlocksAround() as $interactionBlock) if(in_array($interactionBlock->getId(), Fly::DETECTED_FLIGHT_BLOCKS)) return false;
+
+        return true;
     }
 }

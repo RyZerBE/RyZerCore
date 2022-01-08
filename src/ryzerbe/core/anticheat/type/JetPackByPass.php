@@ -29,28 +29,10 @@ class JetPackByPass extends Check {
         foreach(AntiCheatManager::getPlayers() as $cheatPlayer) {
             if($cheatPlayer->getPlayer()->isOnGround()) continue;
             if((microtime(true) - $cheatPlayer->getLastBlockPlaceTime()) < 2) continue;
-            if($cheatPlayer->isServerMotionSet() || $cheatPlayer->getPlayer()->getAllowFlight()) continue;
-            if($cheatPlayer->getPlayer()->getArmorInventory()->getItem(ArmorInventory::SLOT_CHEST)->getId() === ItemIds::ELYTRA) continue;
-            $player = $cheatPlayer->getPlayer();
-
-            $block = $cheatPlayer->getPlayer()->getBlockUnderPlayer();
-            if(in_array($block->getId(), Fly::DETECTED_FLIGHT_BLOCKS)) continue;
-            if(in_array($player->getLevel()->getBlock($player->asVector3()->add(1))->getId(), Fly::DETECTED_FLIGHT_BLOCKS)) continue;
-            if(in_array($player->getLevel()->getBlock($player->asVector3()->add(0, 0, 1))->getId(), Fly::DETECTED_FLIGHT_BLOCKS)) continue;
-            if(in_array($player->getLevel()->getBlock($player->asVector3()->add(-1))->getId(), Fly::DETECTED_FLIGHT_BLOCKS)) continue;
-            if(in_array($player->getLevel()->getBlock($player->asVector3()->add(0, 0, -1))->getId(), Fly::DETECTED_FLIGHT_BLOCKS)) continue;
-            if(in_array($player->getLevel()->getBlock($player->asVector3()->add(-1, 0, -1))->getId(), Fly::DETECTED_FLIGHT_BLOCKS)) continue;
-            if(in_array($player->getLevel()->getBlock($player->asVector3()->add(1, 0, 1))->getId(), Fly::DETECTED_FLIGHT_BLOCKS)) continue;
-            if(in_array($player->getLevel()->getBlock($player->asVector3()->add(0, -1))->getId(), Fly::DETECTED_FLIGHT_BLOCKS)) continue;
-            $continue = false;
-            foreach($player->getEffects() as $effect){
-                if(in_array($effect->getId(), Fly::DETECTED_FLIGHT_EFFECTS)) $continue = true;
-            }
-            if($continue) continue;
+            if(!$cheatPlayer->canFlyCheck()) continue;
 
             $cheatPlayer->airTick();
             $cheatPlayer->logDistance($cheatPlayer->getPlayer()->fallDistance);
-
 
             if(($cheatPlayer->airTick() > TaskUtils::secondsToTicks(3))) {
                 $hasByPass = true;

@@ -9,6 +9,7 @@ use Exception;
 use mysqli;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
+use ryzerbe\core\player\RyZerPlayerProvider;
 use ryzerbe\core\RyZerBE;
 use ryzerbe\core\util\async\AsyncExecutor;
 use ryzerbe\core\util\discord\color\DiscordColor;
@@ -125,6 +126,15 @@ class PunishmentProvider implements RyZerProvider {
                 $pk->addData("playerName", $playerName);
                 $pk->addData("message", TextFormat::RED . "You have been banned from our network!");
                 CloudBridge::getInstance()->getClient()->getPacketHandler()->writePacket($pk);
+            }
+
+            $ryzerPlayer = RyZerPlayerProvider::getRyzerPlayer($playerName);
+            if($ryzerPlayer !== null) {
+                if($type === PunishmentReason::MUTE) {
+                    $ryzerPlayer->setMute($unbanFormat);
+                    $ryzerPlayer->setMuteId($id);
+                    $ryzerPlayer->setMuteReason($reasonName);
+                }
             }
 
             StaffProvider::sendMessageToStaffs(RyZerBE::PREFIX.(($type === PunishmentReason::BAN) ? TextFormat::GOLD.$playerName . TextFormat::RED." wurde gebannt"

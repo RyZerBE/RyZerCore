@@ -60,14 +60,15 @@ class RyZerBE extends PluginBase {
     public const PREFIX = TextFormat::WHITE.TextFormat::BOLD."RyZer".TextFormat::RED."BE ".TextFormat::RESET;
 
     public static RyZerBE $plugin;
+    public static string $file;
 
     /**
      * @throws ReflectionException
      */
     public function onEnable(): void{
         self::$plugin = $this;
-
-        ListenerDirectoryLoader::load($this, $this->getFile(), __DIR__ . "/listener/");
+        self::$file = $this->getFile();
+        ListenerDirectoryLoader::load($this, self::$file, __DIR__ . "/listener/");
 
         $this->initCommands();
         $this->initBlocks();

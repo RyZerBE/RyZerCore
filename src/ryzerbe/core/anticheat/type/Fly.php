@@ -29,12 +29,17 @@ use ryzerbe\core\util\discord\DiscordMessage;
 use ryzerbe\core\util\discord\embed\DiscordEmbed;
 use ryzerbe\core\util\discord\embed\options\EmbedField;
 use ryzerbe\core\util\discord\WebhookLinks;
-use ryzerbe\core\util\math\Facing;
 use function implode;
+use function microtime;
 use function str_contains;
 use function strval;
 
 class Fly extends Check {
+
+    private const XZ = [
+        [0.3, 0], [0, 0.3], [-0.3, 0], [0, -0.3]
+    ];
+
 
     public const DETECTED_FLIGHT_BLOCKS = [
         BlockIds::WATER,
@@ -54,9 +59,33 @@ class Fly extends Check {
     ];
 
     public function onJoin(RyZerPlayerAuthEvent $event){
-        if(str_contains(CloudProvider::getServer(), "BuildFFA") || str_contains(CloudProvider::getServer(), "BW2x1")) {
-            $event->getRyZerPlayer()->getPlayer()->sendMessage("\n\n".TextFormat::RED.TextFormat::BOLD."AntiCheat ".TextFormat::YELLOW."Achtung! Wir testen hier mit dem Anticheat!"."\n\n");
+        if(str_contains(CloudProvider::getServer(), "BuildFFA") || str_contains(CloudProvider::getServer(), "BW2x1") || str_contains(CloudProvider::getServer(), "BW4x2")) {
+            $event->getRyZerPlayer()->getPlayer()->sendMessage("\n\n".AntiCheatManager::PREFIX.TextFormat::YELLOW."Achtung! Hier wird mit dem Anticheat getestet!"."\n\n");
         }
+    }
+
+    public function onUpdate(int $currentTick): bool{
+        if($currentTick % 5 !== 0) return true;
+        foreach(AntiCheatManager::getPlayers() as $acPlayer){
+            $player = $acPlayer->getPlayer();
+            if(!$acPlayer->canFlyCheck()) continue;
+            if((microtime(true) - $acPlayer->getLastBlockPlaceTime()) < 2){
+                $acPlayer->fallDistance = $player->getPlayer()->fallDistance;
+                continue;
+            }
+            if((microtime(true) - $acPlayer->getLastJump()) < 2){
+                $acPlayer->fallDistance = $player->getPlayer()->fallDistance;
+                continue;
+            }
+
+            if($acPlayer->fallDistance > $player->fallDistance && $player->fallDistance > 1 && !$player->isOnGround()){
+                $acPlayer->flag("Fly (Jump/Sneak)", $this);
+                #$player->sendMessage("Verarsch unser AntiCheat nicht du trottel");
+                continue;
+            }
+            $acPlayer->fallDistance = $player->getPlayer()->fallDistance;
+        }
+        return true;
     }
 
     public function onMove(PlayerMoveEvent $event){
@@ -69,9 +98,8 @@ class Fly extends Check {
         if($player->getBlockUnderPlayer()->getId() === BlockIds::SLIME_BLOCK) {
             $acPlayer->setServerMotionSet();
         }
-        if($acPlayer->isServerMotionSet() || $player->getAllowFlight()) return;
-        if($player->getArmorInventory()->getItem(ArmorInventory::SLOT_CHEST)->getId() === ItemIds::ELYTRA) return;
-        $block = $player->getLevel()->getBlock($player->asVector3());
+
+        if(!$acPlayer->canFlyCheck()) return;
 
         $blockInFront = match ($player->getDirection()) {
             Vector3::SIDE_NORTH => $player->getLevel()->getBlock($event->getTo()->subtract(1)),
@@ -81,17 +109,7 @@ class Fly extends Check {
             default => null,
         };
 
-        if(in_array($block->getId(), self::DETECTED_FLIGHT_BLOCKS)) return;
-        if(in_array($player->getLevel()->getBlock($player->getEyePos())->getId(), self::DETECTED_FLIGHT_BLOCKS)) return;
-        if(in_array($player->getLevel()->getBlock($player->asVector3()->add(1))->getId(), self::DETECTED_FLIGHT_BLOCKS)) return;
-        if(in_array($player->getLevel()->getBlock($player->asVector3()->add(0, 0, 1))->getId(), self::DETECTED_FLIGHT_BLOCKS)) return;
-        if(in_array($player->getLevel()->getBlock($player->asVector3()->add(-1))->getId(), self::DETECTED_FLIGHT_BLOCKS)) return;
-        if(in_array($player->getLevel()->getBlock($player->asVector3()->add(0, 0, -1))->getId(), self::DETECTED_FLIGHT_BLOCKS)) return;
-        if(in_array($player->getLevel()->getBlock($player->asVector3()->add(-1, 0, -1))->getId(), self::DETECTED_FLIGHT_BLOCKS)) return;
-        if(in_array($player->getLevel()->getBlock($player->asVector3()->add(1, 0, 1))->getId(), self::DETECTED_FLIGHT_BLOCKS)) return;
-        if(in_array($player->getLevel()->getBlock($player->asVector3()->add(0, -1))->getId(), self::DETECTED_FLIGHT_BLOCKS)) return;
-        foreach($player->getEffects() as $effect) if(in_array($effect->getId(), self::DETECTED_FLIGHT_EFFECTS)) return;
-
+        #$player->getPlayer()->sendMessage(strval($player->getPlayer()->fallDistance));
         if($player->fallDistance == 0){
             $acPlayer->resetMaxFlightHeight();
         }else{
@@ -109,10 +127,8 @@ class Fly extends Check {
         }
 
         if($acPlayer->getMoveOnAirCount() > 10){
-            if($blockInFront->getId() != BlockIds::AIR){
-                #$player->sendMessage("PLEASE REPORT THIS MESSAGE: fly.flag.cancel");
-                return;
-            }
+            if($blockInFront->getId() != BlockIds::AIR) return;
+
             $acPlayer->flag("Fly", $this);
         }
     }

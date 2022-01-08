@@ -11,8 +11,14 @@ use ryzerbe\core\player\PMMPPlayer;
 use ryzerbe\core\provider\PunishmentProvider;
 use ryzerbe\core\provider\ReportProvider;
 use ryzerbe\core\provider\VanishProvider;
+use function in_array;
 
 class ReportPlayerForm {
+
+    const NOT_LIST_REASONS = [
+        "Abschiebung",
+        "AntiCheat Limit Reached"
+    ];
 
     /**
      * @param Player $player
@@ -26,12 +32,14 @@ class ReportPlayerForm {
             if(!$onlinePlayer instanceof PMMPPlayer) continue;
             $ryZerPlayer = $onlinePlayer->getRyZerPlayer();
             if($ryZerPlayer === null) continue;
+            if("???" === TextFormat::clean($onlinePlayer->getDisplayName())) continue; //CWBW Waiting Lobby
             if(VanishProvider::isVanished($onlinePlayer->getName())) continue;
-            if($ryZerPlayer->getNick() !== null) $nicked[$ryZerPlayer->getNick()] = $onlinePlayer->getName();
+            if($ryZerPlayer->getNick() !== null) $nicked[$ryZerPlayer->getNickInfo()->getNickName()] = $onlinePlayer->getName();
             $playerNames[] = $ryZerPlayer->getName(true);
         }
 
         foreach(PunishmentProvider::getPunishmentReasons() as $reason) {
+            if(in_array($reason->getReasonName(), self::NOT_LIST_REASONS)) continue;
             $reasons[] = $reason->getReasonName();
         }
 
@@ -44,11 +52,11 @@ class ReportPlayerForm {
             $nick = $nicked[$badPlayer] ?? $badPlayer;
 
             iF($badPlayer === $player->getName()) {
-                $player->sendMessage(ReportProvider::PREFIX.LanguageProvider::getMessageContainer("cannot-report-self", $player->getName(), ['#playername' => $badPlayer]));
+                $player->sendMessage(ReportProvider::PREFIX.LanguageProvider::getMessageContainer("cannot-report-self", $player->getName(), ['#playername' => $nick]));
                 return;
             }
 
-            ReportProvider::createReport($nick, $player->getName(), $reason, $notice, ($badPlayer === $nick) ? TextFormat::RED."NO NICK" : $nick);
+            ReportProvider::createReport($nick, $player->getName(), $reason, $notice, (!isset($nicked[$badPlayer])) ? TextFormat::RED."NO NICK" : $nick); //TODO: NICK WILL NOT REPORTED LOLL
         });
         $form->setTitle(TextFormat::BLUE."Report a player");
 

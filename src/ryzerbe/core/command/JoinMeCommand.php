@@ -25,6 +25,7 @@ use function in_array;
 use function is_nan;
 use function is_numeric;
 use function is_string;
+use function str_contains;
 use function time;
 use function var_dump;
 
@@ -96,6 +97,10 @@ class JoinMeCommand extends Command {
                 $ryzerPlayer = RyZerPlayerProvider::getRyzerPlayer($player);
                 if($ryzerPlayer === null) return;
                 if($data === "create"){
+                    if(str_contains(CloudProvider::getServer(), "2x1")) {
+                        $ryzerPlayer->sendTranslate("joinme-too-small-round");
+                        return;
+                    }
                     $ev = new JoinMeCreateEvent($ryzerPlayer);
                     $ev->call();
                     if($ev->isCancelled()) return;

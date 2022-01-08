@@ -63,13 +63,11 @@ class Coinboost {
      * @param int $gaveCoins
      */
     public function boostCoins(PMMPPlayer $player, int $gaveCoins){
-        if((!$this->isForAll()) && $player->getName() != $this->getPlayer()->getName()) return;
         $rbePlayer = $player->getRyZerPlayer();
-        $boosterRBEPlayer = $player->getRyZerPlayer();
         if($rbePlayer === null) return;
 
 
         $rbePlayer->addCoins($gaveCoins + round((($this->percent * $gaveCoins) / 100)), true);
-        $rbePlayer->sendTranslate("player-coinboost-get", ["#booster" => (($boosterRBEPlayer === null) ? "§f" : $boosterRBEPlayer->getRank()->getColor()).$this->getPlayer()->getName(), "#percent" => $this->percent]);
+        $rbePlayer->sendTranslate("player-coinboost-get", ["#booster" => (($this->getPlayer()->getRyZerPlayer() === null) ? "§f" : $this->getPlayer()->getRyZerPlayer()->getRank()->getColor()).$this->getPlayer()->getName(), "#percent" => $this->percent]);
     }
 }

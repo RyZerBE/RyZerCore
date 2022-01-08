@@ -6,11 +6,16 @@ namespace ryzerbe\core\anticheat;
 
 use BauboLP\Cloud\Provider\CloudProvider;
 use pocketmine\entity\Entity;
+use pocketmine\event\Listener;
 use pocketmine\Player;
+use pocketmine\plugin\Plugin;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\utils\TextFormat;
+use ReflectionClass;
+use ReflectionException;
 use ryzerbe\core\anticheat\command\CheckKillAuraCommand;
+use ryzerbe\core\anticheat\command\ModuleInfoCommand;
 use ryzerbe\core\anticheat\entity\KillAuraBot;
 use ryzerbe\core\anticheat\type\AirJump;
 use ryzerbe\core\anticheat\type\AutoClicker;
@@ -21,7 +26,12 @@ use ryzerbe\core\anticheat\type\KillAura;
 use ryzerbe\core\anticheat\type\Nuker;
 use ryzerbe\core\anticheat\type\Speed;
 use ryzerbe\core\RyZerBE;
+use function basename;
+use function glob;
+use function is_dir;
+use function scandir;
 use function str_contains;
+use function str_replace;
 
 class AntiCheatManager {
     use SingletonTrait;
@@ -43,19 +53,22 @@ class AntiCheatManager {
             new EditionFaker()
         );
 
-        Server::getInstance()->getCommandMap()->register("anticheat", new CheckKillAuraCommand());
+        Server::getInstance()->getCommandMap()->registerAll("anticheat", [
+            new CheckKillAuraCommand(),
+            new ModuleInfoCommand()
+        ]);
         Entity::registerEntity(KillAuraBot::class, TRUE);
 
-        if(str_contains(CloudProvider::getServer(), "BuildFFA") || str_contains(CloudProvider::getServer(), "BW2x1")){
+        if(str_contains(CloudProvider::getServer(), "BuildFFA") || str_contains(CloudProvider::getServer(), "BW2x1") || str_contains(CloudProvider::getServer(), "BW4x2")){
             self::registerCheck(new Fly());
             self::registerCheck(new AirJump());
             self::registerCheck(new KillAura());
-            self::registerCheck(new JetPackByPass());
+            #self::registerCheck(new JetPackByPass());
             self::registerCheck(new Speed());
             Server::getInstance()->getLogger()->warning("BETA: Fly Module activated!");
             Server::getInstance()->getLogger()->warning("BETA: AirJump Module activated!");
             Server::getInstance()->getLogger()->warning("BETA: KillAura Module activated!");
-            Server::getInstance()->getLogger()->warning("BETA: JetPackByPass Module activated!");
+           # Server::getInstance()->getLogger()->warning("BETA: JetPackByPass Module activated!");
             Server::getInstance()->getLogger()->warning("BETA: Speed Module activated!");
         }
     }
@@ -89,8 +102,9 @@ class AntiCheatManager {
         foreach($checks as $check) self::registerCheck($check);
     }
 
-    public static function isCheckRegistered(Check $check): bool{
-        return isset(self::$registeredChecks[$check::class]);
+    public static function isCheckRegistered(Check|string $check): bool{
+        if($check instanceof Check) $check = $check::class;
+        return isset(self::$registeredChecks[$check]);
     }
 
     /**
@@ -98,6 +112,26 @@ class AntiCheatManager {
      */
     public static function getRegisteredChecks(): array{
         return self::$registeredChecks;
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public static function getModulesIgnoreRegister(): array{
+        $modules = [];
+
+        foreach(scandir(__DIR__."/type/") as $module){
+            if($module === "." || $module === "..") continue;
+
+            $dir = str_replace([RyZerBE::$file."src/", "/"], ["", "\\"], __DIR__."/type/");
+            $refClass = new ReflectionClass($dir.str_replace(".php", "", $module));
+            $class = new ($refClass->getName());
+            if($class instanceof Check){
+                $modules[str_replace(".php", "", $module)] = $class::class;
+            }
+        }
+
+        return $modules;
     }
 
     /**

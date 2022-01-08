@@ -83,8 +83,10 @@ class FishingHook extends Projectile {
     protected function onHitEntity(Entity $entityHit, RayTraceResult $hitResult): void{
         $player = $this->getOwningEntity();
         if($entityHit instanceof PMMPPlayer and $player instanceof PMMPPlayer) {
-            $event = new EntityDamageByEntityEvent($player, $entityHit, EntityDamageEvent::CAUSE_ENTITY_ATTACK, 0.0);
+            $event = new EntityDamageByEntityEvent($player, $entityHit, EntityDamageEvent::CAUSE_PROJECTILE, 0.0);
             $event->call();
+
+            if($player->getName() === $entityHit->getName()) $event->setCancelled();
 
             if(!$event->isCancelled()) {
                 $entityHit->setHealth($entityHit->getHealth());
@@ -93,6 +95,6 @@ class FishingHook extends Projectile {
             }
         }
         $this->isCollided = true;
-        $this->flagForDespawn();
+        #$this->flagForDespawn();
     }
 }

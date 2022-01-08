@@ -3,6 +3,7 @@
 namespace ryzerbe\core\listener\player;
 
 use pocketmine\event\Listener;
+use pocketmine\Server;
 use ryzerbe\core\event\player\coin\PlayerCoinsAddEvent;
 use ryzerbe\core\player\PMMPPlayer;
 use ryzerbe\core\player\RyZerPlayerProvider;
@@ -28,6 +29,11 @@ class PlayerAddCoinsListener implements Listener {
         if($coinBoost->isValid()){
             $event->setCancelled();
             $coinBoost->boostCoins($player, $event->getAddedCoins());
+            if($coinBoost->isForAll()) {
+                foreach(RyZerPlayerProvider::getRyzerPlayers() as $ryzerPlayer) {
+                    $coinBoost->boostCoins($ryzerPlayer->getPlayer(), $event->getAddedCoins());
+                }
+            }
         }else {
             AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(\mysqli $mysqli) use ($playerName): void{
                 $mysqli->query("DELETE FROM `coinboosts` WHERE player='$playerName'");
