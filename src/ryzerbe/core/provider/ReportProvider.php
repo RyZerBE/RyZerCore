@@ -14,6 +14,7 @@ use ryzerbe\core\util\discord\DiscordMessage;
 use ryzerbe\core\util\discord\embed\DiscordEmbed;
 use ryzerbe\core\util\discord\embed\options\EmbedField;
 use ryzerbe\core\util\discord\WebhookLinks;
+use function var_dump;
 
 class ReportProvider implements RyZerProvider {
 
@@ -43,8 +44,10 @@ class ReportProvider implements RyZerProvider {
         }, function(Server $server, bool $success) use ($reporter, $reason, $bad_player, $nick): void{
             $player = $server->getPlayerExact($reporter);
             if($player === null) return;
+            var_dump("NickName: ".$nick);
             $nick = NickProvider::getPlayerByNick($nick, true);
             $nickName = ($nick !== null) ? $nick->getNick() : $bad_player;
+            var_dump($nickName);
 
             if($success) {
                 $player->sendMessage(RyZerBE::PREFIX.LanguageProvider::getMessageContainer("successful-player-reported", $player->getName(), ['#playername' => $nickName, '#reason' => $reason]));

@@ -11,6 +11,8 @@ use ryzerbe\core\player\PMMPPlayer;
 use ryzerbe\core\provider\PunishmentProvider;
 use ryzerbe\core\provider\ReportProvider;
 use ryzerbe\core\provider\VanishProvider;
+use function array_keys;
+use function array_values;
 use function in_array;
 
 class ReportPlayerForm {
@@ -26,7 +28,6 @@ class ReportPlayerForm {
     public static function onOpen(Player $player){
         $reasons = [];
         $playerNames = [];
-        $nicked = [];
 
         foreach(Server::getInstance()->getOnlinePlayers() as $onlinePlayer) {
             if(!$onlinePlayer instanceof PMMPPlayer) continue;
@@ -34,8 +35,7 @@ class ReportPlayerForm {
             if($ryZerPlayer === null) continue;
             if("???" === TextFormat::clean($onlinePlayer->getDisplayName())) continue; //CWBW Waiting Lobby
             if(VanishProvider::isVanished($onlinePlayer->getName())) continue;
-            if($ryZerPlayer->getNick() !== null) $nicked[$ryZerPlayer->getNickInfo()->getNickName()] = $onlinePlayer->getName();
-            $playerNames[] = $ryZerPlayer->getName(true);
+            $playerNames[$ryZerPlayer->getName(true)] = $ryZerPlayer->getName(false);
         }
 
         foreach(PunishmentProvider::getPunishmentReasons() as $reason) {
@@ -43,24 +43,24 @@ class ReportPlayerForm {
             $reasons[] = $reason->getReasonName();
         }
 
-        $form = new CustomForm(function(Player $player, $data) use ($playerNames, $reasons, $nicked): void{
+        $form = new CustomForm(function(Player $player, $data) use ($playerNames, $reasons): void{
             if($data === null) return;
 
-            $badPlayer = $playerNames[$data["bad_player"]];
+            $badPlayer = array_keys($playerNames)[$data["bad_player"]];
             $reason = $reasons[$data["reason"]];
             $notice = $data["notice"];
-            $nick = $nicked[$badPlayer] ?? $badPlayer;
+            $nick = $playerNames[$badPlayer] ?? $badPlayer;
 
-            iF($badPlayer === $player->getName()) {
+            iF($badPlayer === $player->getName() && !$player->isOp()) {
                 $player->sendMessage(ReportProvider::PREFIX.LanguageProvider::getMessageContainer("cannot-report-self", $player->getName(), ['#playername' => $nick]));
                 return;
             }
 
-            ReportProvider::createReport($nick, $player->getName(), $reason, $notice, (!isset($nicked[$badPlayer])) ? TextFormat::RED."NO NICK" : $nick); //TODO: NICK WILL NOT REPORTED LOLL
+            ReportProvider::createReport($nick, $player->getName(), $reason, $notice, ($nick === $badPlayer) ? "No Nick" : $badPlayer);
         });
         $form->setTitle(TextFormat::BLUE."Report a player");
 
-        $form->addDropdown(TextFormat::RED."Name of the bad boy", $playerNames, null, "bad_player");
+        $form->addDropdown(TextFormat::RED."Name of the bad boy", array_keys($playerNames), null, "bad_player");
         $form->addDropdown(TextFormat::RED."Reason", $reasons, null, "reason");
         $form->addInput(TextFormat::RED."Notice", "He has autoclicker..", "", "notice");
         $form->sendToPlayer($player);
