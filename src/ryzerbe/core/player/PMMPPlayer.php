@@ -293,7 +293,11 @@ class PMMPPlayer extends PMPlayer {
                     } else {
                         $item = $this->inventory->getItemInHand();
                         $oldItem = clone $item;
-                        if ($this->useItemOn($blockVector, $item, $face, $packet->trData->getClickPos(), $this, true)) {
+                        $clickPos = $packet->trData->getClickPos();
+                        $useItemOn = $this->useItemOn($blockVector, $item, $face, $clickPos, $this, true);
+                        if($useItemOn === null) return true;//HACK: BUGGY BLOCKS FIX
+
+                        if ($useItemOn) {
                             if (!$item->equalsExact($oldItem) and $oldItem->equalsExact($this->inventory->getItemInHand())) {
                                 $this->inventory->setItemInHand($item);
                                 $this->inventory->sendHeldItem($this->hasSpawned);
@@ -549,9 +553,9 @@ class PMMPPlayer extends PMPlayer {
                             if($item->onReleaseUsing($this)){
                                 $this->resetItemCooldown($item);
                                 $this->inventory->setItemInHand($item);
-                                if($this->isOp()) $this->sendMessage("Action onReleaseUsing successfully executed!");
+                                #if($this->isOp()) $this->sendMessage("Action onReleaseUsing successfully executed!");
                             }else{
-                                if($this->isOp()) $this->sendMessage("Action onReleaseUsing is not in use!");
+                                #if($this->isOp()) $this->sendMessage("Action onReleaseUsing is not in use!");
                             }
                             $this->setUsingItem(false);
                             return true;
@@ -795,7 +799,7 @@ class PMMPPlayer extends PMPlayer {
         return null;
     }
 
-    public function useItemOn(Vector3 $vector, Item &$item, int $face, Vector3 $clickVector = null, Player $player = null, bool $playSound = false) : bool{
+    public function useItemOn(Vector3 $vector, Item &$item, int $face, Vector3 $clickVector = null, Player $player = null, bool $playSound = false) : ?bool{
         $blockClicked = $this->getLevel()->getBlock($vector);
         $blockReplace = $blockClicked->getSide($face);
 
@@ -852,6 +856,10 @@ class PMMPPlayer extends PMPlayer {
             foreach($hand->getCollisionBoxes() as $collisionBox){
                 foreach($this->getLevel()->getCollidingEntities($collisionBox) as $collidingEntity){
                     if($collidingEntity instanceof ItemEntity) continue;
+
+                    if($collidingEntity instanceof PMMPPlayer){
+                        return null;
+                    }
                     return false;
                 }
             }
