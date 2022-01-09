@@ -77,10 +77,15 @@ class Fly extends Check {
                 $acPlayer->fallDistance = $player->getPlayer()->fallDistance;
                 continue;
             }
+            $lastVector3 = $acPlayer->getLastVector3();
+            $bigYDifference = $lastVector3->distance(new Vector3($lastVector3->getX(), $acPlayer->getPlayer()->getY(), $lastVector3->getZ()));
+            if($bigYDifference > 3){
+                $acPlayer->fallDistance = $player->getPlayer()->fallDistance;
+                continue;
+            }
 
-            if($acPlayer->fallDistance > $player->fallDistance && $player->fallDistance > 1 && !$player->isOnGround()){
+            if($acPlayer->fallDistance > $player->fallDistance && $player->fallDistance > 0.7 && !$player->isOnGround()){
                 $acPlayer->flag("Fly (Jump/Sneak)", $this);
-                #$player->sendMessage("Verarsch unser AntiCheat nicht du trottel");
                 continue;
             }
             $acPlayer->fallDistance = $player->getPlayer()->fallDistance;
