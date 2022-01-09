@@ -295,7 +295,7 @@ class PMMPPlayer extends PMPlayer {
                         $oldItem = clone $item;
                         $clickPos = $packet->trData->getClickPos();
                         $useItemOn = $this->useItemOn($blockVector, $item, $face, $clickPos, $this, true);
-                        if($useItemOn === null) return true;//HACK: BUGGY BLOCKS FIX
+                        if($useItemOn === null) return true;//HACK: FLAG BLOCKS FIX
 
                         if ($useItemOn) {
                             if (!$item->equalsExact($oldItem) and $oldItem->equalsExact($this->inventory->getItemInHand())) {
