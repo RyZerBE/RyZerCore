@@ -11,6 +11,7 @@ use ryzerbe\core\player\RyZerPlayerProvider;
 use ryzerbe\core\RyZerBE;
 use function array_keys;
 use function count;
+use function round;
 use function strtolower;
 
 class LanguageForm {
@@ -107,12 +108,15 @@ class LanguageForm {
                     $player->sendMessage(RyZerBE::PREFIX . LanguageProvider::getMessageContainer('selected-language', $player->getName(), ['#language' => $language]));
             }
         });
+        $german = LanguageProvider::getLanguage("Deutsch");
         foreach($languages as $language){
+            $languageObj = LanguageProvider::getLanguage($language);
+            $percentTranslated = round(((count($languageObj->getTranslations()) * 100) / count($german->getTranslations())));
             if(strtolower($language) == strtolower($ryzerPlayer->getLanguageName())){
-                $form->addButton(TextFormat::AQUA . TextFormat::BOLD . $language . "\n" . TextFormat::WHITE . TextFormat::BOLD . count(LanguageProvider::$languages[$language]->getTranslations()) . " translations", 1, "https://media.discordapp.net/attachments/779814956270223380/868901452649734304/276speakinghead_100550.png?width=410&height=410", $language);
+                $form->addButton(TextFormat::AQUA . TextFormat::BOLD . $language . "\n" . TextFormat::WHITE . TextFormat::BOLD . $percentTranslated . "%% translated", 1, "https://media.discordapp.net/attachments/779814956270223380/868901452649734304/276speakinghead_100550.png?width=410&height=410", $language);
             }
             else{
-                $form->addButton(TextFormat::AQUA . $language . "\n" . TextFormat::WHITE . count(LanguageProvider::$languages[$language]->getTranslations()) . " translations", 1, "https://media.discordapp.net/attachments/779814956270223380/868901452649734304/276speakinghead_100550.png?width=410&height=410", $language);
+                $form->addButton(TextFormat::AQUA . $language . "\n" . TextFormat::WHITE . $percentTranslated . "%% translated", 1, "https://media.discordapp.net/attachments/779814956270223380/868901452649734304/276speakinghead_100550.png?width=410&height=410", $language);
             }
         }
         if($player->hasPermission("language.admin")) $form->addButton(TextFormat::RED . "Reload Languages", 0, "textures/ui/refresh", "reload");

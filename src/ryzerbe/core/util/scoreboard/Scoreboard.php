@@ -80,8 +80,9 @@ class Scoreboard {
         $entry->scoreboardId = $id;
         $entry->entityUniqueId = $this->player->getPlayer()->getId();
         $entry->objectiveName = $this->player->getPlayer()->getName();
-        $entry->customName = $line;
+        $entry->customName = "§".($id % 9).($id > 9 ? ("§".($id % 9)) : "").str_repeat(" ", 1)."§r".$line.str_repeat("  ", 2);
         $this->lines[$id] = $entry;
+
         $pkt = new SetScorePacket();
         $pkt->entries[] = $entry;
         $pkt->type = SetScorePacket::TYPE_CHANGE;

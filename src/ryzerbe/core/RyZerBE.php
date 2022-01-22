@@ -17,6 +17,7 @@ use ryzerbe\core\command\ChunkFixCommand;
 use ryzerbe\core\command\ClanUiCommand;
 use ryzerbe\core\command\CoinBoostCommand;
 use ryzerbe\core\command\CoinCommand;
+use ryzerbe\core\command\EmojiListCommand;
 use ryzerbe\core\command\GamemodeCommand;
 use ryzerbe\core\command\GameTimeCommand;
 use ryzerbe\core\command\InvBugFixCommand;
@@ -136,7 +137,8 @@ class RyZerBE extends PluginBase {
             new UpdatelogCommand(),
             new CoinBoostCommand(),
             new InvBugFixCommand(),
-            new BanUiCommand()
+            new BanUiCommand(),
+            new EmojiListCommand()
         ]);
     }
 

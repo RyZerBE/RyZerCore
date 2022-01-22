@@ -10,6 +10,14 @@ use function file_exists;
 
 class Settings {
     use SingletonTrait;
+    
+    public const VOTING = [
+        "Prime" => 2,
+        "Elite" => 4,
+        "Media" => 6,
+        "Friend" => 6,
+        "Freund" => 6
+    ];
 
     public static bool $reduce = false;
     public static array $mysqlLoginData = [];

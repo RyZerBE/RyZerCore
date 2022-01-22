@@ -19,25 +19,13 @@ class ChatEmojiProvider implements RyZerProvider {
         "tear" => "",
         "thinking" => "",
         "confused" => "",
-        "sunglasses" => "",
+        "cool" => "",
         "smirk" => "",
-        "clown" => "",
+        "clown" => "",
         "woozy" => "",
-        "salt" => "",
-        "cry" => "",
+        "cry" => "",
         "sherlock" => "",
-        "surprised" => "",
-        "derp" => "",
-        "money" => "",
-        "scream" => "",
-        "sleepy" => "",
-        "trash" => "",
-        "thinkingc" => "",
-        "hmmm" => "",
-        "feelsbadman" => "",
-        "penguin" => "",
-        "yocker" => "",
-        "angry" => ""
+        "surprised" => ""
     ];
 
     /**
@@ -51,5 +39,5 @@ class ChatEmojiProvider implements RyZerProvider {
             return ":".$key.":";
         }, array_keys(self::EMOJIS)), array_values(self::EMOJIS), $message);
     }
-    //todo: implement animated Emojis (in work..)
+    //todo: implement animated Emojis
 }
