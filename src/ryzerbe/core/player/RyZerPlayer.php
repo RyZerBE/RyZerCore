@@ -422,7 +422,7 @@ class RyZerPlayer {
             }
 
             if(isset($playerData["mute_until"])) {
-                $ryzerPlayer->setMute(new DateTime(($playerData["mute_until"] === "PERMANENT") ? "2040-10-11 23:59" : $playerData["mute_until"]));
+                $ryzerPlayer->setMute(new DateTime(($playerData["mute_until"] === "PERMANENT" || $playerData["mute_until"] == "0") ? "2040-10-11 23:59" : $playerData["mute_until"]));
                 $ryzerPlayer->setMuteId($playerData["mute_id"]);
                 $ryzerPlayer->setMuteReason($playerData["mute_reason"]);
             }
