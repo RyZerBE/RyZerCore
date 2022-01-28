@@ -166,6 +166,14 @@ class PMMPPlayer extends PMPlayer {
         return RyZerPlayerProvider::getRyzerPlayer($this);
     }
 
+    public function playSound(string $sound, float $volume = 1.0, float $pitch = 1.0, array $targets = null): void{
+        if($targets === null) {
+            $targets = [];
+            $targets[] = $this;
+        }
+        parent::playSound($sound, $volume, $pitch, $targets);
+    }
+
     /**
      * Don't expect much from this handler. Most of it is roughly hacked and duct-taped together.
      */
@@ -539,15 +547,15 @@ class PMMPPlayer extends PMPlayer {
             $this->inventory->sendContents($this);
             return false;
         } elseif ($packet->trData instanceof ReleaseItemTransactionData) {
-            if($this->isOp()) $this->sendMessage("ReleaseItemTransactionData");
+            #if($this->isOp()) $this->sendMessage("ReleaseItemTransactionData");
                 switch ($packet->trData->getActionType()){
                     case ReleaseItemTransactionData::ACTION_RELEASE:
-                        if($this->isOp()) $this->sendMessage("ACTION_RELEASE WILL BE HANDLE");
+                        #if($this->isOp()) $this->sendMessage("ACTION_RELEASE WILL BE HANDLE");
                         if($this->isUsingItem()){
                             $item = $this->inventory->getItemInHand();
                             if($this->hasItemCooldown($item)){
                                 $this->inventory->sendContents($this);
-                                if($this->isOp()) $this->sendMessage("Item Cooldown");
+                               # if($this->isOp()) $this->sendMessage("Item Cooldown");
                                 return false;
                             }
                             if($item->onReleaseUsing($this)){
@@ -733,7 +741,7 @@ class PMMPPlayer extends PMPlayer {
                         $rbePlayer->getChatModData()->lastMessageTime = microtime(true);
                     }
 
-                    $message = ChatEmojiProvider::getInstance()->replaceKeys($message);
+                    if($this->hasPermission("ryzer.chat.emoji")) $message = ChatEmojiProvider::getInstance()->replaceKeys($message);
                     $ev = new PlayerChatEvent($this, $message);
                     $ev->call();
                     if(!$ev->isCancelled()){
