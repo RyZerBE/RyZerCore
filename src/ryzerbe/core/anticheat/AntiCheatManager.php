@@ -6,9 +6,7 @@ namespace ryzerbe\core\anticheat;
 
 use BauboLP\Cloud\Provider\CloudProvider;
 use pocketmine\entity\Entity;
-use pocketmine\event\Listener;
 use pocketmine\Player;
-use pocketmine\plugin\Plugin;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\utils\TextFormat;
@@ -19,17 +17,14 @@ use ryzerbe\core\anticheat\command\LiveClicksCommand;
 use ryzerbe\core\anticheat\command\ModuleInfoCommand;
 use ryzerbe\core\anticheat\entity\KillAuraBot;
 use ryzerbe\core\anticheat\type\AirJump;
-use ryzerbe\core\anticheat\type\AutoClicker;
 use ryzerbe\core\anticheat\type\EditionFaker;
 use ryzerbe\core\anticheat\type\Fly;
-use ryzerbe\core\anticheat\type\JetPackByPass;
 use ryzerbe\core\anticheat\type\KillAura;
 use ryzerbe\core\anticheat\type\Nuker;
 use ryzerbe\core\anticheat\type\Speed;
 use ryzerbe\core\RyZerBE;
-use function basename;
-use function glob;
-use function is_dir;
+use function explode;
+use function in_array;
 use function scandir;
 use function str_contains;
 use function str_replace;
@@ -47,34 +42,31 @@ class AntiCheatManager {
     /** @var Check[]  */
     protected static array $registeredChecks = [];
 
-    public static array $liveClickCheck = [];
+    const BLACKLIST_GROUPS = [
+        "EloCWBW"
+    ];
 
     public function __construct(){
-        self::registerChecks(
-            new AutoClicker(),
-            new Nuker(),
-            new EditionFaker()
-        );
-
         Server::getInstance()->getCommandMap()->registerAll("anticheat", [
             new CheckKillAuraCommand(),
-            new ModuleInfoCommand(),
-            new LiveClicksCommand()
+            new ModuleInfoCommand()
         ]);
         Entity::registerEntity(KillAuraBot::class, TRUE);
 
-        if(str_contains(CloudProvider::getServer(), "BuildFFA") || str_contains(CloudProvider::getServer(), "BW2x1") || str_contains(CloudProvider::getServer(), "BW4x2")){
-            self::registerCheck(new Fly());
-            self::registerCheck(new AirJump());
-            self::registerCheck(new KillAura());
-            #self::registerCheck(new JetPackByPass());
-            self::registerCheck(new Speed());
-            Server::getInstance()->getLogger()->warning("BETA: Fly Module activated!");
-            Server::getInstance()->getLogger()->warning("BETA: AirJump Module activated!");
-            Server::getInstance()->getLogger()->warning("BETA: KillAura Module activated!");
-           # Server::getInstance()->getLogger()->warning("BETA: JetPackByPass Module activated!");
-            Server::getInstance()->getLogger()->warning("BETA: Speed Module activated!");
+        if(in_array(explode("-", CloudProvider::getServer())[0] ?? "Lobby", self::BLACKLIST_GROUPS)){
+            Server::getInstance()->getLogger()->warning("AntiCheat disabled because the cloud group is blacklisted!");
+            return;
         }
+
+        self::registerChecks(
+        # new AutoClicker(),//iTzFreeHD: AntiAutoClicker Plugin
+            new Nuker(),
+            new EditionFaker(),
+            new KillAura(),
+            new AirJump(),
+            new Speed(),
+            new Fly()
+        );
     }
 
     public static function addPlayer(Player $player): void {
