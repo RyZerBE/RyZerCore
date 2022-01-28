@@ -58,6 +58,13 @@ class AutoClicker extends Check {
     }
 
     public function onUpdate(int $currentTick): bool{
+        foreach(AntiCheatManager::$liveClickCheck as $staffName => $playerName) {
+            $acStaff = AntiCheatManager::getPlayer($staffName);
+            $acPlayer = AntiCheatManager::getPlayer($playerName);
+            if($acPlayer !== null && $acStaff !== null) {
+                $acStaff->getPlayer()->sendPopup($acPlayer->getClicks()." | ".(($acPlayer->hasConsistentClicks(3) === true) ? "CONSISTENT CLICKS" : "NOT CONSISTENT CLICKS"." | ".$this->getImportance($acPlayer)));
+            }
+        }
         if($currentTick % self::CHECK_DELAY === 0) {
             foreach(AntiCheatManager::getPlayers() as $player) {
                 $player->setClicksPerSecond($player->getClicks());

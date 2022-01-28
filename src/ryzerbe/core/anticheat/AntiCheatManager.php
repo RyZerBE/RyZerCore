@@ -15,6 +15,7 @@ use pocketmine\utils\TextFormat;
 use ReflectionClass;
 use ReflectionException;
 use ryzerbe\core\anticheat\command\CheckKillAuraCommand;
+use ryzerbe\core\anticheat\command\LiveClicksCommand;
 use ryzerbe\core\anticheat\command\ModuleInfoCommand;
 use ryzerbe\core\anticheat\entity\KillAuraBot;
 use ryzerbe\core\anticheat\type\AirJump;
@@ -46,6 +47,8 @@ class AntiCheatManager {
     /** @var Check[]  */
     protected static array $registeredChecks = [];
 
+    public static array $liveClickCheck = [];
+
     public function __construct(){
         self::registerChecks(
             new AutoClicker(),
@@ -55,7 +58,8 @@ class AntiCheatManager {
 
         Server::getInstance()->getCommandMap()->registerAll("anticheat", [
             new CheckKillAuraCommand(),
-            new ModuleInfoCommand()
+            new ModuleInfoCommand(),
+            new LiveClicksCommand()
         ]);
         Entity::registerEntity(KillAuraBot::class, TRUE);
 
@@ -81,8 +85,9 @@ class AntiCheatManager {
         unset(self::$players[$player->getName()]);
     }
 
-    public static function getPlayer(Player $player): ?AntiCheatPlayer {
-        return self::$players[$player->getName()] ?? null;
+    public static function getPlayer(Player|string $player): ?AntiCheatPlayer {
+        if($player instanceof Player) $player = $player->getName();
+        return self::$players[$player] ?? null;
     }
 
     /**
