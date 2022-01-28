@@ -60,3 +60,5 @@ permissions:
     default: op
   ryzer.chatmod.bypass:
     default: op
+  ryzer.chat.emoji:
+    default: op
