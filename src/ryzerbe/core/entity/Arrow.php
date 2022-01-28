@@ -5,6 +5,10 @@ namespace ryzerbe\core\entity;
 use pocketmine\block\Block;
 use pocketmine\entity\Entity;
 use pocketmine\entity\projectile\Projectile;
+use pocketmine\event\entity\EntityCombustByEntityEvent;
+use pocketmine\event\entity\EntityDamageByChildEntityEvent;
+use pocketmine\event\entity\EntityDamageByEntityEvent;
+use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\entity\ProjectileHitEvent;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
@@ -138,11 +142,13 @@ class Arrow extends Projectile {
     }
 
     protected function onHitEntity(Entity $entityHit, RayTraceResult $hitResult) : void{
-        parent::onHitEntity($entityHit, $hitResult);
         $shooter = $entityHit->getOwningEntity();
-        if($entityHit instanceof PMMPPlayer && $shooter instanceof PMMPPlayer) {
+        if($entityHit instanceof PMMPPlayer && $shooter instanceof PMMPPlayer){
             if($entityHit->getName() === $shooter->getName()) return;
         }
+
+        $success = $this->parentOnHitEntity($entityHit, $hitResult);
+        if(!$success) return;
         $horizontalSpeed = sqrt($this->motion->x ** 2 + $this->motion->z ** 2);
         if($this->punchKnockback <= 0) $this->punchKnockback = self::BOW_I;
         if($this->punchKnockback == 1) $this->punchKnockback = self::BOW_II;
@@ -152,6 +158,34 @@ class Arrow extends Projectile {
             $multiplier = $this->punchKnockback * 0.5 / $horizontalSpeed;
             $entityHit->setMotion($entityHit->getMotion()->add($this->motion->x * $multiplier, 0.1, $this->motion->z * $multiplier));
         }
+    }
+
+    protected function parentOnHitEntity(Entity $entityHit, RayTraceResult $hitResult): bool{
+        $damage = $this->getResultDamage();
+
+        if($damage >= 0){
+            if($this->getOwningEntity() === null){
+                $ev = new EntityDamageByEntityEvent($this, $entityHit, EntityDamageEvent::CAUSE_PROJECTILE, $damage);
+            }else{
+                $ev = new EntityDamageByChildEntityEvent($this->getOwningEntity(), $this, $entityHit, EntityDamageEvent::CAUSE_PROJECTILE, $damage);
+            }
+
+            if(!$ev->isCancelled()){
+                $entityHit->attack($ev);
+                $this->flagForDespawn();
+                return false;
+            }
+            if($this->isOnFire()){
+                $ev = new EntityCombustByEntityEvent($this, $entityHit, 5);
+                $ev->call();
+                if(!$ev->isCancelled()){
+                    $entityHit->setOnFire($ev->getDuration());
+                }
+            }
+        }
+
+        $this->flagForDespawn();
+        return true;
     }
 
     public function getPickupMode() : int{
