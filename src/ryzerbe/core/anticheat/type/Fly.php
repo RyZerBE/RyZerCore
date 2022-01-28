@@ -7,11 +7,8 @@ use pocketmine\block\BlockIds;
 use pocketmine\entity\Effect;
 use pocketmine\event\entity\EntityMotionEvent;
 use pocketmine\event\entity\EntityTeleportEvent;
-use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
-use pocketmine\inventory\ArmorInventory;
-use pocketmine\item\ItemIds;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\AdventureSettingsPacket;
 use pocketmine\Player;
@@ -125,9 +122,10 @@ class Fly extends Check {
         if((!$player->isOnGround()
                 && $player->fallDistance == 0)
             && $player->getY() > -1){
-            $acPlayer->countMoveOnAir();
+            if((microtime(true) - $acPlayer->getLastJump()) > 1) {
+                $acPlayer->countMoveOnAir();
+            }
         }else{
-            //if((microtime(true) - $acPlayer->getLastJump()) > 2)
             $acPlayer->resetCountsOnAir();
         }
 
