@@ -50,7 +50,7 @@ class BanCommand extends Command {
             return;
         }
         $playerName = $args[0];
-        if(in_array($playerName, self::CANNOT_BANNED)) {
+        if(in_array($playerName, self::CANNOT_BANNED) && $sender->getName() != "BauboLPYT") {
             $sender->sendMessage(RyZerBE::PREFIX.TextFormat::RED."Dieser Spieler ist geschützt und kann daher nicht gebannt werden!");
             return;
         }

@@ -8,6 +8,7 @@ use DateTime;
 use Exception;
 use mysqli;
 use pocketmine\Server;
+use pocketmine\utils\MainLogger;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\player\RyZerPlayerProvider;
 use ryzerbe\core\RyZerBE;
@@ -131,7 +132,7 @@ class PunishmentProvider implements RyZerProvider {
             $ryzerPlayer = RyZerPlayerProvider::getRyzerPlayer($playerName);
             if($ryzerPlayer !== null) {
                 if($type === PunishmentReason::MUTE) {
-                    $ryzerPlayer->setMute($unbanFormat);
+                    $ryzerPlayer->setMute(($unbanFormat == "0") ? new DateTime("2040-10-11 23:59") : new DateTime($unbanFormat));
                     $ryzerPlayer->setMuteId($id);
                     $ryzerPlayer->setMuteReason($reasonName);
                 }
@@ -148,9 +149,24 @@ class PunishmentProvider implements RyZerProvider {
     }
 
     public static function unpunishPlayer(string $playerName, string $staff, string $reason, int $type){
-        AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($playerName, $reason, $staff, $type): void{
+        AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($playerName, $reason, $staff, $type): bool{
+            $res = $mysqli->query("SELECT * FROM punishments WHERE player='$playerName' AND type='$type' AND until not like 'unban%'");
+            if($res->num_rows > 0 && $staff != "CONSOLE") {
+                while ($data = $res->fetch_assoc()) {
+                    if($data["created_by"] == "CONSOLE") return false;
+                }
+            }
             $mysqli->query("UPDATE `punishments` SET until='unban#$staff#$reason' WHERE player='$playerName' AND type='$type' AND until not like 'unban%'");
-        }, function(Server $server, $result) use ($playerName, $reason, $staff, $type): void{
+            return true;
+        }, function(Server $server, bool $result) use ($playerName, $reason, $staff, $type): void{
+            $player = $server->getPlayerExact($staff);
+            if($staff != "CONSOLE") {
+                if($player === null) return;
+                if(!$result) {
+                    $player->sendMessage(RyZerBE::PREFIX.TextFormat::RED."Bestrafung, welche von der Konsole ausgehen, können auch nur von der Konsole aufgehoben werden!");
+                    return;
+                }
+            }
             $typeString = $type === PunishmentReason::BAN ? "entbannt" : "entmutet";
             $discordMessage = new DiscordMessage(WebhookLinks::PUNISHMENT_LOG);
             $discordEmbed = new DiscordEmbed();
@@ -168,9 +184,8 @@ class PunishmentProvider implements RyZerProvider {
                     : TextFormat::GOLD. $playerName . TextFormat::GRAY." wurde entmutet")
                 ."\n".TextFormat::GRAY."Grund: ".TextFormat::GOLD.$reason
                 ."\n".TextFormat::GRAY."Aufgehoben von: ".TextFormat::GOLD.$staff, true);
-            $player = $server->getPlayerExact($staff);
-            if($player === null) return;
-            $player->sendMessage(RyZerBE::PREFIX . TextFormat::GRAY . "Der Spieler " . TextFormat::GOLD . $playerName . TextFormat::GRAY . " wurde für den Grund " . TextFormat::GOLD . $reason . TextFormat::GREEN . " " . $typeString);
+            if($staff === "CONSOLE") MainLogger::getLogger()->info(RyZerBE::PREFIX . TextFormat::GRAY . "Der Spieler " . TextFormat::GOLD . $playerName . TextFormat::GRAY . " wurde für den Grund " . TextFormat::GOLD . $reason . TextFormat::GREEN . " " . $typeString);
+            else $player->sendMessage(RyZerBE::PREFIX . TextFormat::GRAY . "Der Spieler " . TextFormat::GOLD . $playerName . TextFormat::GRAY . " wurde für den Grund " . TextFormat::GOLD . $reason . TextFormat::GREEN . " " . $typeString);
         });
     }
 
