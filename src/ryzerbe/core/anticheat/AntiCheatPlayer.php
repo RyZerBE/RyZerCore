@@ -14,6 +14,8 @@ use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\anticheat\entity\KillAuraBot;
 use ryzerbe\core\anticheat\type\Fly;
+use ryzerbe\core\event\player\anticheat\PlayerAntiCheatFlagEvent;
+use ryzerbe\core\event\player\anticheat\PlayerTriggeredAntiCheatEvent;
 use ryzerbe\core\player\PMMPPlayer;
 use function array_filter;
 use function array_shift;
@@ -177,6 +179,8 @@ class AntiCheatPlayer {
         ){
             $this->getPlayer()->addDelay($check::class, 10);
             $check->sendWarningMessage($this->getPlayer(), $ban);
+            $ev = new PlayerTriggeredAntiCheatEvent($this, $check);
+            $ev->call();
             #PunishmentProvider::punishPlayer($this->getPlayer()->getName(), "AntiCheat", 15);
         }
     }
@@ -275,6 +279,10 @@ class AntiCheatPlayer {
     }
 
     public function flag(string $reason, Check $check, bool $warning = true): void{
+        $ev = new PlayerAntiCheatFlagEvent($this, $check, $reason);
+        $ev->call();
+        if($ev->isCancelled()) return;
+
         $this->getPlayer()->teleport($this->lastVector);
         $this->lastFlagReason = $reason;
         if($warning) $this->addWarning($check);
