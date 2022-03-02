@@ -592,79 +592,36 @@ class PMMPPlayer extends PMPlayer {
     }
 
 
-    public function knockBack(Entity $attacker, float $damage, float $x, float $z, float $base = 0.4): void{
+    public function knockBack(Entity $attacker, float $damage, float $x, float $z, float $base = 0.4) : void{
+        $edit = 1;
+
+        if ($base > 0.5) $edit = 0.5;
+
         $f = sqrt($x * $x + $z * $z);
-        if($f <= 0){
+        if($f <= 0) {
             return;
         }
 
-        if($attacker instanceof Player) {
-            if($attacker->getInventory()->getItemInHand()->hasEnchantment(Enchantment::KNOCKBACK)){
-                $motion = clone $this->getMotion();
-                $motion->y /= 2;
-                $motion->y += 0.45;
-                if($motion->y > 0.45)
-                    $motion->y = 0.45;
+        if(mt_rand() / mt_getrandmax() > $this->getAttributeMap()->getAttribute(Attribute::KNOCKBACK_RESISTANCE)->getValue()){
+            $f = 1 / $f;
+            if ($f > 0.6) $f = 0.6;
+            if ($f < 0.25) $f = 0.25;
 
-                if(!$this->useLadder()){
-                    $motion = new Vector3($attacker->getDirectionVector()->x / 1.2, $motion->y, $attacker->getDirectionVector()->z / 1.2); // ($this->getMotion()->y / 2) + 0.4
-                }
+            $motion = $this->motion->multiply(0.5);
+            $directionPlane = $attacker->getDirectionPlane()->multiply(2);
+            var_dump($directionPlane);
+            var_dump($f);
+            $motion->x += $directionPlane->getX() * $f * $base * $edit;
+            $motion->y += $base;
+            if($motion->y > 0.45)
+                $motion->y = 0.45;
+            $motion->z += $directionPlane->getY() * $f * $base * $edit;
 
-                if(Settings::$reduce){
-                    $ownmotion = $attacker->getMotion();
-                    $ownmotion->setComponents($ownmotion->getX() * 0.6, $ownmotion->getY() * 0.6, $ownmotion->getZ() * 0.6);
-                    $attacker->setMotion($ownmotion);
-                    $attacker->setSprinting(false);
-                }
-
-                $this->setMotion($motion);
-            }else {
-                if(mt_rand() / mt_getrandmax() > $this->getAttributeMap()->getAttribute(Attribute::KNOCKBACK_RESISTANCE)->getValue()){
-                    $f = 1 / $f;
-
-                    $motion = clone $this->motion;
-
-                    $motion->x /= 2;
-                    $motion->y /= 2;
-                    $motion->z /= 2;
-                    $motion->x += $x * $f * $base;
-                    $motion->y += $base;
-                    $motion->z += $z * $f * $base;
-
-                    if($motion->y > $base){
-                        $motion->y = $base;
-                    }
-
-                    $this->setMotion($motion);
-                }
+            if($motion->y > $base){
+                $motion->y = $base;
             }
-        }else {
-            if(mt_rand() / mt_getrandmax() > $this->getAttributeMap()->getAttribute(Attribute::KNOCKBACK_RESISTANCE)->getValue()){
-                $f = 1 / $f;
 
-                $motion = clone $this->motion;
-
-                $motion->x /= 2;
-                $motion->y /= 2;
-                $motion->z /= 2;
-                if($base >= 100) {
-                    $motion->x += $x * $f * 1.3;
-                    $motion->y += 0.70;
-                    $motion->z += $z * $f * 1.3;
-                }else {
-                    $motion->x += $x * $f * $base;
-                    $motion->y += 0.50;
-                    $motion->z += $z * $f * $base;
-                }
-
-                if($motion->y > 0.50)
-                    $motion->y = 0.50;
-
-                // var_dump($base);
-
-
-                $this->setMotion($motion);
-            }
+            $this->setMotion($motion);
         }
     }
 

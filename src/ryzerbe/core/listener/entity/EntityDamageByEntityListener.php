@@ -50,40 +50,6 @@ class EntityDamageByEntityListener implements Listener {
             return;
         }
         $event->setModifier(0, EntityDamageEvent::MODIFIER_TOTEM);
-        if($entity instanceof PMMPPlayer){
-            $item = $player->getInventory()->getItemInHand();
-            if($event->isCancelled()) return;
-            //RBE Knock
-             if($player->distance($entity) > 4 && $item->hasEnchantment(Enchantment::KNOCKBACK)){
-                $event->setCancelled();
-                return;
-            }
-            if($item->hasEnchantment(Enchantment::KNOCKBACK)){
-                $this->delay[$player->getName()] = microtime(true) + 0.45;
-                $event->setCancelled();
-                $entity->setImmobile(true);
-                $entity->setImmobile(false);
-                $entity->broadcastEntityEvent(ActorEventPacket::HURT_ANIMATION);
-                $this->RyZerBEKnock($entity, $player, self::KNOCK_STICK);
-                $entity->setHealth($entity->getHealth() - $event->getFinalDamage());
-            }elseif($item->getId() != ItemIds::STICK && $item->getId() != ItemIds::GOLDEN_SWORD && $item->getId() != ItemIds::WOODEN_SWORD){
-                $this->delay[$player->getName()] = microtime(true) + 0.45;
-                $event->setCancelled();
-                $entity->setImmobile(true);
-                $entity->setImmobile(false);
-                $entity->broadcastEntityEvent(ActorEventPacket::HURT_ANIMATION);
-                $this->RyZerBEKnock($entity, $player, self::KNOCK_HAND);
-                $entity->setHealth($entity->getHealth() - $event->getFinalDamage());
-            }
-            /*//BMC Knock
-            if($item->hasEnchantment(Enchantment::KNOCKBACK)){
-                $this->delay[$player->getName()] = microtime(true) + 0.35;
-                $event->setCancelled();
-                $entity->broadcastEntityEvent(ActorEventPacket::HURT_ANIMATION);
-                $this->BattleMCKnockback($entity, $player);
-                $entity->setHealth($entity->getHealth() - $event->getFinalDamage());
-            }*/
-        }
     }
 
     public function BattleMCKnockback(PMMPPlayer $victim, PMMPPlayer $attacker): void{
