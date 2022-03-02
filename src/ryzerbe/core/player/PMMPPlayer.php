@@ -609,8 +609,6 @@ class PMMPPlayer extends PMPlayer {
 
             $motion = $this->motion->multiply(0.5);
             $directionPlane = $attacker->getDirectionPlane()->multiply(2);
-            var_dump($directionPlane);
-            var_dump($f);
             $motion->x += $directionPlane->getX() * $f * $base * $edit;
             $motion->y += $base;
             if($motion->y > 0.45)
