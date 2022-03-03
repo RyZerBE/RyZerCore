@@ -104,6 +104,7 @@ class Speed extends Check {
     public function onUpdate(int $currentTick): bool{
         if(($currentTick % 20) === 0){
             foreach(AntiCheatManager::getPlayers() as$cheatPlayer) {
+                foreach($cheatPlayer->getPlayer()->getEffects() as $effect) if(in_array($effect->getId(), self::DETECTED_SPEED_EFFECTS)) continue;
                 if($cheatPlayer->isServerMotionSet() || $cheatPlayer->getPlayer()->getAllowFlight() || $cheatPlayer->getPlayer()->isSwimming()) continue;
                 $lastVector3 = $cheatPlayer->getLastVector3();
                 $bigYDifference = $lastVector3->distance(new Vector3($lastVector3->getX(), $cheatPlayer->getPlayer()->getY(), $lastVector3->getZ()));

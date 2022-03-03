@@ -55,17 +55,14 @@ class Fly extends Check {
         Effect::LEVITATION
     ];
 
-    public function onJoin(RyZerPlayerAuthEvent $event){
-        if(str_contains(CloudProvider::getServer(), "BuildFFA") || str_contains(CloudProvider::getServer(), "BW2x1") || str_contains(CloudProvider::getServer(), "BW4x2")) {
-            $event->getRyZerPlayer()->getPlayer()->sendMessage("\n\n".AntiCheatManager::PREFIX.TextFormat::YELLOW."Achtung! Hier wird mit dem Anticheat getestet!"."\n\n");
-        }
-    }
-
     public function onUpdate(int $currentTick): bool{
         if($currentTick % 5 !== 0) return true;
         foreach(AntiCheatManager::getPlayers() as $acPlayer){
             $player = $acPlayer->getPlayer();
-            if(!$acPlayer->canFlyCheck()) continue;
+            if(!$acPlayer->canFlyCheck()){
+                $acPlayer->fallDistance = $player->getPlayer()->fallDistance;
+                continue;
+            }
             if((microtime(true) - $acPlayer->getLastBlockPlaceTime()) < 2){
                 $acPlayer->fallDistance = $player->getPlayer()->fallDistance;
                 continue;
@@ -82,6 +79,8 @@ class Fly extends Check {
             }
 
             if($acPlayer->fallDistance > $player->fallDistance && $player->fallDistance > 0.7 && !$player->isOnGround()){
+                $player->sendMessage("ACPlayer: ".$acPlayer->fallDistance);
+                $player->sendMessage("PMMPPlayer: ".$player->fallDistance);
                 $acPlayer->flag("Fly (Jump/Sneak)", $this);
                 continue;
             }

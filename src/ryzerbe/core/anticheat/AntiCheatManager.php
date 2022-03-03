@@ -43,7 +43,9 @@ class AntiCheatManager {
     protected static array $registeredChecks = [];
 
     const BLACKLIST_GROUPS = [
-        "EloCWBW"
+        "CW",
+        "Lobby",
+        "EMA"
     ];
 
     public function __construct(){
