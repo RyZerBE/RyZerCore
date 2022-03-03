@@ -591,9 +591,14 @@ class PMMPPlayer extends PMPlayer {
         $this->setGenericFlag(self::DATA_FLAG_ACTION, $value);
     }
 
-
-    public function knockBack(Entity $attacker, float $damage, float $x, float $z, float $base = 0.4) : void{
+    public function knockBack(Entity $attacker, float $damage, float $x, float $z, float $base = 0.45) : void{
     	if($attacker instanceof PMMPPlayer) {
+
+    		$this->setImmobile(true);
+			$attacker->setImmobile(true);
+			$this->setImmobile(false);
+			$attacker->setImmobile(false);
+
 			$edit = 1;
 			if ($base > 0.5)
 				$edit = 0.5;
