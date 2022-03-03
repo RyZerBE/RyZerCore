@@ -12,6 +12,7 @@ use pocketmine\item\ItemIds;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\ActorEventPacket;
 use pocketmine\network\mcpe\protocol\AnimatePacket;
+use ryzerbe\core\entity\Arrow;
 use ryzerbe\core\player\PMMPPlayer;
 use ryzerbe\core\util\Settings;
 use function microtime;

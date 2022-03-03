@@ -593,35 +593,64 @@ class PMMPPlayer extends PMPlayer {
 
 
     public function knockBack(Entity $attacker, float $damage, float $x, float $z, float $base = 0.4) : void{
-        $edit = 1;
+    	if($attacker instanceof PMMPPlayer) {
+			$edit = 1;
+			if ($base > 0.5)
+				$edit = 0.5;
+			$f = sqrt($x * $x + $z * $z);
+			if ($f <= 0) {
+				return;
+			}
+			if (mt_rand() / mt_getrandmax() > $this->getAttributeMap()->getAttribute(Attribute::KNOCKBACK_RESISTANCE)->getValue()) {
+				$f = 1 / $f;
+				if ($f > 0.6)
+					$f = 0.6;
+				if ($f < 0.25)
+					$f = 0.25;
+				$motion = $this->motion->multiply(0.5);
+				$directionPlane = $attacker->getDirectionPlane()->multiply(2);
+				$motion->x += $directionPlane->getX() * $f * $base * $edit;
+				$motion->y += $base;
+				if ($motion->y > 0.45)
+					$motion->y = 0.45;
+				$motion->z += $directionPlane->getY() * $f * $base * $edit;
+				if ($motion->y > $base) {
+					$motion->y = $base;
+				}
+				$this->setMotion($motion);
+			}
+		}else {
+			$f = sqrt($x * $x + $z * $z);
+			if($f <= 0) {
+				return;
+			}
+			if(mt_rand() / mt_getrandmax() > $this->getAttributeMap()->getAttribute(Attribute::KNOCKBACK_RESISTANCE)->getValue()){
+				$f = 1 / $f;
 
-        if ($base > 0.5) $edit = 0.5;
+				$motion = clone $this->motion;
 
-        $f = sqrt($x * $x + $z * $z);
-        if($f <= 0) {
-            return;
-        }
+				$motion->x /= 2;
+				$motion->y /= 2;
+				$motion->z /= 2;
 
-        if(mt_rand() / mt_getrandmax() > $this->getAttributeMap()->getAttribute(Attribute::KNOCKBACK_RESISTANCE)->getValue()){
-            $f = 1 / $f;
-            if ($f > 0.6) $f = 0.6;
-            if ($f < 0.25) $f = 0.25;
+				if($base >= 100) {
+					$motion->x += $x * $f * 1.3;
+					$motion->y += 0.70;
+					$motion->z += $z * $f * 1.3;
+				}else {
+					$motion->x += $x * $f * $base;
+					$motion->y += 0.50;
+					$motion->z += $z * $f * $base;
 
-            $motion = $this->motion->multiply(0.5);
-            $directionPlane = $attacker->getDirectionPlane()->multiply(2);
-            $motion->x += $directionPlane->getX() * $f * $base * $edit;
-            $motion->y += $base;
-            if($motion->y > 0.45)
-                $motion->y = 0.45;
-            $motion->z += $directionPlane->getY() * $f * $base * $edit;
+					if($motion->y > $base){
+						$motion->y = $base;
+					}
+				}
 
-            if($motion->y > $base){
-                $motion->y = $base;
-            }
-
-            $this->setMotion($motion);
-        }
-    }
+				$this->setMotion($motion);
+			}
+		}
+	}
 
     public function chat(string $message) : bool{
         if(!$this->spawned or !$this->isAlive()){

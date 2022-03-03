@@ -148,8 +148,9 @@ class Arrow extends Projectile {
         }
 
         $success = $this->parentOnHitEntity($entityHit, $hitResult);
-        if(!$success) return;
-        $horizontalSpeed = sqrt($this->motion->x ** 2 + $this->motion->z ** 2);
+		if(!$success) return;
+
+		$horizontalSpeed = sqrt($this->motion->x ** 2 + $this->motion->z ** 2);
         if($this->punchKnockback <= 0) $this->punchKnockback = self::BOW_I;
         if($this->punchKnockback == 1) $this->punchKnockback = self::BOW_II;
         if($this->punchKnockback == 2) $this->punchKnockback = self::BOW_III;
@@ -173,7 +174,7 @@ class Arrow extends Projectile {
             if(!$ev->isCancelled()){
                 $entityHit->attack($ev);
                 $this->flagForDespawn();
-                return false;
+                return true;
             }
             if($this->isOnFire()){
                 $ev = new EntityCombustByEntityEvent($this, $entityHit, 5);
