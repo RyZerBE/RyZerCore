@@ -50,7 +50,9 @@ class EntityDamageByEntityListener implements Listener {
             $event->setCancelled();
             return;
         }
+
         $event->setModifier(0, EntityDamageEvent::MODIFIER_TOTEM);
+        $this->delay[$player->getName()] = microtime(true) + 0.45;
     }
 
     public function BattleMCKnockback(PMMPPlayer $victim, PMMPPlayer $attacker): void{
