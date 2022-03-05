@@ -174,7 +174,7 @@ class Arrow extends Projectile {
             if(!$ev->isCancelled()){
                 $entityHit->attack($ev);
                 $this->flagForDespawn();
-                return true;
+                return $ev->isCancelled();
             }
             if($this->isOnFire()){
                 $ev = new EntityCombustByEntityEvent($this, $entityHit, 5);
