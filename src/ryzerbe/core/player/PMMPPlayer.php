@@ -58,6 +58,7 @@ use pocketmine\network\mcpe\protocol\types\NetworkInventoryAction;
 use pocketmine\network\mcpe\protocol\UpdateBlockPacket;
 use pocketmine\Player;
 use pocketmine\Player as PMPlayer;
+use pocketmine\Server;
 use pocketmine\tile\Spawnable;
 use pocketmine\timings\Timings;
 use pocketmine\utils\TextFormat;
@@ -600,17 +601,12 @@ class PMMPPlayer extends PMPlayer {
         if($attacker instanceof PMMPPlayer) {
             if (mt_rand() / mt_getrandmax() > $this->getAttributeMap()->getAttribute(Attribute::KNOCKBACK_RESISTANCE)->getValue()) {
 				$f = 1 / $f;
-                $edit = $f;
-				if ($edit > 0.6)
-                    $edit = 0.6;
-				if ($edit < 0.25)
-                    $edit = 0.25;
 				$motion = $this->motion->multiply(0.5);
                 $directionPlane = new Vector2($x, $z);
                 $knockedPos = $directionPlane->add($this->x, $this->z);
                 $directionOfAttackerPlanePos = $attacker->getDirectionPlane()->add($attacker->x, $attacker->z);
                 if ($knockedPos->distance($directionOfAttackerPlanePos) > $knockedPos->distance($attacker->x, $attacker->z))
-                    $directionPlane = $attacker->getDirectionPlane()->multiply(2);
+                    $directionPlane = $attacker->getDirectionPlane()->multiply(1.2);
                 else
                     $directionPlane = $directionPlane->multiply($f);
 				$motion->y += $base;
@@ -619,11 +615,10 @@ class PMMPPlayer extends PMPlayer {
 				if ($motion->y > $base)
 					$motion->y = $base;
                 if (!$this->isOnGround()) {
-                    $edit += $edit * 0.5;
                     $motion->y -= $motion->y * 0.1;
                 }
-                $motion->x += $directionPlane->getX() * $base * $edit * 1.2;
-                $motion->z += $directionPlane->getY() * $base * $edit * 1.2;
+                $motion->x += $directionPlane->getX() * $base;
+                $motion->z += $directionPlane->getY() * $base;
 				$this->setMotion($motion);
 			}
 		}else {
