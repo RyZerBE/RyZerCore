@@ -28,31 +28,32 @@ class EntityDamageByEntityListener implements Listener {
      * @priority HIGH
      */
     public function entityDamage(EntityDamageByEntityEvent $event): void{
-        $player = $event->getDamager();
+        $attacker = $event->getDamager();
         $entity = $event->getEntity();
-        if(!$player instanceof PMMPPlayer) return;
-
-        $ryzerPlayer = $player->getRyZerPlayer();
+        
+        
+        if(!$attacker instanceof PMMPPlayer) return;
+        $ryzerPlayer = $attacker->getRyZerPlayer();
         if($ryzerPlayer === null) return;
 
         if($ryzerPlayer->getPlayerSettings()->isMoreParticleActivated()){
             $pk = new AnimatePacket();
             $pk->action = AnimatePacket::ACTION_CRITICAL_HIT;
             $pk->entityRuntimeId = $entity->getId();
-            $player->getServer()->broadcastPacket([$player], $pk);
+            $attacker->getServer()->broadcastPacket([$attacker], $pk);
         }
 
-        if(!isset($this->delay[$player->getName()]))
-            $this->delay[$player->getName()] = microtime(true);
+        if(!isset($this->delay[$attacker->getName()]))
+            $this->delay[$attacker->getName()] = microtime(true);
 
-        if($player->isCreative()) return;
-        if($this->delay[$player->getName()] > microtime(true)){
+        if($attacker->isCreative()) return;
+        if($this->delay[$attacker->getName()] > microtime(true)){
             $event->setCancelled();
             return;
         }
 
         $event->setModifier(0, EntityDamageEvent::MODIFIER_TOTEM);
-        $this->delay[$player->getName()] = microtime(true) + 0.45;
+        $this->delay[$attacker->getName()] = microtime(true) + 0.45;
     }
 
     public function BattleMCKnockback(PMMPPlayer $victim, PMMPPlayer $attacker): void{
