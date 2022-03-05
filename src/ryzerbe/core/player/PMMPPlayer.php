@@ -39,6 +39,7 @@ use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
 use pocketmine\item\MaybeConsumable;
 use pocketmine\level\Position;
+use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Vector2;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\ListTag;
@@ -305,8 +306,6 @@ class PMMPPlayer extends PMPlayer {
                         $oldItem = clone $item;
                         $clickPos = $packet->trData->getClickPos();
                         $useItemOn = $this->useItemOn($blockVector, $item, $face, $clickPos, $this, true);
-                        if($useItemOn === null) return true;//HACK: FLAG BLOCKS FIX
-
                         if ($useItemOn) {
                             if (!$item->equalsExact($oldItem) and $oldItem->equalsExact($this->inventory->getItemInHand())) {
                                 $this->inventory->setItemInHand($item);
@@ -328,7 +327,7 @@ class PMMPPlayer extends PMPlayer {
                     /** @var Block[] $blocks */
                     //$blocks = array_merge($target->getAllSides(), $block->getAllSides()); //getAllSides() on each of these will include $target and $block because they are next to each other
 
-                    $this->level->sendBlocks([$this], [$block], UpdateBlockPacket::FLAG_ALL_PRIORITY);
+                    $this->level->sendBlocks($this->getLevel()->getPlayers(), [$block], UpdateBlockPacket::FLAG_ALL_PRIORITY);
 
                     return true;
                 case UseItemTransactionData::ACTION_BREAK_BLOCK:
@@ -846,10 +845,6 @@ class PMMPPlayer extends PMPlayer {
             foreach($hand->getCollisionBoxes() as $collisionBox){
                 foreach($this->getLevel()->getCollidingEntities($collisionBox) as $collidingEntity){
                     if($collidingEntity instanceof ItemEntity) continue;
-
-                    if($collidingEntity instanceof PMMPPlayer){
-                        return null;
-                    }
                     return false;
                 }
             }
