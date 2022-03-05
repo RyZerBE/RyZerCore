@@ -39,6 +39,7 @@ use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
 use pocketmine\item\MaybeConsumable;
 use pocketmine\level\Position;
+use pocketmine\math\Vector2;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\ListTag;
 use pocketmine\nbt\tag\StringTag;
@@ -57,6 +58,7 @@ use pocketmine\network\mcpe\protocol\types\NetworkInventoryAction;
 use pocketmine\network\mcpe\protocol\UpdateBlockPacket;
 use pocketmine\Player;
 use pocketmine\Player as PMPlayer;
+use pocketmine\Server;
 use pocketmine\tile\Spawnable;
 use pocketmine\timings\Timings;
 use pocketmine\utils\TextFormat;
@@ -592,44 +594,35 @@ class PMMPPlayer extends PMPlayer {
     }
 
     public function knockBack(Entity $attacker, float $damage, float $x, float $z, float $base = 0.45) : void{
-    	if($attacker instanceof PMMPPlayer) {
-
-    		$this->setImmobile(true);
-			$attacker->setImmobile(true);
-			$this->setImmobile(false);
-			$attacker->setImmobile(false);
-
-			$edit = 1;
-			if ($base > 0.5)
-				$edit = 0.5;
-			$f = sqrt($x * $x + $z * $z);
-			if ($f <= 0) {
-				return;
-			}
-			if (mt_rand() / mt_getrandmax() > $this->getAttributeMap()->getAttribute(Attribute::KNOCKBACK_RESISTANCE)->getValue()) {
+        $f = sqrt($x * $x + $z * $z);
+        if ($f <= 0) {
+            return;
+        }
+        if($attacker instanceof PMMPPlayer) {
+            if (mt_rand() / mt_getrandmax() > $this->getAttributeMap()->getAttribute(Attribute::KNOCKBACK_RESISTANCE)->getValue()) {
 				$f = 1 / $f;
-				if ($f > 0.6)
-					$f = 0.6;
-				if ($f < 0.25)
-					$f = 0.25;
 				$motion = $this->motion->multiply(0.5);
-				$directionPlane = $attacker->getDirectionPlane()->multiply(2);
-				$motion->x += $directionPlane->getX() * $f * $base * $edit;
+                $directionPlane = new Vector2($x, $z);
+                $knockedPos = $directionPlane->add($this->x, $this->z);
+                $directionOfAttackerPlanePos = $attacker->getDirectionPlane()->add($attacker->x, $attacker->z);
+                if ($knockedPos->distance($directionOfAttackerPlanePos) > $knockedPos->distance($attacker->x, $attacker->z))
+                    $directionPlane = $attacker->getDirectionPlane()->multiply(1.2);
+                else
+                    $directionPlane = $directionPlane->multiply($f);
 				$motion->y += $base;
 				if ($motion->y > 0.45)
 					$motion->y = 0.45;
-				$motion->z += $directionPlane->getY() * $f * $base * $edit;
-				if ($motion->y > $base) {
+				if ($motion->y > $base)
 					$motion->y = $base;
-				}
+                if (!$this->isOnGround()) {
+                    $motion->y -= $motion->y * 0.1;
+                }
+                $motion->x += $directionPlane->getX() * $base;
+                $motion->z += $directionPlane->getY() * $base;
 				$this->setMotion($motion);
 			}
 		}else {
-			$f = sqrt($x * $x + $z * $z);
-			if($f <= 0) {
-				return;
-			}
-			if(mt_rand() / mt_getrandmax() > $this->getAttributeMap()->getAttribute(Attribute::KNOCKBACK_RESISTANCE)->getValue()){
+            if(mt_rand() / mt_getrandmax() > $this->getAttributeMap()->getAttribute(Attribute::KNOCKBACK_RESISTANCE)->getValue()){
 				$f = 1 / $f;
 
 				$motion = clone $this->motion;
