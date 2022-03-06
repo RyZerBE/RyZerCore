@@ -34,7 +34,7 @@ class ClanInformationForm {
         $information .=  " " ."\n";
         $information .= TextFormat::GOLD . TextFormat::BOLD . "Elo: " . TextFormat::RESET . TextFormat::YELLOW . $extraData["elo"] . "\n";
         $information .= TextFormat::GOLD . TextFormat::BOLD . "Won ClanWars: " . TextFormat::RESET . TextFormat::GREEN . $extraData["wonMatches"] . "\n";
-        $information .= TextFormat::GOLD . TextFormat::BOLD . "Lose ClanWars " . TextFormat::RESET . TextFormat::RED . $extraData["loseMatches"] . "\n";
+        $information .= TextFormat::GOLD . TextFormat::BOLD . "Lose ClanWars " . TextFormat::RESET . TextFormat::RED . $extraData["loseMatches"]. "\n";
         $information .=  " " ."\n";
         $information .= TextFormat::GOLD . TextFormat::BOLD . "State: " . TextFormat::RESET . $state . "\n";
         $information .= TextFormat::GOLD . TextFormat::BOLD . "Members: \n" . TextFormat::RESET;
