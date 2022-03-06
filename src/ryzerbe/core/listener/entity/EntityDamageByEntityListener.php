@@ -49,6 +49,6 @@ class EntityDamageByEntityListener implements Listener {
         }
 
         $event->setModifier(0, EntityDamageEvent::MODIFIER_TOTEM);
-        $this->delay[$attacker->getName()] = microtime(true) + 0.2;
+        $this->delay[$attacker->getName()] = microtime(true) + 0.1;
     }
 }
