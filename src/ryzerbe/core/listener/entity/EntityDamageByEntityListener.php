@@ -30,8 +30,6 @@ class EntityDamageByEntityListener implements Listener {
     public function entityDamage(EntityDamageByEntityEvent $event): void{
         $attacker = $event->getDamager();
         $entity = $event->getEntity();
-        
-        
         if(!$attacker instanceof PMMPPlayer) return;
         $ryzerPlayer = $attacker->getRyZerPlayer();
         if($ryzerPlayer === null) return;
@@ -43,15 +41,11 @@ class EntityDamageByEntityListener implements Listener {
             $attacker->getServer()->broadcastPacket([$attacker], $pk);
         }
 
-        if(!isset($this->delay[$attacker->getName()]))
-            $this->delay[$attacker->getName()] = microtime(true);
-
         if($attacker->isCreative()) return;
-        if($this->delay[$attacker->getName()] > microtime(true)){
+        if(isset($this->delay[$attacker->getName()]) and $this->delay[$attacker->getName()] > microtime(true)){
             $event->setCancelled();
             return;
         }
-
         $event->setModifier(0, EntityDamageEvent::MODIFIER_TOTEM);
         $this->delay[$attacker->getName()] = microtime(true) + 0.45;
     }
