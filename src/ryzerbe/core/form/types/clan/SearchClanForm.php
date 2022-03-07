@@ -52,6 +52,15 @@ class SearchClanForm {
                 }
             }
             $loadedData["players"] = $playerList;
+			$res = $mysqli->query("SELECT * FROM CWHistory WHERE clan_1='$clanName' OR clan_2='$clanName'");
+			$loadedData["loseMatches"] = 0;
+			$loadedData["wonMatches"] = 0;
+			if($res->num_rows > 0) {
+				while($data = $res->fetch_assoc()){
+					if($loadedData["clanName"] == $data["clan_1"]) $loadedData["wonMatches"]++;
+					else if($loadedData["clanName"] == $data["clan_2"]) $loadedData["loseMatches"]++;
+				}
+			}
             return $loadedData;
         }, function(Server $server, ?array $result) use ($playerName){
             if(($player = $server->getPlayer($playerName)) !== null){

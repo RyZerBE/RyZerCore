@@ -12,7 +12,7 @@ use ryzerbe\core\player\PMMPPlayer;
 
 class YouTubeCommand extends Command {
     public function __construct(){
-        parent::__construct("youtube", "View our youtuber conditions", "", ["yt"]);
+        parent::__construct("youtube", "View our youtuber conditions", "", ["yt", "media"]);
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args){
