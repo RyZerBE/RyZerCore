@@ -20,9 +20,7 @@ use pocketmine\network\mcpe\protocol\ActorEventPacket;
 use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
 use pocketmine\network\mcpe\protocol\TakeItemActorPacket;
 use pocketmine\Player;
-use pocketmine\Server;
 use ryzerbe\core\player\PMMPPlayer;
-use function round;
 
 class Arrow extends Projectile {
 
@@ -120,7 +118,7 @@ class Arrow extends Projectile {
 
         if($this->blockHit !== null){
             $this->collideTicks += $tickDiff;
-            if($this->collideTicks > 1200){
+            if($this->collideTicks > 1200 || $this->y <= -40){
                 $this->flagForDespawn();
                 $hasUpdate = true;
             }
