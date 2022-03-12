@@ -60,6 +60,6 @@ class PvPRod extends Durable {
     }
 
     public function getThrowForce(): float{
-        return 1.9;
+        return 1.6;
     }
 }

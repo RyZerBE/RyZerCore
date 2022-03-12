@@ -39,6 +39,7 @@ use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
 use pocketmine\item\MaybeConsumable;
 use pocketmine\level\Position;
+use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Vector2;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\ListTag;
@@ -58,6 +59,7 @@ use pocketmine\network\mcpe\protocol\types\NetworkInventoryAction;
 use pocketmine\network\mcpe\protocol\UpdateBlockPacket;
 use pocketmine\Player;
 use pocketmine\Player as PMPlayer;
+use pocketmine\Server;
 use pocketmine\tile\Spawnable;
 use pocketmine\timings\Timings;
 use pocketmine\utils\TextFormat;
@@ -304,8 +306,6 @@ class PMMPPlayer extends PMPlayer {
                         $oldItem = clone $item;
                         $clickPos = $packet->trData->getClickPos();
                         $useItemOn = $this->useItemOn($blockVector, $item, $face, $clickPos, $this, true);
-                        if($useItemOn === null) return true;//HACK: FLAG BLOCKS FIX
-
                         if ($useItemOn) {
                             if (!$item->equalsExact($oldItem) and $oldItem->equalsExact($this->inventory->getItemInHand())) {
                                 $this->inventory->setItemInHand($item);
@@ -327,7 +327,7 @@ class PMMPPlayer extends PMPlayer {
                     /** @var Block[] $blocks */
                     //$blocks = array_merge($target->getAllSides(), $block->getAllSides()); //getAllSides() on each of these will include $target and $block because they are next to each other
 
-                    $this->level->sendBlocks([$this], [$block], UpdateBlockPacket::FLAG_ALL_PRIORITY);
+                    $this->level->sendBlocks($this->getLevel()->getPlayers(), [$block], UpdateBlockPacket::FLAG_ALL_PRIORITY);
 
                     return true;
                 case UseItemTransactionData::ACTION_BREAK_BLOCK:
@@ -600,17 +600,12 @@ class PMMPPlayer extends PMPlayer {
         if($attacker instanceof PMMPPlayer) {
             if (mt_rand() / mt_getrandmax() > $this->getAttributeMap()->getAttribute(Attribute::KNOCKBACK_RESISTANCE)->getValue()) {
 				$f = 1 / $f;
-                $edit = $f;
-				if ($edit > 0.6)
-                    $edit = 0.6;
-				if ($edit < 0.25)
-                    $edit = 0.25;
 				$motion = $this->motion->multiply(0.5);
                 $directionPlane = new Vector2($x, $z);
                 $knockedPos = $directionPlane->add($this->x, $this->z);
                 $directionOfAttackerPlanePos = $attacker->getDirectionPlane()->add($attacker->x, $attacker->z);
                 if ($knockedPos->distance($directionOfAttackerPlanePos) > $knockedPos->distance($attacker->x, $attacker->z))
-                    $directionPlane = $attacker->getDirectionPlane()->multiply(2);
+                    $directionPlane = $attacker->getDirectionPlane()->multiply(1.2);
                 else
                     $directionPlane = $directionPlane->multiply($f);
 				$motion->y += $base;
@@ -619,11 +614,10 @@ class PMMPPlayer extends PMPlayer {
 				if ($motion->y > $base)
 					$motion->y = $base;
                 if (!$this->isOnGround()) {
-                    $edit += $edit * 0.5;
                     $motion->y -= $motion->y * 0.1;
                 }
-                $motion->x += $directionPlane->getX() * $base * $edit * 1.2;
-                $motion->z += $directionPlane->getY() * $base * $edit * 1.2;
+                $motion->x += $directionPlane->getX() * $base;
+                $motion->z += $directionPlane->getY() * $base;
 				$this->setMotion($motion);
 			}
 		}else {
@@ -851,10 +845,6 @@ class PMMPPlayer extends PMPlayer {
             foreach($hand->getCollisionBoxes() as $collisionBox){
                 foreach($this->getLevel()->getCollidingEntities($collisionBox) as $collidingEntity){
                     if($collidingEntity instanceof ItemEntity) continue;
-
-                    if($collidingEntity instanceof PMMPPlayer){
-                        return null;
-                    }
                     return false;
                 }
             }

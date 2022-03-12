@@ -95,6 +95,6 @@ class FishingHook extends Projectile {
             }
         }
         $this->isCollided = true;
-        #$this->flagForDespawn();
+        $this->flagForDespawn();
     }
 }
