@@ -5,7 +5,6 @@ namespace ryzerbe\core\player;
 use BauboLP\Cloud\CloudBridge;
 use BauboLP\Cloud\Packets\PlayerDisconnectPacket;
 use BauboLP\Cloud\Packets\PlayerMoveServerPacket;
-use Exception;
 use pocketmine\block\Block;
 use pocketmine\block\BlockIds;
 use pocketmine\entity\Attribute;
@@ -28,10 +27,8 @@ use pocketmine\inventory\transaction\action\InventoryAction;
 use pocketmine\inventory\transaction\CraftingTransaction;
 use pocketmine\inventory\transaction\InventoryTransaction;
 use pocketmine\inventory\transaction\TransactionValidationException;
-use pocketmine\item\Bow;
 use pocketmine\item\Consumable;
 use pocketmine\item\Durable;
-use pocketmine\item\enchantment\Enchantment;
 use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\enchantment\MeleeWeaponEnchantment;
 use pocketmine\item\Item;
@@ -39,7 +36,6 @@ use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
 use pocketmine\item\MaybeConsumable;
 use pocketmine\level\Position;
-use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Vector2;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\ListTag;
@@ -59,21 +55,16 @@ use pocketmine\network\mcpe\protocol\types\NetworkInventoryAction;
 use pocketmine\network\mcpe\protocol\UpdateBlockPacket;
 use pocketmine\Player;
 use pocketmine\Player as PMPlayer;
-use pocketmine\Server;
 use pocketmine\tile\Spawnable;
 use pocketmine\timings\Timings;
 use pocketmine\utils\TextFormat;
 use ryzerbe\core\item\rod\entity\FishingHook;
 use ryzerbe\core\provider\ChatEmojiProvider;
 use ryzerbe\core\provider\ChatModProvider;
-use ryzerbe\core\util\Settings;
-use UnexpectedValueException;
 use function cos;
 use function count;
 use function deg2rad;
-use function floor;
 use function microtime;
-use function random_bytes;
 use function sin;
 use function str_replace;
 use function strtolower;
@@ -903,5 +894,11 @@ class PMMPPlayer extends PMPlayer {
 
     public function useLadder(): bool{
         return false;
+    }
+
+    public function boost(float $multiplier, ?float $yMotion = null): void {
+        $motion = $this->getDirectionVector();
+        $motion->y = $yMotion ?? $motion->y * $multiplier;
+        $this->setMotion($motion);
     }
 }
