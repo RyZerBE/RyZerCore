@@ -898,6 +898,8 @@ class PMMPPlayer extends PMPlayer {
 
     public function boost(float $multiplier, ?float $yMotion = null): void {
         $motion = $this->getDirectionVector();
+        $motion->x *= $multiplier;
+        $motion->z *= $multiplier;
         $motion->y = $yMotion ?? $motion->y * $multiplier;
         $this->setMotion($motion);
     }
