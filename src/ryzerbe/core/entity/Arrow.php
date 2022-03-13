@@ -116,9 +116,13 @@ class Arrow extends Projectile {
 
         $hasUpdate = parent::entityBaseTick($tickDiff);
 
+        if($this->y <= -30) {
+        	$this->flagForDespawn();
+        	return true;
+		}
         if($this->blockHit !== null){
             $this->collideTicks += $tickDiff;
-            if($this->collideTicks > 1200 || $this->y <= -40){
+            if($this->collideTicks > 1200){
                 $this->flagForDespawn();
                 $hasUpdate = true;
             }
