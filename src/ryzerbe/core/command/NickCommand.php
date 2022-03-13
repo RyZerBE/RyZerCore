@@ -15,6 +15,8 @@ use ryzerbe\core\player\PMMPPlayer;
 use ryzerbe\core\provider\NickProvider;
 use ryzerbe\core\RyZerBE;
 use ryzerbe\core\util\async\AsyncExecutor;
+use ryzerbe\statssystem\provider\StatsAsyncProvider;
+
 
 class NickCommand extends Command {
 
@@ -32,7 +34,25 @@ class NickCommand extends Command {
      */
     public function execute(CommandSender $sender, string $commandLabel, array $args){
         if(!$sender instanceof PMMPPlayer) return;
-        if(!$this->testPermission($sender)) return;
+        if(!$this->testPermissionSilent($sender)) {
+			$rbePlayer = $sender->getRyZerPlayer();
+			if($rbePlayer->isNicked()) {
+				$rbePlayer->unnick();
+				return;
+			}
+        	$senderName = $sender->getName();
+			StatsAsyncProvider::getTopEntriesOfColumn("Bedwars", "m_wins", function (array $topEntries) use ($senderName, $sender): void{
+				if(!$sender->isConnected()) return;
+				if(!isset($topEntries[$senderName])) {
+					$sender->sendMessage(RyZerBE::PREFIX.LanguageProvider::getMessageContainer("no-nick-perms", $senderName));
+					return;
+				}
+
+				$rbePlayer = $sender->getRyZerPlayer();
+				$rbePlayer->toggleNick();
+			}, 3);
+        	return;
+		}
 
         if($sender->hasPermission("ryzer.nick.list") && isset($args[0])) {
             switch($args[0]) {
@@ -59,11 +79,7 @@ class NickCommand extends Command {
             return;
         }
 
-        if(stripos(CloudProvider::getServer(), "CWBW") !== false) {
-            $sender->sendMessage(RyZerBE::PREFIX.LanguageProvider::getMessageContainer('cannot-nick-in-cwbw', $sender));
-            return;
-        }
         $rbePlayer = $sender->getRyZerPlayer();
-        if($rbePlayer->getNick() === null) NickProvider::nick($sender);else NickProvider::unnick($sender);
+        $rbePlayer->toggleNick();
     }
 }

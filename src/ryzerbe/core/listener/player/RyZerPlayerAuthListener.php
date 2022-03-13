@@ -12,6 +12,7 @@ class RyZerPlayerAuthListener implements Listener {
         if(!$player->hasPermission("ryzer.login") && StaffProvider::loggedIn($player)) {
             StaffProvider::logout($player);
         }
+
         $player->getServer()->dispatchCommand($player, "invbug");
     }
 }

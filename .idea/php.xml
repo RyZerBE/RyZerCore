@@ -4,6 +4,7 @@
     <include_path>
       <path value="$PROJECT_DIR$/../CloudBridgePM" />
       <path value="$PROJECT_DIR$/../BetterLobbySystem2" />
+      <path value="$PROJECT_DIR$/../StatsSystem" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.0">

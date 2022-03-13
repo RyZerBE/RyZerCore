@@ -62,3 +62,5 @@ permissions:
     default: op
   ryzer.chat.emoji:
     default: op
+  ryzer.debug:
+    default: op

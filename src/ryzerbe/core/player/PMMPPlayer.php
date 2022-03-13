@@ -35,6 +35,7 @@ use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
 use pocketmine\item\MaybeConsumable;
+use pocketmine\item\Tool;
 use pocketmine\level\Position;
 use pocketmine\math\Vector2;
 use pocketmine\math\Vector3;
@@ -583,32 +584,48 @@ class PMMPPlayer extends PMPlayer {
         $this->setGenericFlag(self::DATA_FLAG_ACTION, $value);
     }
 
-    public function knockBack(Entity $attacker, float $damage, float $x, float $z, float $base = 0.45) : void{
+    public function knockBack(Entity $attacker, float $damage, float $x, float $z, float $base = 0.5) : void{
         $f = sqrt($x * $x + $z * $z);
         if ($f <= 0) {
             return;
         }
         if($attacker instanceof PMMPPlayer) {
-            if (mt_rand() / mt_getrandmax() > $this->getAttributeMap()->getAttribute(Attribute::KNOCKBACK_RESISTANCE)->getValue()) {
-				$f = 1 / $f;
+			if (mt_rand() / mt_getrandmax() > $this->getAttributeMap()->getAttribute(Attribute::KNOCKBACK_RESISTANCE)->getValue()) {
+				$item = $attacker->getInventory()->getItemInHand();
+				$toolCombo = $item instanceof Tool;
 				$motion = $this->motion->multiply(0.5);
-                $directionPlane = new Vector2($x, $z);
-                $knockedPos = $directionPlane->add($this->x, $this->z);
-                $directionOfAttackerPlanePos = $attacker->getDirectionPlane()->add($attacker->x, $attacker->z);
-                if ($knockedPos->distance($directionOfAttackerPlanePos) > $knockedPos->distance($attacker->x, $attacker->z))
-                    $directionPlane = $attacker->getDirectionPlane()->multiply(1.2);
-                else
-                    $directionPlane = $directionPlane->multiply($f);
 				$motion->y += $base;
-				if ($motion->y > 0.45)
-					$motion->y = 0.45;
-				if ($motion->y > $base)
-					$motion->y = $base;
-                if (!$this->isOnGround()) {
-                    $motion->y -= $motion->y * 0.1;
-                }
-                $motion->x += $directionPlane->getX() * $base;
-                $motion->z += $directionPlane->getY() * $base;
+
+				if ($toolCombo) {
+					if ($motion->y > 0.45)
+						$motion->y = 0.45;
+					if ($motion->y > $base)
+						$motion->y = $base;
+					$motion = new Vector3($attacker->getDirectionVector()->x / 2.3, $motion->y, $attacker->getDirectionVector()->z / 2.3);
+				}else {
+					$f = 1 / $f;
+
+					$directionPlane = new Vector2($x, $z);
+					$knockedPos = $directionPlane->add($this->x, $this->z);
+					$directionOfAttackerPlanePos = $attacker->getDirectionPlane()->add($attacker->x, $attacker->z);
+					if ($knockedPos->distance($directionOfAttackerPlanePos) > $knockedPos->distance($attacker->x, $attacker->z)) {
+						$directionPlane = $attacker->getDirectionPlane()->multiply(1.2);
+						if($attacker->hasPermission("ryzer.debug")) $attacker->sendMessage("multiply with 1.2");
+					} else {
+						$directionPlane = $directionPlane->multiply($f);
+						if($attacker->hasPermission("ryzer.debug")) $attacker->sendMessage("multiply with f = ".$f);
+					}
+					if ($motion->y > 0.45)
+						$motion->y = 0.45;
+					if ($motion->y > $base)
+						$motion->y = $base;
+					if (!$this->isOnGround()) {
+						$motion->y -= $motion->y * 0.1;
+					}
+					$motion->x += $directionPlane->getX() * $base;
+					$motion->z += $directionPlane->getY() * $base;
+				}
+
 				$this->setMotion($motion);
 			}
 		}else {
