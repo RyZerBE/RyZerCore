@@ -26,7 +26,7 @@ class Scoreboard {
         $this->initScoreboard();
     }
 
-    private function initScoreboard(): void{
+    public function initScoreboard(): void{
         $pkt = new SetDisplayObjectivePacket();
         $pkt->objectiveName = $this->player->getPlayer()->getName();
         $pkt->displayName = ($this->imagePath !== null) ? $this->imagePath : $this->title;
