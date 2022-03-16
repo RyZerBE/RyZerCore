@@ -39,9 +39,9 @@ class PlayerInteractListener implements Listener {
             $customItem->onInteract($player, $item);
             return;
         }
-        $rightClick = $action === PlayerInteractEvent::RIGHT_CLICK_AIR;
+        $rightClick = $action === PlayerInteractEvent::RIGHT_CLICK_AIR || $action === PlayerInteractEvent::RIGHT_CLICK_BLOCK;
 
-        if($item->getId() == ItemIds::ENDER_PEARL && $rightClick) {
+        if($item->getId() == ItemIds::ENDER_PEARL && $action === PlayerInteractEvent::RIGHT_CLICK_AIR) {
             $event->setCancelled();
             $player->getInventory()->removeItem(Item::get(ItemIds::ENDER_PEARL));
             $this->createEnderpearl($player);
@@ -49,7 +49,7 @@ class PlayerInteractListener implements Listener {
 
         if($item instanceof Armor && $rightClick) {
             $itemInArmorSlot = $player->getArmorInventory()->getItem($item->getArmorSlot());
-            if($player->getArmorInventory()->getItem($item->getArmorSlot())->getId() != BlockIds::AIR){
+            if(!$player->getArmorInventory()->getItem($item->getArmorSlot())->isNull()){
                 $event->setCancelled();
                 $player->getArmorInventory()->setItem($item->getArmorSlot(), $item);
                 $player->getInventory()->setItemInHand($itemInArmorSlot);
