@@ -24,6 +24,8 @@ class ErrorLogger extends ThreadedLoggerAttachment{
 		"zuWxld"
 	]; //TODO: Do a team setting for that! - will come with team setting update (per ui)
 
+	public static int|float $lastCall = -1;
+
 	/**
 	 * Function log
 	 * @param mixed $level
@@ -44,9 +46,12 @@ class ErrorLogger extends ThreadedLoggerAttachment{
 				$embed->setAuthor(new EmbedAuthor(CloudProvider::getServer()));
 				$discordMessage->addEmbed($embed);
 				$discordMessage->send();
+				if(self::$lastCall > microtime(true)) return;
+
 				foreach (self::INFO as $infoPlayerName) {
 					BungeeAPI::sendMessage(TextFormat::GRAY . "[" . TextFormat::RED . "Error-Logger" . TextFormat::GRAY . "] " . TextFormat::YELLOW . CloudProvider::getServer() . TextFormat::GRAY . " hat einen Fehler gespeichert.", $infoPlayerName);
 				}
+				self::$lastCall = microtime(true) + 5;
 				break;
 		}
 	}

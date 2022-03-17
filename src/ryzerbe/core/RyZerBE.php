@@ -2,6 +2,7 @@
 
 namespace ryzerbe\core;
 
+use BauboLP\Cloud\Bungee\BungeeAPI;
 use BauboLP\Cloud\Provider\CloudProvider;
 use pocketmine\block\BlockFactory;
 use pocketmine\entity\Entity;
@@ -174,6 +175,7 @@ class RyZerBE extends PluginBase {
 	 * @priority LOWEST
 	 */
 	public function onDisable(): void{
+		ErrorLogger::$lastCall = microtime(true) + 10;
 		foreach (glob("/root/RyzerCloud/servers/".CloudProvider::getServer()."/crashdumps/*") as $crashDumpPath) {
 			$content = file_get_contents($crashDumpPath);
 			if(empty($content)) continue;
@@ -181,6 +183,9 @@ class RyZerBE extends PluginBase {
 			$message = new DiscordMessage(WebhookLinks::ERROR_LOGGER);
 			$message->setMessage("```php\n" . str_split($content, 1950)[0] . "...```");
 			$message->send();
+			foreach (ErrorLogger::INFO as $infoPlayerName) {
+				BungeeAPI::sendMessage(TextFormat::GRAY . "[" . TextFormat::RED . "Error-Logger" . TextFormat::GRAY . "] " . TextFormat::YELLOW . CloudProvider::getServer() . TextFormat::GRAY . " ist crashed", $infoPlayerName);
+			}
 		}
     }
 }
