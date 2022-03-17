@@ -8,4 +8,5 @@ final class WebhookLinks {
     public const COMMAND_LOG = "https://discord.com/api/webhooks/928326187867070474/66yYxcLdyhs4SNqbR9HLM7w1K4seohIeA8j-Pz_3i777mK323bttyfvoUdSHDH-fDjyz";
     public const AUTOCLICKER_LOG = "https://discord.com/api/webhooks/731221472374292552/phDx3Wb39cQ3Pgtb4-Ci6RLqbvItBMYpUuAT4SmgTati5tpmIDG-jqvKNXF6MmfHVykN";
     public const REPORT_LOG = "https://discord.com/api/webhooks/731218498914877593/RnElLQ9V5X6vy5i9F8J6M-nlTHbAFGtBdzEnOFLS6kvbgEe2KozCwjlcCiJHguaosoeb";
+    public const ERROR_LOGGER = "https://discord.com/api/webhooks/954056880194465803/2Z-SSkIMq1BOIeqZPe8Yvt2sEuZHrYlvc91tU39xtxFn1XinSELARhZ8a1Ur_LO8RhGP";
 }

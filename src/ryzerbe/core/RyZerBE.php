@@ -6,6 +6,7 @@ use pocketmine\block\BlockFactory;
 use pocketmine\entity\Entity;
 use pocketmine\item\ItemFactory;
 use pocketmine\plugin\PluginBase;
+use pocketmine\utils\MainLogger;
 use pocketmine\utils\TextFormat;
 use ReflectionException;
 use ryzerbe\core\block\TNTBlock;
@@ -55,6 +56,7 @@ use ryzerbe\core\provider\VIPJoinProvider;
 use ryzerbe\core\rank\RankManager;
 use ryzerbe\core\task\RyZerUpdateTask;
 use ryzerbe\core\util\loader\ListenerDirectoryLoader;
+use ryzerbe\core\util\logger\ErrorLogger;
 use ryzerbe\core\util\Settings;
 
 class RyZerBE extends PluginBase {
@@ -82,6 +84,7 @@ class RyZerBE extends PluginBase {
         popen('rm -r '.$this->getServer()->getDataPath()."server.log", 'r');
         date_default_timezone_set("Europe/Berlin");
         $this->boot();
+        MainLogger::getLogger()->addAttachment(new ErrorLogger());
     }
 
     public function boot(): void{
