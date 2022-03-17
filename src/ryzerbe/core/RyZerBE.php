@@ -2,6 +2,7 @@
 
 namespace ryzerbe\core;
 
+use BauboLP\Cloud\Provider\CloudProvider;
 use pocketmine\block\BlockFactory;
 use pocketmine\entity\Entity;
 use pocketmine\item\ItemFactory;
@@ -55,6 +56,8 @@ use ryzerbe\core\provider\StaffProvider;
 use ryzerbe\core\provider\VIPJoinProvider;
 use ryzerbe\core\rank\RankManager;
 use ryzerbe\core\task\RyZerUpdateTask;
+use ryzerbe\core\util\discord\DiscordMessage;
+use ryzerbe\core\util\discord\WebhookLinks;
 use ryzerbe\core\util\loader\ListenerDirectoryLoader;
 use ryzerbe\core\util\logger\ErrorLogger;
 use ryzerbe\core\util\Settings;
@@ -163,5 +166,21 @@ class RyZerBE extends PluginBase {
 
     public static function getPlugin(): RyZerBE{
         return self::$plugin;
+    }
+
+	/**
+	 * Function onDisable
+	 * @return void
+	 * @priority LOWEST
+	 */
+	public function onDisable(): void{
+		foreach (glob("/root/RyzerCloud/servers/".CloudProvider::getServer()."/crashdumps/*") as $crashDumpPath) {
+			$content = file_get_contents($crashDumpPath);
+			if(empty($content)) continue;
+
+			$message = new DiscordMessage(WebhookLinks::ERROR_LOGGER);
+			$message->setMessage("```php\n" . str_split($content, 1950)[0] . "...```");
+			$message->send();
+		}
     }
 }
