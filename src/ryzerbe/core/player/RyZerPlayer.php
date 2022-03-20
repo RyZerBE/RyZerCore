@@ -682,4 +682,24 @@ class RyZerPlayer {
     public function getChatModData(): PlayerChatMod{
         return $this->chatMod;
     }
+
+	public function nick(): void{
+    	if($this->isNicked()) return;
+		NickProvider::nick($this->getPlayer());
+    }
+
+	public function isNicked(){
+		return $this->getNick() !== null;
+    }
+
+	public function toggleNick(): void{
+		if($this->isNicked()) $this->unnick();
+		else $this->nick();
+    }
+
+	public function unnick(): void{
+		if(!$this->isNicked()) return;
+
+		NickProvider::unnick($this->getPlayer());
+    }
 }
