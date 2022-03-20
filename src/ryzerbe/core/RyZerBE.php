@@ -35,6 +35,7 @@ use ryzerbe\core\command\PlayerSettingsCommand;
 use ryzerbe\core\command\PunishHistoryCommand;
 use ryzerbe\core\command\RankCommand;
 use ryzerbe\core\command\ReportCommand;
+use ryzerbe\core\command\SetBanCommand;
 use ryzerbe\core\command\SkinDatabaseCommand;
 use ryzerbe\core\command\TeamchatCommand;
 use ryzerbe\core\command\TestCommand;
@@ -145,7 +146,8 @@ class RyZerBE extends PluginBase {
             new CoinBoostCommand(),
             new InvBugFixCommand(),
             new BanUiCommand(),
-            new EmojiListCommand()
+            new EmojiListCommand(),
+			new SetBanCommand()
         ]);
     }
 

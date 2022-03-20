@@ -64,3 +64,5 @@ permissions:
     default: op
   ryzer.debug:
     default: op
+  ryzer.untilban:
+    default: op
