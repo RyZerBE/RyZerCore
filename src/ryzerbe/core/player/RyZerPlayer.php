@@ -73,6 +73,8 @@ class RyZerPlayer {
     /** @var Skin  */
     private Skin $skin;
 
+    public bool $muteByPass = false;
+
     public function __construct(Player $player, LoginPlayerData $playerData){
         $this->player = $player;
         $this->loginPlayerData = $playerData;
@@ -415,10 +417,8 @@ class RyZerPlayer {
             }
 
             if(isset($playerData["mute"])) {
-                $ryzerPlayer->punish(PunishmentProvider::getPunishmentReasonById(9), "System");
-                $ryzerPlayer->setMute(new DateTime("2040-10-11 23:59"));
-                $ryzerPlayer->setMuteId("Rejoin to see it!");
-                $ryzerPlayer->setMuteReason("Mute Bypass");
+            	$ryzerPlayer->muteByPass = true;
+            	$player->sendMessage("\n\n\n\n".RyZerBE::PREFIX.LanguageProvider::getMessageContainer("mute-bypass-info", $player->getName()));
             }
 
             if(isset($playerData["mute_until"])) {

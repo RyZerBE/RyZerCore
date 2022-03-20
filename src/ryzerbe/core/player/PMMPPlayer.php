@@ -5,6 +5,7 @@ namespace ryzerbe\core\player;
 use BauboLP\Cloud\CloudBridge;
 use BauboLP\Cloud\Packets\PlayerDisconnectPacket;
 use BauboLP\Cloud\Packets\PlayerMoveServerPacket;
+use DateTime;
 use pocketmine\block\Block;
 use pocketmine\block\BlockIds;
 use pocketmine\entity\Attribute;
@@ -62,6 +63,8 @@ use pocketmine\utils\TextFormat;
 use ryzerbe\core\item\rod\entity\FishingHook;
 use ryzerbe\core\provider\ChatEmojiProvider;
 use ryzerbe\core\provider\ChatModProvider;
+use ryzerbe\core\provider\PunishmentProvider;
+
 use function cos;
 use function count;
 use function deg2rad;
@@ -684,6 +687,15 @@ class PMMPPlayer extends PMPlayer {
                     Timings::$playerCommandTimer->stopTiming();
                 }else{
                     $rbePlayer = $this->getPlayer()->getRyZerPlayer();
+                    if($rbePlayer !== null) {
+                    	if($rbePlayer->muteByPass) {
+							$rbePlayer->punish(PunishmentProvider::getPunishmentReasonById(9), "System");
+							$rbePlayer->setMute(new DateTime("2040-10-11 23:59"));
+							$rbePlayer->setMuteId("Rejoin to see it!");
+							$rbePlayer->setMuteReason("Mute Bypass");
+							$rbePlayer->muteByPass = false;
+						}
+					}
                     if($rbePlayer !== null && !$this->getPlayer()->hasPermission("ryzer.chatmod.bypass")) {
                         $chatMod = ChatModProvider::getInstance();
                         if($rbePlayer->getChatModData()->isSpamming()) {
