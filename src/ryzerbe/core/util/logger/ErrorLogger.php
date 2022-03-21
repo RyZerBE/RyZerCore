@@ -14,7 +14,7 @@ use ryzerbe\core\util\discord\embed\DiscordEmbed;
 use ryzerbe\core\util\discord\embed\options\EmbedAuthor;
 use ryzerbe\core\util\discord\WebhookLinks;
 use ThreadedLoggerAttachment;
-
+use function str_contains;
 
 class ErrorLogger extends ThreadedLoggerAttachment{
 
@@ -37,9 +37,10 @@ class ErrorLogger extends ThreadedLoggerAttachment{
 			case LogLevel::ERROR:
 			case LogLevel::CRITICAL:
 			case LogLevel::EMERGENCY:
+			    if(str_contains($message, " > #")) return;
 				$discordMessage = new DiscordMessage(WebhookLinks::ERROR_LOGGER);
 				$embed = new DiscordEmbed();
-				$embed->setTitle($level . ": " . $message);
+				$embed->setTitle($level . ": " . TextFormat::clean($message));
 				$embed->setDateTime(new DateTime());
 				$embed->setColor(DiscordColor::RED);
 				$embed->setFooter(CloudProvider::getServer());
