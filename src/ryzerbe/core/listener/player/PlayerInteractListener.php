@@ -2,8 +2,6 @@
 
 namespace ryzerbe\core\listener\player;
 
-use pocketmine\block\Block;
-use pocketmine\block\BlockIds;
 use pocketmine\entity\Entity;
 use pocketmine\entity\projectile\Projectile;
 use pocketmine\event\entity\ProjectileLaunchEvent;
@@ -48,14 +46,12 @@ class PlayerInteractListener implements Listener {
         }
 
         if($item instanceof Armor && $rightClick) {
+            $event->setCancelled();
+
             $itemInArmorSlot = $player->getArmorInventory()->getItem($item->getArmorSlot());
-            if(!$player->getArmorInventory()->getItem($item->getArmorSlot())->isNull()){
-                $event->setCancelled();
-                $player->getArmorInventory()->setItem($item->getArmorSlot(), $item);
-                $player->getInventory()->setItemInHand($itemInArmorSlot);
-                return;
-            }
-            $player->getInventory()->removeItem(Item::get($item->getId()));
+
+            $player->getArmorInventory()->setItem($item->getArmorSlot(), $item);
+            $player->getInventory()->setItemInHand($itemInArmorSlot);
         }
     }
 
