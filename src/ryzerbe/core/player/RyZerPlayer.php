@@ -418,7 +418,6 @@ class RyZerPlayer {
 
             if(isset($playerData["mute"])) {
             	$ryzerPlayer->muteByPass = true;
-            	$player->sendMessage("\n\n\n\n".RyZerBE::PREFIX.LanguageProvider::getMessageContainer("mute-bypass-info", $player->getName()));
             }
 
             if(isset($playerData["mute_until"])) {

@@ -141,7 +141,6 @@ class RyZerBE extends PluginBase {
             new ReportCommand(),
             new NickCommand(),
             new SkinDatabaseCommand(),
-            new TestCommand(),
             new UpdatelogCommand(),
             new CoinBoostCommand(),
             new InvBugFixCommand(),
