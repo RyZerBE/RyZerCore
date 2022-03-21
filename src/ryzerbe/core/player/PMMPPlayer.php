@@ -689,11 +689,8 @@ class PMMPPlayer extends PMPlayer {
                     $rbePlayer = $this->getPlayer()->getRyZerPlayer();
                     if($rbePlayer !== null) {
                     	if($rbePlayer->muteByPass) {
-							$rbePlayer->punish(PunishmentProvider::getPunishmentReasonById(9), "System");
-							$rbePlayer->setMute(new DateTime("2040-10-11 23:59"));
-							$rbePlayer->setMuteId("Rejoin to see it!");
-							$rbePlayer->setMuteReason("Mute Bypass");
-							$rbePlayer->muteByPass = false;
+                    		$rbePlayer->sendTranslate("mute-bypass-info");
+                    		return false;
 						}
 					}
                     if($rbePlayer !== null && !$this->getPlayer()->hasPermission("ryzer.chatmod.bypass")) {

@@ -65,9 +65,9 @@ class AntiCheatManager {
             new Nuker(),
             new EditionFaker(),
             new KillAura(),
-            new AirJump(),
-            new Speed(),
-            new Fly()
+           # new AirJump(),
+           # new Speed(),
+            #new Fly()
         );
     }
 
