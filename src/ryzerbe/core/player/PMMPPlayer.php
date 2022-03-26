@@ -604,7 +604,7 @@ class PMMPPlayer extends PMPlayer {
 						$motion->y = 0.45;
 					if ($motion->y > $base)
 						$motion->y = $base;
-					$motion = new Vector3($attacker->getDirectionVector()->x / 2.3, $motion->y, $attacker->getDirectionVector()->z / 2.3);
+					$motion = new Vector3($attacker->getDirectionVector()->x / 2.1, $motion->y, $attacker->getDirectionVector()->z / 2.1);
 				}else {
 					$f = 1 / $f;
 
