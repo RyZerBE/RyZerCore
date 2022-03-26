@@ -188,6 +188,7 @@ class RyZerPlayer {
         $loginPlayerData = $this->getLoginPlayerData();
         $address = $loginPlayerData->getAddress();
         $mc_id = $loginPlayerData->getMinecraftId();
+        $client_random_id = $loginPlayerData->getClientRandomId();
         $device_id = $loginPlayerData->getDeviceId();
         $device_os = $loginPlayerData->getDeviceOs();
         $device_input = $loginPlayerData->getCurrentInputMode();
@@ -205,7 +206,7 @@ class RyZerPlayer {
             }, null, $player);
         }
 
-        AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($playerName, $mysqlData, $address, $device_os, $device_id, $device_input, $mc_id, $server, $nowFormat, $skinData, $geometryName): array{
+        AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($playerName, $mysqlData, $address, $device_os, $device_id, $device_input, $mc_id, $server, $nowFormat, $skinData, $geometryName, $client_random_id): array{
             $playerData = [];
             $res = $mysqli->query("SELECT * FROM playerlanguage WHERE player='$playerName'");
             if($res->num_rows > 0){
@@ -229,7 +230,7 @@ class RyZerPlayer {
                 }
             }
 
-            $mysqli->query("INSERT INTO `playerdata`(`player`, `ip_address`, `device_id`, `device_os`, `device_input`, `server`, `last_join`, `minecraft_id`) VALUES ('$playerName', '$address', '$device_id', '$device_os', '$device_input', '$server', '$nowFormat', '$mc_id') ON DUPLICATE KEY UPDATE device_id='$device_id',device_os='$device_os',device_input='$device_input',server='$server',last_join='$nowFormat',minecraft_id='$mc_id'");
+            $mysqli->query("INSERT INTO `playerdata`(`player`, `ip_address`, `device_id`, `device_os`, `device_input`, `server`, `last_join`, `minecraft_id`, `client_random_id`) VALUES ('$playerName', '$address', '$device_id', '$device_os', '$device_input', '$server', '$nowFormat', '$mc_id', '$client_random_id') ON DUPLICATE KEY UPDATE device_id='$device_id',device_os='$device_os',device_input='$device_input',server='$server',last_join='$nowFormat',minecraft_id='$mc_id',client_random_id='$client_random_id'");
             PlayerSkinProvider::storeSkin($playerName, $skinData, $geometryName, $mysqli);
             $res = $mysqli->query("SELECT * FROM coins WHERE player='$playerName'");
             if($res->num_rows > 0){
@@ -459,7 +460,7 @@ class RyZerPlayer {
             $ryzerPlayer->setNetworkLevel(new NetworkLevel($ryzerPlayer, $playerData["network_level"], $playerData["network_level_progress"], $playerData["level_progress_today"], strtotime($playerData["last_level_progress"])));
 
             if($playerData['clan'] !== "null" && !empty($playerData['clan'])) {
-                $ryzerPlayer->setClan(new Clan($playerData["clan"], $playerData["clanColor"].$playerData["clanTag"], (int)$playerData["clanElo"], $playerData["owner"]));
+                $ryzerPlayer->setClan(new Clan($playerData["clan"], $playerData["clanColor"].$playerData["clanTag"], (int)$playerData["clanElo"], $playerData["owner"] ?? "???"));
             }
 
 

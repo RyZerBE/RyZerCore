@@ -18,7 +18,7 @@ use ryzerbe\core\util\Settings;
 use function microtime;
 
 class EntityDamageByEntityListener implements Listener {
-    private array $delay = [];
+    public static array $delay = [];
 
     /**
      * @priority HIGH
@@ -38,11 +38,10 @@ class EntityDamageByEntityListener implements Listener {
         }
 
         if($attacker->isCreative()) return;
-        if(isset($this->delay[$attacker->getName()]) and $this->delay[$attacker->getName()] > microtime(true)){
+        if(isset(self::$delay[$attacker->getName()]) and self::$delay[$attacker->getName()] > microtime(true)){
             $event->setCancelled();
             return;
         }
         $event->setModifier(0, EntityDamageEvent::MODIFIER_TOTEM);
-        $this->delay[$attacker->getName()] = microtime(true) + 0.1;
     }
 }
