@@ -57,6 +57,7 @@ class ChatEmojiProvider implements RyZerProvider {
         "cup" => "",
         "king" => "",
         "matrix" => "",
+		"yocker" => "",
         "broxstar" => ""
     ];
 
