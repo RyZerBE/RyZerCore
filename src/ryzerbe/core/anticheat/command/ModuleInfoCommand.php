@@ -14,6 +14,7 @@ class ModuleInfoCommand extends Command {
 
     public function __construct(){
         parent::__construct("modules", "AntiCheat Modules", "", []);
+        $this->setPermission("ryzer.anticheat.modules");
     }
 
     /**
@@ -25,6 +26,7 @@ class ModuleInfoCommand extends Command {
      */
     public function execute(CommandSender $sender, string $commandLabel, array $args){
         if(!$sender instanceof Player) return;
+        if(!$this->testPermission($sender)) return;
 
         $modules = [];
         $modules[] = AntiCheatManager::PREFIX.TextFormat::GREEN."My Modules";
