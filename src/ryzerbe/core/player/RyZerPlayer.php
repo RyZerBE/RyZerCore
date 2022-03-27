@@ -345,7 +345,7 @@ class RyZerPlayer {
             $res = $mysqli->query("SELECT * FROM `playerdata`");
             if($res->num_rows > 0) {
                 while($data = $res->fetch_assoc()) {
-                    if($data["minecraft_id"] === $mc_id || $data["ip_address"] === $address || $data["device_id"] === $device_id) {
+                    if($data["minecraft_id"] === $mc_id || $data["ip_address"] === $address || $data["device_id"] === $device_id || $data["client_random_id"] === $client_random_id) {
                         if(!in_array($data["player"], $accounts)) $accounts[] = $data["player"];
                     }
                 }
