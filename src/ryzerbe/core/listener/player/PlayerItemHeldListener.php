@@ -20,7 +20,7 @@ class PlayerItemHeldListener implements Listener {
         if($item->getId() != ItemIds::BOW) {
 			$player->lastItemSwitch = microtime(true);
 		}
-        if(microtime(true) - $player->lastDamage < 0.25) {
+        if(microtime(true) - $player->lastDamage < 0.25 && $event->getItem()->getId() != ItemIds::BOW) {
         	$player->nextHitCancel = true;
 		}
         if($item instanceof Shield) {
