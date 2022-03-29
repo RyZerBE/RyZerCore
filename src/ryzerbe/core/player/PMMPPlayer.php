@@ -55,6 +55,7 @@ use pocketmine\network\mcpe\protocol\types\inventory\UseItemOnEntityTransactionD
 use pocketmine\network\mcpe\protocol\types\inventory\UseItemTransactionData;
 use pocketmine\network\mcpe\protocol\types\NetworkInventoryAction;
 use pocketmine\network\mcpe\protocol\UpdateBlockPacket;
+use pocketmine\network\SourceInterface;
 use pocketmine\Player;
 use pocketmine\Player as PMPlayer;
 use pocketmine\tile\Spawnable;
@@ -78,8 +79,20 @@ class PMMPPlayer extends PMPlayer {
     private array $delay = [];
     /** @var bool  */
     public bool $container_packet_cancel = true;
+    /** @var float|int  */
+    public float|int $lastItemSwitch;
+    /** @var float|int  */
+    public float|int $lastDamage;
+    /** @var bool  */
+    public bool $nextHitCancel = false;
 
-    public ?FishingHook $pvpFishingHook = null;
+    public function __construct(SourceInterface $interface, string $ip, int $port){
+    	$this->lastItemSwitch = microtime(true);
+    	$this->lastDamage = microtime(true);
+    	parent::__construct($interface, $ip, $port);
+	}
+
+	public ?FishingHook $pvpFishingHook = null;
 
     public function addDelay(string $id, int|float $seconds){
         $this->delay[$id] = microtime(true) + $seconds;
