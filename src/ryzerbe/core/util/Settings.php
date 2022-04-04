@@ -25,6 +25,7 @@ class Settings {
 
     public static array $ips = [
         "5.181.151.61",
+		"45.142.115.211",
         "127.0.0.1"
     ];
 
