@@ -35,6 +35,7 @@ use ryzerbe\core\util\Coinboost;
 use ryzerbe\core\util\punishment\PunishmentReason;
 use ryzerbe\core\util\Settings;
 use ryzerbe\core\util\skin\SkinDatabase;
+use ryzerbe\core\util\TaskUtils;
 use ryzerbe\core\util\time\TimeAPI;
 use function array_key_exists;
 use function array_search;
@@ -199,12 +200,14 @@ class RyZerPlayer {
 
         $correct_size = Skin::ACCEPTED_SKIN_SIZES[2];
         if(strlen($skinData) > $correct_size) {
-            SkinDatabase::getInstance()->loadSkin("steve", function(bool $success) use ($player): void{
-                if(!$player->isConnected() || !$player instanceof PMMPPlayer) return;
-                if(!$success) $player->kickFromProxy("&cSkin aren't allowed! Please switch your skin!");
-                else $player->sendMessage(RyZerBE::PREFIX.TextFormat::RED."Skin aren't allowed!");
-            }, null, $player);
-        }
+			SkinDatabase::getInstance()->loadSkin("steve", function (bool $success) use ($player): void{
+				if (!$player->isConnected() || !$player instanceof PMMPPlayer)
+					return;
+				if (!$success) {
+					$player->kickFromProxy("&cSkin aren't allowed! Please switch your skin!");
+				} else $player->sendMessage(RyZerBE::PREFIX . TextFormat::RED . "Skin aren't allowed!");
+			}, null, $player);
+		}
 
         AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($playerName, $mysqlData, $address, $device_os, $device_id, $device_input, $mc_id, $server, $nowFormat, $skinData, $geometryName, $client_random_id): array{
             $playerData = [];

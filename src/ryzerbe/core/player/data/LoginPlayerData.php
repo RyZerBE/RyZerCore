@@ -2,7 +2,13 @@
 
 namespace ryzerbe\core\player\data;
 
+use BauboLP\Cloud\CloudBridge;
+use BauboLP\Cloud\Packets\PlayerDisconnectPacket;
 use pocketmine\network\mcpe\protocol\LoginPacket;
+use ryzerbe\core\player\PMMPPlayer;
+use ryzerbe\core\util\async\AsyncExecutor;
+use ryzerbe\core\util\TaskUtils;
+
 use function trim;
 
 class LoginPlayerData {
@@ -95,7 +101,13 @@ class LoginPlayerData {
         $this->skin_id = $data["SkinId"] ?? 1;
         $this->ui_profile = $data["UIProfile"] ?? 1;
         $this->address = $data['Waterdog_IP'] ?? "0.0.0.0";
-        $this->minecraft_id = $data["PlayFabId"];
+        if(!isset($data["PlayFabId"])) {
+			$pk = new PlayerDisconnectPacket();
+			$pk->addData("playerName", $this->playerName);
+			$pk->addData("message", "&cYou have to join with a valid minecraft client.\n&cYou can't play on our network without PlayFabId (Minecraft-ID)");
+			CloudBridge::getInstance()->getClient()->getPacketHandler()->writePacket($pk);
+		}
+        $this->minecraft_id = $data["PlayFabId"] ?? "NO-PLAY_FAB_ID-FOUND";
         if(trim($this->getDeviceModel()) == ''){
             switch($this->getDeviceOs()){
                 case self::ANDROID:
