@@ -17,7 +17,7 @@ use function array_rand;
 
 class RyZerUpdateTask extends Task {
     public function onRun(int $currentTick){
-        Server::getInstance()->getNetwork()->unblockAddress("5.181.151.61");
+        Server::getInstance()->getNetwork()->unblockAddress("45.142.115.211");
 
         if(($currentTick % 20) === 0){
             foreach(VanishProvider::$vanishedPlayer as $playerName){
