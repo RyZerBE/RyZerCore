@@ -3,7 +3,9 @@
 namespace ryzerbe\core\provider;
 
 use BauboLP\Cloud\CloudBridge;
+use BauboLP\Cloud\Packets\AddPlayerToCloudNotifyPacket;
 use BauboLP\Cloud\Packets\PlayerMessagePacket;
+use BauboLP\Cloud\Packets\RemovePlayerFromCloudNotifyPacket;
 use mysqli;
 use pocketmine\Player;
 use pocketmine\Server;
@@ -36,6 +38,11 @@ class StaffProvider implements RyZerProvider {
         AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($player): void{
             $mysqli->query("INSERT INTO `staffs`(`player`) VALUES ('$player')");
         });
+
+		$pk = new AddPlayerToCloudNotifyPacket();
+		$pk->addData("playerName", $player);
+		CloudBridge::getInstance()->getClient()->getPacketHandler()->writePacket($pk);
+
         StaffProvider::sendMessageToStaffs(TextFormat::GREEN.$player.TextFormat::GRAY." hat sich §aeingeloggt§7.", true);
     }
 
@@ -56,6 +63,10 @@ class StaffProvider implements RyZerProvider {
         AsyncExecutor::submitMySQLAsyncTask("RyZerCore", function(mysqli $mysqli) use ($player): void{
             $mysqli->query("DELETE FROM `staffs` WHERE player='$player'");
         });
+
+        $pk = new RemovePlayerFromCloudNotifyPacket();
+        $pk->addData("playerName", $player);
+        CloudBridge::getInstance()->getClient()->getPacketHandler()->writePacket($pk);
 
         unset(self::$loggedIn[array_search($player, self::$loggedIn)]);
     }
